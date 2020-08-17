@@ -1,4 +1,5 @@
 'use strict';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('records', {
@@ -9,16 +10,17 @@ module.exports = {
         type: Sequelize.BIGINT.UNSIGNED
       },
       lead_id: {
-        type: Sequelize.BIGINT.UNSIGNED
+        type: Sequelize.BIGINT.UNSIGNED,
+        references: {         // User belongsTo Company 1:1
+          model: 'Leads',
+          key: 'id'
+        }
       },
       datetime: {
         type: Sequelize.DATE
       },
       call_sid: {
         type: Sequelize.STRING
-      },
-      duration: {
-        type: Sequelize.BIGINT
       },
       sid: {
         type: Sequelize.STRING

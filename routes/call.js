@@ -3,6 +3,6 @@ const { token, voice } = require('../app/controller/call');
 
 router.get('/token', token);
 
-router.get('/voice', voice);
+router.post('/voice', voice);
 
 module.exports = router;

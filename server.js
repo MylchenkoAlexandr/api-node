@@ -5,7 +5,12 @@ const express = require('express');
 const db = require('./app/database/models/index');
 const app = express();
 const bodyParser = require('body-parser');
+const cors = require('cors');
+
 require('dotenv').config();
+
+//  Cors 
+app.use(cors());
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));

@@ -1,8 +1,6 @@
 const router = require('express').Router();
-const { getRecords, getRecordsListFromTwilio } = require('../app/controller/record');
+const { fetchRecordsFromTwilioAndSaveToDB } = require('../app/controller/record');
 
-router.post('/', getRecords);
-
-// router.post('/create', createRecord);
+router.post('/fetch-records', fetchRecordsFromTwilioAndSaveToDB);
 
 module.exports = router;

@@ -1,14 +1,15 @@
+const models = require('../database/models/index');
+
 /**
  * @param {*} req 
  * @param {*} res 
  */
-const createRecord = async function (record) {
+async function createRecord(record) {
     try {
         await models.Records.create({
-            lead_id: record.lead_id,
-            datetime: record.datetime,
-            call_sid: record.call_sid,
-            duration: record.duration,
+            lead_id: record.leadId,
+            datetime: record.datatime,
+            call_sid: record.callSid,
             sid: record.sid
         });
     } catch (e) {

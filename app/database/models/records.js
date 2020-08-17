@@ -15,10 +15,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Records.init({
-    lead_id: DataTypes.BIGINT.UNSIGNED, 
-    datetime: DataTypes.DATE,  
-    call_sid: DataTypes.STRING,  
-    duration: DataTypes.BIGINT,  
+    lead_id: DataTypes.BIGINT.UNSIGNED,    
+    datetime: DataTypes.DATE,
+    call_sid: DataTypes.STRING,
     sid: DataTypes.STRING,
   }, {
     sequelize,
