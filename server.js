@@ -21,9 +21,11 @@ app.use(bodyParser.json());
 // Routes
 const recordRoutes = require('./routes/record');
 const callRoutes = require('./routes/call');
+const leadRoutes = require('./routes/lead');
 
 app.use('/api/records', recordRoutes);
 app.use('/api/call', callRoutes);
+app.use('/api/lead', leadRoutes);
 
 // Start server
 const server = http.createServer(app);

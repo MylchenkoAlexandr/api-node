@@ -33,7 +33,7 @@ async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
                 if (!recordExist) {
                     createRecord(r);
                 }
-            });
+            })
 
             responce.code = 200;
             responce.message = 'Success';
