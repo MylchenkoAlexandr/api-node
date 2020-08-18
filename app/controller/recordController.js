@@ -22,6 +22,7 @@ async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
                     sid: r.sid
                 }
             });
+
             records.forEach(async r => {
                 const recordExist = await models.Records.findOne({
                     where: {

@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { token, voice } = require('../app/controller/call');
+const { token, voice } = require('../app/controller/callController');
 
 router.get('/token', token);
 
