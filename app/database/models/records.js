@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     call_sid: DataTypes.STRING,
     sid: DataTypes.STRING,
   }, {
+    freezeTableName: true,
     sequelize,
     modelName: 'Records',
     tableName: 'records'
