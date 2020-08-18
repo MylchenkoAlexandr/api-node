@@ -11,7 +11,7 @@ module.exports = {
       },
       lead_id: {
         type: Sequelize.BIGINT.UNSIGNED,
-        references: {         // User belongsTo Company 1:1
+        references: {
           model: 'Leads',
           key: 'id'
         }
