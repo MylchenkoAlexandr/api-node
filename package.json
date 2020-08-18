@@ -4,7 +4,8 @@
   "description": "Blueberry API with Twilio (calls, records), NinjaQuoter, MediaAlpha services",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "prod": "node app.js",
+    "dev": "nodemon app.js"
   },
   "author": "Dmytro <dmytro@fluidweb.io>",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mysql2": "^2.1.0",
+    "nodemailer": "^6.4.11",
     "sequelize": "^6.3.4",
     "sequelize-cli": "^6.2.0",
     "twilio": "^3.48.2"

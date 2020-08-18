@@ -2,6 +2,11 @@ const models = require('../database/models/index');
 const { createRecord } = require('../services/record');
 const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
+async function getRecords(req, res) {
+    const records = await models.Records.findAll();
+    res.send(records);
+}
+
 async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
     const responce = {
         code: 204,
@@ -12,6 +17,7 @@ async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
         const recordings = await client.recordings.list({ from: '+18339282583', to: req.body.customerPhone });
 
         let records = [];
+
         if (recordings) {
             records = recordings.map(r => {
                 return {
@@ -21,7 +27,6 @@ async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
                     sid: r.sid
                 }
             });
-
             records.forEach(async r => {
                 const recordExist = await models.Records.findOne({
                     where: {
@@ -51,5 +56,6 @@ async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
 }
 
 module.exports = {
+    getRecords,
     fetchRecordsFromTwilioAndSaveToDB
 }

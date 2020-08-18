@@ -9,10 +9,22 @@ const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
 let sequelize;
+
+const reconnectOptions = {
+  max_retries: 999,
+  onRetry: function (count) {
+    console.log("connection lost, trying to reconnect (" + count + ")");
+  }
+};
+
 if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+  sequelize = new Sequelize(process.env[config.use_env_variable], config, {
+    reconnect: reconnectOptions || true
+  });
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelize = new Sequelize(config.database, config.username, config.password, config, {
+    reconnect: reconnectOptions || true
+  });
 }
 
 fs

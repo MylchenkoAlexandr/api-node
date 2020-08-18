@@ -1,8 +1,14 @@
 const axios = require('axios');
 
-const companyList = {};
+const companies = [];
 
-function getCompanyListNinjaQuoter() {
+function setCompanies(userCompanies) {
+    this.companies.push(userCompanies);
+    console.log(this.companies);
+}
+
+function fetchCompanyListFromNinjaQuoter(params) {
+    console.log(params)
     return new Promise((resolve, reject) => {
         const token = process.env.NINJA_QUOTER_API_TOKEN;
 
@@ -21,5 +27,6 @@ function getCompanyListNinjaQuoter() {
 }
 
 module.exports = {
-    getCompanyListNinjaQuoter
+    setCompanies,
+    fetchCompanyListFromNinjaQuoter
 }

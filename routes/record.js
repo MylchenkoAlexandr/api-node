@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const { fetchRecordsFromTwilioAndSaveToDB } = require('../app/controller/record');
+const { getRecords } = require('../app/controller/record');
 
-router.post('/fetch-records', fetchRecordsFromTwilioAndSaveToDB);
+router.get('/get', getRecords);
+// router.post('/fetch-records', fetchCompanyListFromNinjaQuoter);
 
 module.exports = router;
