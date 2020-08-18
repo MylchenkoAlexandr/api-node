@@ -6,7 +6,6 @@ const db = require('./app/database/models/index');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
 require('dotenv').config();
 
 //  Cors 

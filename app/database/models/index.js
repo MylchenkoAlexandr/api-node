@@ -4,28 +4,33 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
-let sequelize;
+require('dotenv').config();
 
-const reconnectOptions = {
-  max_retries: 999,
-  onRetry: function (count) {
-    console.log("connection lost, trying to reconnect (" + count + ")");
-  }
-};
 
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config, {
-    reconnect: reconnectOptions || true
-  });
-} else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config, {
-    reconnect: reconnectOptions || true
-  });
+const options = {
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
 }
+
+const sequelize = new Sequelize(options.database, options.user, options.password, {
+  host: options.host,
+  dialect: 'mysql',
+  port: options.port,
+  pool: {
+    max: 1,
+    min: 1,
+    idle: 10000
+  }
+});
+
+setInterval(function () {
+  sequelize.query('SELECT SLEEP(1);');
+}, 2000);
 
 fs
   .readdirSync(__dirname)
