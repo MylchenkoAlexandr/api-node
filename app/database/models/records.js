@@ -15,13 +15,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Records.init({
-    lead_id: DataTypes.BIGINT.UNSIGNED,    
+    lead_id: DataTypes.BIGINT.UNSIGNED,
     datetime: DataTypes.DATE,
     call_sid: DataTypes.STRING,
     sid: DataTypes.STRING,
   }, {
-    freezeTableName: true,
     sequelize,
+    freezeTableName: true,
     modelName: 'Records',
     tableName: 'records'
   });

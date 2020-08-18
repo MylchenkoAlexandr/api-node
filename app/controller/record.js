@@ -2,11 +2,6 @@ const models = require('../database/models/index');
 const { createRecord } = require('../services/record');
 const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-async function getRecords(req, res) {
-    const records = await models.Records.findAll();
-    res.send(records);
-}
-
 async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
     const responce = {
         code: 204,
@@ -56,6 +51,5 @@ async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
 }
 
 module.exports = {
-    getRecords,
     fetchRecordsFromTwilioAndSaveToDB
 }
