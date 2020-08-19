@@ -21,16 +21,16 @@ const sequelize = new Sequelize(options.database, options.user, options.password
   host: options.host,
   dialect: 'mysql',
   port: options.port,
-  pool: {
-    max: 1,
-    min: 1,
-    idle: 10000
-  }
+  // pool: {
+  //   max: 1,
+  //   min: 1,
+  //   idle: 10000
+  // }
 });
 
-setInterval(function () {
-  sequelize.query('SELECT SLEEP(1);');
-}, 2000);
+// setInterval(function () {
+//   sequelize.query('SELECT SLEEP(1);');
+// }, 2000);
 
 fs
   .readdirSync(__dirname)
