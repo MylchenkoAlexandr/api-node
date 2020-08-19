@@ -1,4 +1,5 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
+const LeadService = require('../services/LeadService')
 
 async function getCompaniesListByLeadData(req, res) {
     const quotes = new NinjaQuoterService({
@@ -15,10 +16,13 @@ async function getCompaniesListByLeadData(req, res) {
         gender: "m"
     });
 
-    const companies = await quotes.getCompaniesInfo();
-    const price = await quotes.getPrice();
 
-    res.json({price, companies});
+    // Create func to save saveLeadService();
+
+    // const companies = await quotes.getCompaniesInfo();
+    // const price = await quotes.getPrice();
+
+    // res.json({ companies });
 }
 
 

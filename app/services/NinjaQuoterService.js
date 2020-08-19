@@ -32,10 +32,7 @@ class NinjaQuoter {
                 this.companies[comp.company_code] = comp.premium_monthly
         });
 
-        return [
-            this.companies,
-            { type: 'ninjaquoter' }
-        ];
+        return this.companies;
     }
 
     async getCompaniesInfo() {
@@ -45,39 +42,8 @@ class NinjaQuoter {
             return comp.company_code in this.companies;
         });
 
-        const comp = _.uniqBy(companiesFullData, 'company_code');
-
-        return { companies: comp, type: 'ninjaquoter' };
+        return _.uniqBy(companiesFullData, 'company_code');
     }
-
-
-    // async getFullCompaniesData() {
-    //     try {
-    //         const ninjaQuoterCompanies = await this.fetchCompanyListFromNinjaQuoter();
-
-    //         console.log("NinjaQuoter -> getQuotes -> ninjaQuoterCompanies", ninjaQuoterCompanies)
-
-    //         return new Promise((resolve, reject) => {
-    //             if (ninjaQuoterCompanies) {
-    //                 resolve(this.filterCompaniesData(ninjaQuoterCompanies));
-    //             } else reject();
-    //         })
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
-
-    // filterCompaniesPrice(ninjaQuoterCompanies) {
-    //     ninjaQuoterCompanies.forEach(comp => {
-    //         if (comp.company_code in this.companies)
-    //             this.companies[comp.company_code] = comp.premium_monthly
-    //     });
-
-    //     return [
-    //         this.companies,
-    //         { type: 'ninjaquoter' }
-    //     ];
-    // }
 
     /**
      * Fetch companies list from Ninja Quoter API 
