@@ -1,4 +1,4 @@
-const models = require('../database/models/index');
+const models = require('../../database/models/index');
 
 /**
  * @param {*} req 

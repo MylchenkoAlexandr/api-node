@@ -2,7 +2,7 @@
 
 const http = require('http');
 const express = require('express');
-const db = require('./app/database/models/index');
+const db = require('./database/models/index');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');

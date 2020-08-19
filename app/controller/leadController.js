@@ -15,8 +15,15 @@ async function create(req, res) {
         gender: "m"
     });
 
-    const price = await quotes.getQuotes();
-    res.send(price);
+    try {
+        const price = await quotes.getQuotes();
+
+        if (price) return res.status(200).json({ price });
+    } catch (error) {
+        console.log(error);
+    }
+
+    return res.status(400).json({ message: 'Error' });
 }
 
 module.exports = {
