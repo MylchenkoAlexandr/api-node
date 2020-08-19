@@ -1,4 +1,4 @@
-const models = require('../database/models/index');
+const models = require('../database/models');
 const { createRecord } = require('../services/record');
 const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
