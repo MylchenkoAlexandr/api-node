@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
 
-//  Cors 
+// Cors 
 app.use(cors());
 
 // parse application/x-www-form-urlencoded
@@ -18,13 +18,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Routes
-const recordRoutes = require('./routes/record');
-const callRoutes = require('./routes/call');
-const leadRoutes = require('./routes/lead');
-
-app.use('/api/records', recordRoutes);
-app.use('/api/call', callRoutes);
-app.use('/api/lead', leadRoutes);
+app.use('/api/records', require('./routes/record'));
+app.use('/api/call', require('./routes/call'));
+app.use('/api/lead', require('./routes/lead'));
+app.use('/api/mail', require('./routes/mail'));
+app.use('/api/auth', require('./routes/auth'));
 
 // Start server
 const server = http.createServer(app);
