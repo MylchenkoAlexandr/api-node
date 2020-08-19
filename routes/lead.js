@@ -1,6 +1,8 @@
 const router = require('express').Router();
-const { create } = require('../app/controller/leadController');
+const { getCompaniesListByLeadData } = require('../app/controller/leadController');
 
-router.post('/create', create);
+router.post('/get-companies', getCompaniesListByLeadData);
+
+// router.post('/create', create);
 
 module.exports = router;

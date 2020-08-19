@@ -20,7 +20,28 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.BIGINT.UNSIGNED
-        }
+        },
+        // user_id: {
+
+        // },
+        // source_id: {
+
+        // },
+        // status_id: {
+            
+        // },
+        // price_id: {
+
+        // },
+        // type_id: {
+
+        // },
+        // email: {
+
+        // },
+        // property: {
+
+        // }
     }, {
         sequelize,
         modelName: 'Leads',
