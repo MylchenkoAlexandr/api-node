@@ -22,12 +22,14 @@ async function sendMailToClient(req, res) {
         const mail = await transporter.sendMail(mailOptions);
 
         if (mail) {
-            res.send(200, { message: "Mail send" });
-        } else res.send(400, { message: "Error" });
+            return res.status(200).json({ message: "Mail send" });
+        }  
 
     } catch (error) {
         console.error(error);
     }
+    
+    return res.status(400).json({ message: "Error" });
 }
 
 module.exports = {

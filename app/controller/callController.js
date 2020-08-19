@@ -16,9 +16,7 @@ function token(req, res) {
 
     const token = capability.toJwt();
 
-    res.send({
-        token: token
-    });
+    return res.status(200).json({ token });
 }
 
 function voice(req, res) {
@@ -29,8 +27,7 @@ function voice(req, res) {
         callerId: process.env.TWILIO_NUMBER,
     }, req.body.number);
 
-    res.type('text/xml');
-    res.send(voiceResponse.toString());
+    return res.status(200).type('text/xml').json(voiceResponse.toString());
 }
 
 module.exports = {

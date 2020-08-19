@@ -1,12 +1,8 @@
-const models = require('../database/models');
+const models = require('../../database/models');
 const { createRecord } = require('../services/record');
 const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
-    const responce = {
-        code: 204,
-        message: 'Server error!'
-    };
 
     try {
         const recordings = await client.recordings.list({ from: '+18339282583', to: req.body.customerPhone });
@@ -36,19 +32,18 @@ async function fetchRecordsFromTwilioAndSaveToDB(req, res) {
                 }
             })
 
-            responce.code = 200;
-            responce.message = 'Success';
+            return res.status(200).json({
+                message: 'Success'
+            });
         }
 
-        res.status(responce.code).send({
-            message: responce.message
-        });
     } catch (e) {
         console.error(e);
-        res.status(responce.code).send({
-            message: responce.message
-        });
     }
+    
+    return res.status(400).json({
+        message: 'Error'
+    });
 }
 
 module.exports = {

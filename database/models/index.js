@@ -8,29 +8,19 @@ const db = {};
 
 require('dotenv').config();
 
-
 const options = {
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
-}
+};
 
 const sequelize = new Sequelize(options.database, options.user, options.password, {
   host: options.host,
   dialect: 'mysql',
   port: options.port,
-  // pool: {
-  //   max: 1,
-  //   min: 1,
-  //   idle: 10000
-  // }
 });
-
-// setInterval(function () {
-//   sequelize.query('SELECT SLEEP(1);');
-// }, 2000);
 
 fs
   .readdirSync(__dirname)
