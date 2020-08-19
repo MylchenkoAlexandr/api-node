@@ -1,7 +1,7 @@
-const NinjaQuoter = require('../services/ninjaQuoter')
+const NinjaQuoter = require('../services/NinjaQuoterService')
 
 async function create(req, res) {
-    const quotes = new NinjaQuoter({
+    const quotes = new NinjaQuoterService({
         mutual_omaha: 0,
         liberty_bankers: 0,
         royal_neighbors: 0
