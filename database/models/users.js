@@ -31,8 +31,8 @@ module.exports = (sequelize, DataTypes) => {
     states: DataTypes.STRING,
   }, {
     sequelize,
-    freezeTableName: true,
     modelName: 'Users',
+    freezeTableName: true,
     tableName: 'users'
   });
   return Users;

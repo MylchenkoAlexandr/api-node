@@ -2,7 +2,7 @@ const axios = require('axios');
 const { map } = require('lodash');
 const _ = require('lodash');
 
-class NinjaQuoter {
+class NinjaQuoterService {
 
     constructor(companiesList, customerInfo) {
         this.companies = companiesList;
@@ -65,4 +65,4 @@ class NinjaQuoter {
     }
 }
 
-module.exports = NinjaQuoter;
+module.exports = NinjaQuoterService;

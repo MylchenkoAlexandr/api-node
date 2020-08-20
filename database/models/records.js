@@ -21,8 +21,8 @@ module.exports = (sequelize, DataTypes) => {
     sid: DataTypes.STRING,
   }, {
     sequelize,
-    freezeTableName: true,
     modelName: 'Records',
+    freezeTableName: true,
     tableName: 'records'
   });
   return Records;

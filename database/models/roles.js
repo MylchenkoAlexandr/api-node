@@ -14,11 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Roles.init({
-    name: DataTypes.STRING
+    name: DataTypes.STRING,
+    title: DataTypes.STRING
   }, {
     sequelize,
-    freezeTableName: true,
     modelName: 'Roles',
+    freezeTableName: true,
     tableName: 'roles'
   });
   return Roles;

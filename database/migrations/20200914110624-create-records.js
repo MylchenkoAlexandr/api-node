@@ -1,34 +1,29 @@
 'use strict';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('records', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.BIGINT.UNSIGNED
       },
-      role_id: {
+      lead_id: {
         allowNull: false,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
-          model: 'Roles',
-          key: 'id',
-        },
+          model: 'Leads',
+          key: 'id'
+        }
       },
-      fname: {
+      datetime: {
+        type: Sequelize.DATE
+      },
+      call_sid: {
         type: Sequelize.STRING
       },
-      lname: {
-        type: Sequelize.STRING
-      },
-      email: {
-        type: Sequelize.STRING
-      },
-      password: {
-        type: Sequelize.STRING
-      },
-      states: {
+      sid: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -42,6 +37,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('records');
   }
 };
