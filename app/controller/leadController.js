@@ -1,5 +1,5 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
-const { processLead, savePrice } = require('../services/LeadService')
+const { processLead, processPrice } = require('../services/LeadService')
 
 async function getCompaniesListByLeadData(req, res) {
 

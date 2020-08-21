@@ -9,10 +9,44 @@ exports.processLead = async (lead) => {
             }
         });
 
+        const source = await models.Sources.findOne({
+            where: {
+                name: lead.source
+            }
+        }).then((result) => {
+            return result;
+        }).catch((err) => {
+            console.error(err);
+        });
+
+        const type = await models.Types.findOne({
+            where: {
+                name: lead.type
+            }
+        }).then((result) => {
+            return result;
+        }).catch((err) => {
+            console.error(err);
+        });
+
         if (_.isEmpty(property)) {
-            property = await create(lead);
+            property = await models.Leads.create({
+                user_id: null,
+                source_id: source.id,
+                status_id: 1,
+                type_id: type.id,
+                email: lead.email,
+                property: JSON.stringify(lead)
+            });
         } else {
-            await update(property);
+            await property.update({
+                user_id: null,
+                source_id: source.id,
+                status_id: 1,
+                type_id: type.id,
+                email: lead.email,
+                property: JSON.stringify(lead)
+            });
         }
 
         return property;
@@ -48,52 +82,4 @@ exports.processPrice = async (lead_id, price, quoter) => {
     }
 }
 
-/**
- * Leads functions 
- */
-async function create(lead) {
-    try {
-        const source = await models.Sources.findOne({
-            where: {
-                name: lead.source
-            }
-        }).then((result) => {
-            return result;
-        }).catch((err) => {
-            console.error(err);
-        });
-
-        const type = await models.Types.findOne({
-            where: {
-                name: lead.type
-            }
-        }).then((result) => {
-            return result;
-        }).catch((err) => {
-            console.error(err);
-        });
-
-        await models.Leads.create({
-            user_id: null,
-            source_id: source.id,
-            status_id: 1,
-            type_id: type.id,
-            email: lead.email,
-            property: JSON.stringify(lead)
-        });
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-async function update(property) {
-    await property.update({
-        user_id: null,
-        source_id: source.id,
-        status_id: status.id,
-        type_id: type.id,
-        email: lead.email,
-        property: JSON.stringify(lead)
-    });
-}
 

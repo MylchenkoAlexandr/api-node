@@ -1,4 +1,4 @@
-var expect = require('chai').expect;
+const expect = require('chai').expect;
 const db = require('../database/models/index');
 const { processLead } = require('../app/services/LeadService');
 
