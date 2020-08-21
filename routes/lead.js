@@ -1,8 +1,9 @@
 const router = require('express').Router();
-const { getCompaniesListByLeadData } = require('../app/controller/leadController');
+const { getCompaniesListByLeadData, processLeadDashoard, uploadLeadFromMediaAlpha, uploadLeadFromUrl } = require('../app/controller/leadController');
 
 router.post('/get-companies', getCompaniesListByLeadData);
-
-// router.post('/create', create);
+router.post('/dashboard/process-lead', processLeadDashoard);
+router.post('/upload/media-alpha', uploadLeadFromMediaAlpha);
+router.post('/upload/media-alpha/url', uploadLeadFromUrl);
 
 module.exports = router;

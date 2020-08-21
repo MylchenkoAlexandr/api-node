@@ -13,7 +13,7 @@ async function sendMailToClient(req, res) {
         from: "danilkrivosheynodejs@gmail.com",
         to: req.body.email,
         subject: "Blueberry",
-        html: `<h1>Welcome to Blueberry</h1>`
+        html: `<h1></h1>`
     };
 
     try {
@@ -23,12 +23,12 @@ async function sendMailToClient(req, res) {
 
         if (mail) {
             return res.status(200).json({ message: "Mail send" });
-        }  
+        }
 
     } catch (error) {
         console.error(error);
     }
-    
+
     return res.status(400).json({ message: "Error" });
 }
 

@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     source_id: DataTypes.BIGINT.UNSIGNED,
     status_id: DataTypes.BIGINT.UNSIGNED,
     type_id: DataTypes.BIGINT.UNSIGNED,
+    state_id: DataTypes.BIGINT.UNSIGNED,
     email: DataTypes.STRING,
     property: DataTypes.TEXT
   }, {

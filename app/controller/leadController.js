@@ -1,39 +1,241 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
-const { processLead, processPrice } = require('../services/LeadService')
+const { processLead, processPrice } = require('../services/LeadService');
+const zipcodes = require('zipcodes');
 
+const preferedCompanies = {
+    mutual_omaha: 0,
+    royal_neighbors: 0,
+    liberty_bankers: 0
+};
+
+async function getLeads(req, res) {
+    const leads = [];
+
+    try {
+        if (req.body.states.length) {
+            leads = await models.Leads.findAll({
+                attributes: property,
+                where: {
+                    state: req.body.states
+                }
+            });
+        } else {
+            leads = await models.Leads.findAll({
+                attributes: property,
+            });
+        }
+        return res.status(200).json(leads);
+    } catch (error) {
+        console.error(error);
+    }
+
+    return res.status(400).json({
+        status: 'failed',
+        message: "Server error!"
+    });
+}
+
+// TODO Remove same code reusing in all function 
 async function getCompaniesListByLeadData(req, res) {
-
-    const requstedData = { "source": "blueberry", "type": "life", "birth_date": "2001-05-23", "children": 1, "coverage_amount": 6000, "disability": "1", "email": "test@test.com", "fname": "Test", "gender": "m", "height": 57, "howchildren": null, "insurance": 1, "jobstatus": "3", "lname": "Test", "married": 1, "medications": ["4"], "mortgage": 1, "mortgage_remaining": null, "phone": "(503)336-9814", "policy": 1, "rateClass": "lb", "state": "CO", "term": "fex", "tobacco": true, "total_income": null, "weight": "123", "zipcode": "12321" };
-
-    const preferedCompanies = {
-        mutual_omaha: 0,
-        royal_neighbors: 0,
-        liberty_bankers: 0
-    };
+    const rowLead = req.body;
 
     const quoterInfo = {
-        birthdate: requstedData.birth_date,
-        smoker: requstedData.tobacco,
-        rate_class: requstedData.rateClass,
-        term: requstedData.term,
-        coverage: requstedData.coverage_amount,
-        state: requstedData.state,
-        gender: requstedData.gender
+        birthdate: rowLead.birth_date,
+        smoker: rowLead.tobacco,
+        rate_class: rowLead.rateClass,
+        term: rowLead.term,
+        coverage: rowLead.coverage_amount,
+        state: rowLead.state,
+        gender: rowLead.gender
     };
-
-    const lead = await processLead(requstedData);
 
     const quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
 
-    const companies = await quotes.getCompaniesInfo();
+    try {
+        const lead = await processLead(rowLead);
 
-    const price = await quotes.getPrice();
+        const companies = await quotes.getCompaniesInfo();
 
-    await processPrice(lead.id, price, "ninjaQuoter");
+        const price = await quotes.getPrice();
 
-    res.json(companies);
+        await processPrice(lead.id, price, "ninjaQuoter");
+
+        return res.status(200).json(companies);
+    } catch (error) {
+        console.error(error)
+    }
+
+    return res.status(400).json({
+        status: 'failed',
+        message: "Server Error!"
+    });
+}
+
+// TODO remove code dublicate 
+async function processLeadDashoard(req, res) {
+    const rowLead = req.body;
+
+    if (rowLead.coverage_type) {
+        switch (rowLead.coverage_type) {
+            case 'Term 10 Years':
+                rowLead.coverage_type = '10';
+                break;
+            case 'Term 15 Years':
+                rowLead.coverage_type = '15';
+                break;
+            case 'Term 20 Years':
+                rowLead.coverage_type = '20';
+                break;
+            case 'Term 25 Years':
+                rowLead.coverage_type = '25';
+                break;
+            case 'Term 30 Years':
+                rowLead.coverage_type = '30';
+                break;
+            case 'Final Expense':
+                rowLead.coverage_type = 'fex';
+                break;
+        }
+    }
+
+    if (rowLead.state == undefined) {
+        getZipCodeInfo = zipcodes.lookup(rowLead.zipcode || rowLead.zip)
+
+        rowLead.state = getZipCodeInfo.state
+    }
+
+    const quoterInfo = {
+        birthdate: rowLead.birth_date,
+        smoker: rowLead.tobacco == "1" ? true : false,
+        term: rowLead.term || rowLead.coverage_type,
+        rate_class: rowLead.rateClass || rowLead.rateClass == 'fex' ? 'lb' : 's',
+        coverage: rowLead.coverage_amount,
+        state: rowLead.state,
+        gender: rowLead.gender.toLowerCase()
+    };
+
+    const quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
+
+    try {
+        const lead = await processLead(rowLead, null);
+
+        const price = await quotes.getPrice();
+
+        console.log("processLeadInDashoard -> price", price)
+
+        await processPrice(lead.id, price, "ninjaQuoter");
+
+        return res.status(200).json({
+            status: "success",
+            message: "Success update!"
+        });
+    } catch (error) {
+        console.error(error)
+    }
+
+    return res.status(400).json({
+        status: 'failed',
+        message: "Server Error!"
+    });
+}
+
+// TODO write function for fetching data from url
+async function uploadLeadFromUrl(req, res) {
+    const rowLead = req.body;
+
+    console.log("uploadLeadFromUrl -> rowLead", rowLead)
+
+    rowLead.status = "new";
+    rowLead.source = "blueberry";
+
+    try {
+        await processLead(rowLead);
+        return res.status(200).json({
+            status: 'success',
+            message: 'Success Uploaded!'
+        });
+    } catch (error) {
+        console.error(error);
+    }
+
+    return res.status(400).json({
+        status: 'failed',
+        message: 'Server Error!'
+    });
+}
+
+// TODO resolve all issues with type
+async function uploadLeadFromMediaAlpha(req, res) {
+    const rowLead = req.body;
+
+    rowLead.type = "life";
+    rowLead.status = "new";
+    rowLead.source = "mediaalpha"
+
+    switch (rowLead.coverage_type) {
+        case 'Term 10 Years':
+            rowLead.coverage_type = '10';
+            break;
+        case 'Term 15 Years':
+            rowLead.coverage_type = '15';
+            break;
+        case 'Term 20 Years':
+            rowLead.coverage_type = '20';
+            break;
+        case 'Term 25 Years':
+            rowLead.coverage_type = '25';
+            break;
+        case 'Term 30 Years':
+            rowLead.coverage_type = '30';
+            break;
+        case 'Final Expense':
+            rowLead.coverage_type = 'fex';
+            break;
+    }
+
+    if (rowLead.state == undefined) {
+        getZipCodeInfo = zipcodes.lookup(rowLead.zipcode || rowLead.zip)
+
+        rowLead.state = getZipCodeInfo.state
+    }
+
+    const quoterInfo = {
+        birthdate: rowLead.birth_date,
+        smoker: rowLead.tobacco == "1" ? true : false,
+        term: rowLead.coverage_type,
+        rate_class: rowLead.coverage_type == 'fex' ? 'lb' : 's',
+        coverage: rowLead.coverage_amount,
+        state: rowLead.state,
+        gender: rowLead.gender.toLowerCase()
+    };
+
+    const quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
+
+    try {
+        const lead = await processLead(rowLead);
+
+        const price = await quotes.getPrice();
+
+        await processPrice(lead.id, price, "ninjaQuoter");
+
+        return res.status(200).json({
+            status: "success",
+            message: "Success Uploaded!"
+        });
+    } catch (error) {
+        console.error(error)
+    }
+
+    return res.status(400).json({
+        status: 'failed',
+        message: "Server Error!"
+    });
 }
 
 module.exports = {
+    getLeads,
     getCompaniesListByLeadData,
+    processLeadDashoard,
+    uploadLeadFromMediaAlpha,
+    uploadLeadFromUrl
 }   

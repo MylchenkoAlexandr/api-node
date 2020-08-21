@@ -1,5 +1,4 @@
 const axios = require('axios');
-const { map } = require('lodash');
 const _ = require('lodash');
 
 class NinjaQuoterService {
@@ -25,24 +24,39 @@ class NinjaQuoterService {
         });
     }
 
+    /**
+     * Return Price 
+     */
     async getPrice() {
-        const companies = await this.fetchQuotes();
-        companies.forEach(comp => {
-            if (comp.company_code in this.companies && this.companies[comp.company_code] == 0)
-                this.companies[comp.company_code] = comp.premium_monthly
-        });
+        try {
+            const companies = await this.fetchQuotes();
+            companies.forEach(comp => {
+                if (comp.company_code in this.companies && this.companies[comp.company_code] == 0)
+                    this.companies[comp.company_code] = comp.premium_monthly
+            });
 
-        return this.companies;
+            return this.companies;
+        } catch (error) {
+            console.error(error);
+        }
     }
 
+    /**
+     * Return full companies info
+     */
     async getCompaniesInfo() {
-        const companies = await this.fetchQuotes();
+        try {
+            const companies = await this.fetchQuotes();
 
-        let companiesFullData = companies.filter(comp => {
-            return comp.company_code in this.companies;
-        });
+            let companiesFullData = companies.filter(comp => {
+                return comp.company_code in this.companies;
+            });
 
-        return _.uniqBy(companiesFullData, 'company_code');
+            return _.uniqBy(companiesFullData, 'company_code');
+        } catch (error) {
+            console.error(error)
+        }
+        return [];
     }
 
     /**

@@ -39,6 +39,14 @@ module.exports = {
         },
         type: Sequelize.BIGINT.UNSIGNED
       },
+      state_id: {
+        allowNull: false,
+        references: {
+          model: 'States',
+          key: 'id',
+        },
+        type: Sequelize.BIGINT.UNSIGNED
+      },
       email: {
         type: Sequelize.STRING
       },

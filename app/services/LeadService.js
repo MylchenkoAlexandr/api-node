@@ -1,7 +1,7 @@
 const models = require('../../database/models/index')
 const _ = require('lodash');
 
-exports.processLead = async (lead) => {
+exports.processLead = async (lead, agent_id = null) => {
     try {
         let property = await models.Leads.findOne({
             where: {
@@ -12,6 +12,26 @@ exports.processLead = async (lead) => {
         const source = await models.Sources.findOne({
             where: {
                 name: lead.source
+            }
+        }).then((result) => {
+            return result;
+        }).catch((err) => {
+            console.error(err);
+        });
+
+        const state = await models.States.findOne({
+            where: {
+                name: lead.state
+            }
+        }).then((result) => {
+            return result;
+        }).catch((err) => {
+            console.error(err);
+        });
+
+        const status = await models.Status.findOne({
+            where: {
+                name: lead.status
             }
         }).then((result) => {
             return result;
@@ -31,20 +51,22 @@ exports.processLead = async (lead) => {
 
         if (_.isEmpty(property)) {
             property = await models.Leads.create({
-                user_id: null,
+                user_id: agent_id,
                 source_id: source.id,
                 status_id: 1,
                 type_id: type.id,
                 email: lead.email,
+                state: state.id,
                 property: JSON.stringify(lead)
             });
         } else {
             await property.update({
-                user_id: null,
+                user_id: agent_id,
                 source_id: source.id,
-                status_id: 1,
+                status_id: status.id,
                 type_id: type.id,
                 email: lead.email,
+                state: state.id,
                 property: JSON.stringify(lead)
             });
         }
@@ -69,16 +91,34 @@ exports.processPrice = async (lead_id, price, quoter) => {
         }
     });
 
+    const jsonInString = JSON.stringify(price);
+
     if (_.isEmpty(propertyPrice)) {
         await models.Prices.create({
             quoter_id: quoterFromDB.id,
             lead_id: lead_id,
-            price: JSON.stringify(price)
+            price: jsonInString
         });
     } else {
         await propertyPrice.update({
-            price: price
+            price: jsonInString
         })
+    }
+}
+
+exports.asignAgent = async (agent_id, lead_id) => {
+    try {
+        const lead = await models.Leads.findOne({
+            where: {
+                id: lead_id
+            }
+        });
+
+        await lead.update({
+            user_id: agent_id
+        });
+    } catch (error) {
+        console.error(error);
     }
 }
 
