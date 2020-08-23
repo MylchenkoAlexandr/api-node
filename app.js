@@ -27,6 +27,7 @@ app.use('/api/auth', require('./routes/auth'));
 // Start server
 const server = http.createServer(app);
 const port = process.env.PORT || 3000;
+require("./app/lib/sockets")(server);
 
 server.listen(port, async () => {
     console.log(`Server listening on port: ${port}`);
@@ -40,4 +41,3 @@ server.listen(port, async () => {
 });
 
 module.exports = app;
-
