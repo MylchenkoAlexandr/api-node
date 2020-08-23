@@ -1,6 +1,7 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
 const { processLead, processPrice } = require('../services/LeadService');
 const zipcodes = require('zipcodes');
+const models = require('../../database/models/index');
 
 const preferedCompanies = {
     mutual_omaha: 0,
@@ -9,21 +10,19 @@ const preferedCompanies = {
 };
 
 async function getLeads(req, res) {
-    const leads = [];
+    var leads = [];
 
     try {
-        if (req.body.states.length) {
-            leads = await models.Leads.findAll({
-                attributes: property,
-                where: {
-                    state: req.body.states
-                }
-            });
-        } else {
-            leads = await models.Leads.findAll({
-                attributes: property,
-            });
-        }
+        // if (req.body.states.length) {
+        //     leads = await models.Leads.findAll({
+        //         attributes: property,
+        //         where: {
+        //             state: req.body.states
+        //         }
+        //     });
+        // } else {
+        leads = await models.Leads.findAll();
+        // }
         return res.status(200).json(leads);
     } catch (error) {
         console.error(error);

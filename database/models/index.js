@@ -11,7 +11,7 @@ const appState = process.env.NODE_ENV;
 const config = require('../config/config.js')[appState];
 const db = {};
 
-const sequelize = new Sequelize(config.database, config.user, config.password, config);
+const sequelize = new Sequelize(config.database, config.username, config.password, config);
 
 fs
   .readdirSync(__dirname)
