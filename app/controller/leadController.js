@@ -10,7 +10,7 @@ const preferedCompanies = {
 };
 
 async function getLeads(req, res) {
-    var leads = [];
+    let leads = [];
 
     try {
         // if (req.body.states.length) {

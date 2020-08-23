@@ -1,77 +1,63 @@
-const models = require('../../database/models/index')
+const models = require('../../database/models');
 const _ = require('lodash');
 
 exports.processLead = async (lead, agent_id = null) => {
     try {
-        let property = await models.Leads.findOne({
-            where: {
-                email: lead.email
-            }
+        const property = await models.Leads.findOne({
+            where: { email: lead.email }
         });
 
         const source = await models.Sources.findOne({
-            where: {
-                name: lead.source
-            }
-        }).then((result) => {
-            return result;
-        }).catch((err) => {
-            console.error(err);
+            where: { name: lead.source }
         });
 
         const state = await models.States.findOne({
-            where: {
-                name: lead.state
-            }
-        }).then((result) => {
-            return result;
-        }).catch((err) => {
-            console.error(err);
+            where: { name: lead.state }
         });
 
         const status = await models.Status.findOne({
-            where: {
-                name: lead.status
-            }
-        }).then((result) => {
-            return result;
-        }).catch((err) => {
-            console.error(err);
+            where: { name: lead.status }
         });
 
         const type = await models.Types.findOne({
-            where: {
-                name: lead.type
-            }
-        }).then((result) => {
-            return result;
-        }).catch((err) => {
-            console.error(err);
+            where: { name: lead.type }
         });
 
-        if (_.isEmpty(property)) {
-            property = await models.Leads.create({
-                user_id: agent_id,
-                source_id: source.id,
-                status_id: 1,
-                type_id: type.id,
-                email: lead.email,
-                state: state.id,
-                property: JSON.stringify(lead)
+        if (_.isEmpty(property) && source && state && status && type) {
+            return new Promise((resolve, reject) => {
+                models.Leads.create({
+                    user_id: agent_id,
+                    source_id: source.id,
+                    status_id: 1,
+                    type_id: type.id,
+                    email: lead.email,
+                    state_id: state.id,
+                    property: JSON.stringify(lead)
+                }).then(res => {
+                    return resolve(res.dataValues);
+                }).catch(err => {
+                    return reject(err);
+                });
             });
+
         } else {
-            await property.update({
-                user_id: agent_id,
-                source_id: source.id,
-                status_id: status.id,
-                type_id: type.id,
-                email: lead.email,
-                state: state.id,
-                property: JSON.stringify(lead)
+            return new Promise((resolve, reject) => {
+                property.update({
+                    user_id: agent_id,
+                    source_id: source.id,
+                    status_id: status.id,
+                    type_id: type.id,
+                    email: lead.email,
+                    state: state.id,
+                    property: JSON.stringify(lead)
+                }).then(res => {
+                    return resolve(res.dataValues.id);
+                }).catch(err => {
+                    return reject(err);
+                });
             });
         }
 
-        return property;
     } catch (error) {
         console.error(error)
     }
@@ -79,9 +65,7 @@ exports.processLead = async (lead, agent_id = null) => {
 
 exports.processPrice = async (lead_id, price, quoter) => {
     const quoterFromDB = await models.Quoters.findOne({
-        where: {
-            name: quoter
-        }
+        where: { name: quoter }
     });
 
     const propertyPrice = await models.Prices.findOne({
