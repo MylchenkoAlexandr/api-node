@@ -64,7 +64,39 @@ async function registration(req, res) {
   return res.status(400).json({ message: "Sign Up error" });
 };
 
+async function verify(req, res) {
+  try {
+    const decoded = jwt.decode(req.body.token, process.env.SECRET_KEY);
+
+    const candidate = await models.Users.findOne({
+      where: { email: decoded.data }
+    });
+
+    if (candidate) {
+      const user = candidate.dataValues;
+
+      return res.status(200).json({
+        user: {
+          email: user.email,
+          fname: user.fname,
+          lname: user.lname,
+          states: user.states,
+          role_id: user.role_id
+        }
+      })
+    }
+
+    return res.status(401).json({ message: "Token not found" });
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return res.status(401).json({ message: "Verify error" });
+}
+
 module.exports = {
   login,
-  registration
+  registration,
+  verify
 }
