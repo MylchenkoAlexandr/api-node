@@ -14,8 +14,9 @@ module.exports = server => {
     io.on('connection', socket => {
         console.log("Socket connection!");
         socket.on("new-lead", async data => {
+        console.log("data", data)
             try {
-                const lead = await createLead(data[0], "ninjaQuoter");
+                const lead = await createLead(data, "ninjaQuoter");
                 
                 // socket.emit("UPDATE_LEAD", lead);
             } catch (error) {
