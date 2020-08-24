@@ -18,92 +18,9 @@ async function test(req, res) {
 }
 
 async function getLeads(req, res) {
-    const states = req.body.states;
-    const type = req.body.type;
-
     try {
-        const typeId = await models.Types.findOne({
-            attributes: ['id'],
-            where: { name: type }
-        });
-
-        const statesId = await models.States.findAll({
-            attributes: ['id'],
-            where: { name: [states.fs, states.ls] }
-        });
-
-        if (statesId && typeId) {
-            const leads = await models.Leads.findAll({
-                attributes: ['property', 'email'],
-                where: {
-                    type_id: typeId.id,
-                    state_id: [statesId[0].id, statesId[1].id]
-                },
-                include: [
-                    models.Users,
-                    models.States,
-                    models.Status,
-                    models.Prices,
-                ],
-            });
-
-            if (states_id) {
-                const leads = await models.Leads.findAll({
-                    attributes: ['property', 'email'],
-                    where: {
-                        type_id: type_id.id,
-                        state_id: [states_id[0].id, states_id[1].id]
-                    },
-                    include: [
-                        {
-                            model: models.Users,
-                            attributes: ['fname', 'lname', 'email']
-                        },
-                        {
-                            model: models.States,
-                            attributes: ['name']
-                        },
-                        {
-                            model: models.Status,
-                            attributes: ['name']
-                        },
-                        {
-                            model: models.Prices,
-                            attributes: ['price']
-                        },
-                    ],
-                });
-
-                return res.status(200).send(leads);
-            }
-        }
-
-        leads = await models.Leads.findAll({
-            where: {
-                type_id: type_id.id,
-            },
-            include: [
-                {
-                    model: models.Users,
-                    attributes: ['fname', 'lname', 'email']
-                },
-                {
-                    model: models.States,
-                    attributes: ['name']
-                },
-                {
-                    model: models.Status,
-                    attributes: ['name']
-                },
-                {
-                    model: models.Prices,
-                    attributes: ['price']
-                },
-            ],
-        });
-
-        return res.status(200).send(leads);
-
+        const leads = await LeadRepository.getAll(req.body.type, req.body.states);
+        return res.status(200).json(leads);
     } catch (error) {
         console.error(error);
     }
