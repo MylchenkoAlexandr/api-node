@@ -10,20 +10,55 @@ const preferedCompanies = {
 };
 
 async function getLeads(req, res) {
+    const state = req.body.states;
+    const type = req.body.type;
+
     let leads = [];
 
     try {
-        // if (req.body.states.length) {
-        //     leads = await models.Leads.findAll({
-        //         attributes: property,
-        //         where: {
-        //             state: req.body.states
-        //         }
-        //     });
-        // } else {
-        leads = await models.Leads.findAll();
-        // }
-        return res.status(200).json(leads);
+        const type_id = await models.Types.findOne({
+            attributes: ['id'],
+            where: {
+                name: type
+            }
+        })
+
+        if (state) {
+            const states_id = await models.States.findAll({
+                attributes: ['id'],
+                where: {
+                    name: [state.fs, state.ls],
+                }
+            });
+
+            if (states_id) {
+                const leads = await models.Leads.findAll({
+                    attributes: ['property', 'email'],
+                    where: {
+                        type_id: type_id.id,
+                        state_id: [states_id[0].id, states_id[1].id]
+                    },
+                    include: [
+                        models.Users,
+                        models.States,
+                        models.Status,
+                        models.Prices,
+                    ],  
+                });
+
+                return res.status(200).send(leads);
+            }
+        }
+
+        leads = await models.Leads.findAll({
+            where: {
+                type_id: type_id.id,
+            },
+            include: models.User
+        });
+
+        return res.status(200).send(leads);
+
     } catch (error) {
         console.error(error);
     }
