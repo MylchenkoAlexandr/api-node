@@ -142,10 +142,7 @@ async function createLead(lead, quoter, agentId = null) {
                     state_id: state.id,
                     property: JSON.stringify(lead.property)
                 }).then(async res => {
-
                     const newLead = JSON.parse(res.dataValues.property);
-
-                    console.log("createLead -> newLead", newLead)
                     const quoterInfo = {
                         birthdate: newLead.birth_date,
                         smoker: !!+newLead.tobacco,
@@ -174,7 +171,7 @@ async function createLead(lead, quoter, agentId = null) {
                         console.error("createLead -> error", error)
                     }
 
-                    return resolve(res);
+                    return resolve(res.dataValues);
                 }).catch(err => {
                     return reject(err);
                 });

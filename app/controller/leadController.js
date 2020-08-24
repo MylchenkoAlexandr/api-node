@@ -2,7 +2,7 @@ const NinjaQuoterService = require('../services/NinjaQuoterService')
 const { getLead, processLead, processPrice } = require('../services/LeadService');
 const zipcodes = require('zipcodes');
 const models = require('../../database/models/index');
-const LeadRepository = require('../repository/LeadRepository')
+const LeadRepository = require('../repository/LeadRepository');
 
 const preferedCompanies = {
     mutual_omaha: 0,

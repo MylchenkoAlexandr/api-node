@@ -1,11 +1,5 @@
 const { createLead } = require('../services/LeadService');
-const NinjaQuoterService = require('../services/NinjaQuoterService');
-
-const preferedCompanies = {
-    mutual_omaha: 0,
-    royal_neighbors: 0,
-    liberty_bankers: 0
-};
+const LeadRepository = require('../repository/LeadRepository');
 
 module.exports = server => {
 
@@ -14,11 +8,19 @@ module.exports = server => {
     io.on('connection', socket => {
         console.log("Socket connection!");
         socket.on("new-lead", async data => {
-        console.log("data", data)
+            console.log("data", data)
             try {
-                const lead = await createLead(data, "ninjaQuoter");
-                
-                // socket.emit("UPDATE_LEAD", lead);
+                const candidateLead = await createLead(data, "ninjaQuoter", 1);
+
+                if (candidateLead) {
+
+                    const lead = await LeadRepository.getOne(candidateLead.id);
+
+                    if (lead) {
+                        io.sockets.emit("UPDATE_LEAD", lead);
+                    }
+
+                }
             } catch (error) {
                 console.log(error);
             }
