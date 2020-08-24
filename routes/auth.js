@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { login } = require('../app/controller/authController');
 
-router.post('/sing-in', login);
+router.post('/signin', login);
 /**
  * TODO Create function of sigOut 
  * router.post('/sign-out', signOut)

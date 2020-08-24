@@ -18,7 +18,9 @@ async function login(req, res) {
           message: "Login success",
           user: {
             email: user.email,
-            name: user.name,
+            fname: user.fname,
+            lname: user.lname,
+            states: user.states,
             role_id: user.role_id
           },
           token: accesToken

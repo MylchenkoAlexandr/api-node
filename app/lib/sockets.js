@@ -16,7 +16,6 @@ module.exports = server => {
         socket.on("new-lead", async data => {
             try {
                 const lead = await processLead(data[0]);
-
                 if (lead) {
                     const property = JSON.parse(lead.property);
                     const quoterInfo = {
