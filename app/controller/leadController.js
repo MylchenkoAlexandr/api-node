@@ -39,7 +39,8 @@ async function getLeads(req, res) {
                 ],
             });
 
-            if (leads) {
+            if (leads) { 
+                
                 return res.status(200).json(leads);
             }
         }
