@@ -18,25 +18,33 @@ async function test(req, res) {
 }
 
 async function getLeads(req, res) {
-    const state = req.body.states;
+    const states = req.body.states;
     const type = req.body.type;
 
-    let leads = [];
-
     try {
-        const type_id = await models.Types.findOne({
+        const typeId = await models.Types.findOne({
             attributes: ['id'],
-            where: {
-                name: type
-            }
-        })
+            where: { name: type }
+        });
 
-        if (state) {
-            const states_id = await models.States.findAll({
-                attributes: ['id'],
+        const statesId = await models.States.findAll({
+            attributes: ['id'],
+            where: { name: [states.fs, states.ls] }
+        });
+
+        if (statesId && typeId) {
+            const leads = await models.Leads.findAll({
+                attributes: ['property', 'email'],
                 where: {
-                    name: [state.fs, state.ls],
-                }
+                    type_id: typeId.id,
+                    state_id: [statesId[0].id, statesId[1].id]
+                },
+                include: [
+                    models.Users,
+                    models.States,
+                    models.Status,
+                    models.Prices,
+                ],
             });
 
             if (states_id) {
