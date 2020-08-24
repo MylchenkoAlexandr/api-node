@@ -116,19 +116,19 @@ async function asignAgent(agent_id, lead_id) {
 async function createLead(lead, quoter, agentId = null) {
     try {
         const source = await models.Sources.findOne({
-            where: { name: lead.source }
+            where: { name: lead.property.source }
         });
 
         const state = await models.States.findOne({
-            where: { name: lead.state }
+            where: { name: lead.property.state }
         });
 
         const status = await models.Status.findOne({
-            where: { name: lead.status }
+            where: { name: lead.property.status }
         });
 
         const type = await models.Types.findOne({
-            where: { name: lead.type }
+            where: { name: lead.property.type }
         });
 
         if (source && state && status && type) {
@@ -138,11 +138,14 @@ async function createLead(lead, quoter, agentId = null) {
                     source_id: source.id,
                     status_id: 1,
                     type_id: type.id,
-                    email: lead.email,
+                    email: lead.property.email,
                     state_id: state.id,
-                    property: JSON.stringify(lead)
+                    property: JSON.stringify(lead.property)
                 }).then(async res => {
-                    const newLead = res.dataValues;
+
+                    const newLead = JSON.parse(res.dataValues.property);
+
+                    console.log("createLead -> newLead", newLead)
                     const quoterInfo = {
                         birthdate: newLead.birth_date,
                         smoker: !!+newLead.tobacco,
@@ -165,13 +168,13 @@ async function createLead(lead, quoter, agentId = null) {
 
                         if (price) {
                             console.log("price", price);
-                            await processPrice(lead.id, price, "ninjaQuoter");
+                            await processPrice(res.dataValues.id, price, "ninjaQuoter");
                         }
                     } catch (error) {
                         console.error("createLead -> error", error)
                     }
 
-                    return resolve(newlead);
+                    return resolve(res);
                 }).catch(err => {
                     return reject(err);
                 });
