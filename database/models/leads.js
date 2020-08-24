@@ -18,14 +18,14 @@ module.exports = (sequelize, DataTypes) => {
       Leads.belongsTo(models.States, {
         foreignKey: {
           name: 'state_id'
-        }
+        },
       }),
         Leads.belongsTo(models.Status, {
           foreignKey: {
             name: 'status_id'
           }
         }),
-        Leads.hasMany(models.Prices, {
+        Leads.hasOne(models.Prices, {
           foreignKey: {
             name: 'lead_id'
           }
@@ -39,7 +39,12 @@ module.exports = (sequelize, DataTypes) => {
     type_id: DataTypes.BIGINT.UNSIGNED,
     state_id: DataTypes.BIGINT.UNSIGNED,
     email: DataTypes.STRING,
-    property: DataTypes.TEXT
+    property: {
+      type: DataTypes.TEXT,
+      get() {
+        return JSON.parse(this.getDataValue('property'));
+      }
+    },
   }, {
     sequelize,
     modelName: 'Leads',

@@ -16,7 +16,12 @@ module.exports = (sequelize, DataTypes) => {
   Prices.init({
     quoter_id: DataTypes.INTEGER,
     lead_id: DataTypes.INTEGER,
-    price: DataTypes.STRING
+    price: {
+      type: DataTypes.STRING,
+      get() {
+        return JSON.parse(this.getDataValue('price'));
+      }
+    }
   }, {
     sequelize,
     modelName: 'Prices',

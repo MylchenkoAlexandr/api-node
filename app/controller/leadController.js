@@ -1,13 +1,21 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
-const { processLead, processPrice } = require('../services/LeadService');
+const { getLead, processLead, processPrice } = require('../services/LeadService');
 const zipcodes = require('zipcodes');
 const models = require('../../database/models/index');
+const LeadRepository = require('../repository/LeadRepository')
 
 const preferedCompanies = {
     mutual_omaha: 0,
     royal_neighbors: 0,
     liberty_bankers: 0
 };
+
+async function test(req, res) {
+    const leads = await LeadRepository.getAll();
+    const lead = await LeadRepository.getOne(2);
+
+    return res.status(200).json(lead);
+}
 
 async function getLeads(req, res) {
     const state = req.body.states;
@@ -39,11 +47,23 @@ async function getLeads(req, res) {
                         state_id: [states_id[0].id, states_id[1].id]
                     },
                     include: [
-                        models.Users,
-                        models.States,
-                        models.Status,
-                        models.Prices,
-                    ],  
+                        {
+                            model: models.Users,
+                            attributes: ['fname', 'lname', 'email']
+                        },
+                        {
+                            model: models.States,
+                            attributes: ['name']
+                        },
+                        {
+                            model: models.Status,
+                            attributes: ['name']
+                        },
+                        {
+                            model: models.Prices,
+                            attributes: ['price']
+                        },
+                    ],
                 });
 
                 return res.status(200).send(leads);
@@ -54,7 +74,24 @@ async function getLeads(req, res) {
             where: {
                 type_id: type_id.id,
             },
-            include: models.User
+            include: [
+                {
+                    model: models.Users,
+                    attributes: ['fname', 'lname', 'email']
+                },
+                {
+                    model: models.States,
+                    attributes: ['name']
+                },
+                {
+                    model: models.Status,
+                    attributes: ['name']
+                },
+                {
+                    model: models.Prices,
+                    attributes: ['price']
+                },
+            ],
         });
 
         return res.status(200).send(leads);
@@ -271,5 +308,6 @@ module.exports = {
     getCompaniesListByLeadData,
     processLeadDashoard,
     uploadLeadFromMediaAlpha,
-    uploadLeadFromUrl
+    uploadLeadFromUrl,
+    test
 }   
