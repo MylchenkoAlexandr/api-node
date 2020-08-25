@@ -1,7 +1,6 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
 const { processLead, processPrice } = require('../services/LeadService');
 const zipcodes = require('zipcodes');
-const models = require('../../database/models/index');
 const LeadRepository = require('../repository/LeadRepository');
 
 const preferedCompanies = {
