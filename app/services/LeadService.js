@@ -37,6 +37,7 @@ async function processLead(lead, agent_id = null) {
                     source_id: source.id,
                     status_id: 1,
                     type_id: type.id,
+                    fullname: lead.fname + lead.lname || lead.contact,
                     email: lead.email,
                     state_id: state.id,
                     property: JSON.stringify(lead)
@@ -54,6 +55,7 @@ async function processLead(lead, agent_id = null) {
                     source_id: source.id,
                     status_id: status.id,
                     type_id: type.id,
+                    fullname: lead.fname + lead.lname || lead.contact,
                     email: lead.email,
                     state: state.id,
                     property: JSON.stringify(lead)
@@ -139,6 +141,7 @@ async function createLead(lead, quoter, agentId = null) {
                     status_id: 1,
                     type_id: type.id,
                     email: lead.property.email,
+                    fullname: lead.property.fname + ' ' + lead.property.lname || lead.property.contact,
                     state_id: state.id,
                     property: JSON.stringify(lead.property)
                 }).then(async res => {

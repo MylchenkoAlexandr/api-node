@@ -8,9 +8,8 @@ module.exports = server => {
     io.on('connection', socket => {
         console.log("Socket connection!");
         socket.on("new-lead", async data => {
-            console.log("data", data)
             try {
-                const candidateLead = await createLead(data, "ninjaQuoter", 1);
+                const candidateLead = await createLead(data, "ninjaQuoter", null);
 
                 if (candidateLead) {
                     const lead = await LeadRepository.getOne(candidateLead.id);
