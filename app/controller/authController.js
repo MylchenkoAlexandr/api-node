@@ -20,7 +20,7 @@ async function login(req, res) {
             email: user.email,
             fname: user.fname,
             lname: user.lname,
-            states: user.states,
+            states: JSON.parse(user.states),
             role_id: user.role_id
           },
           token: accesToken
@@ -80,7 +80,7 @@ async function verify(req, res) {
           email: user.email,
           fname: user.fname,
           lname: user.lname,
-          states: user.states,
+          states: JSON.parse(user.states),
           role_id: user.role_id
         }
       })

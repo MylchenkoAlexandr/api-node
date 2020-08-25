@@ -1,5 +1,5 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
-const { getLead, processLead, processPrice } = require('../services/LeadService');
+const { processLead, processPrice } = require('../services/LeadService');
 const zipcodes = require('zipcodes');
 const models = require('../../database/models/index');
 const LeadRepository = require('../repository/LeadRepository');
@@ -29,6 +29,15 @@ async function getLeads(req, res) {
         status: 'failed',
         message: "Server error!"
     });
+}
+
+async function getLead(req, res) {
+    try {
+        const lead = await LeadRepository.getOne(req.body.id);
+        return res.status(200).json(lead);
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 // TODO Remove same code reusing in all function 
@@ -234,5 +243,6 @@ module.exports = {
     processLeadDashoard,
     uploadLeadFromMediaAlpha,
     uploadLeadFromUrl,
-    test
+    test,
+    getLead
 }   

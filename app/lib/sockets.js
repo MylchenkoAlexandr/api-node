@@ -13,7 +13,6 @@ module.exports = server => {
                 const candidateLead = await createLead(data, "ninjaQuoter", 1);
 
                 if (candidateLead) {
-
                     const lead = await LeadRepository.getOne(candidateLead.id);
 
                     if (lead) {
