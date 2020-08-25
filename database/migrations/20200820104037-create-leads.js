@@ -50,6 +50,9 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
+      fullname: {
+        type: Sequelize.STRING
+      },
       property: {
         type: Sequelize.TEXT
       },

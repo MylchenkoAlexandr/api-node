@@ -3,7 +3,6 @@ const db = require('../../database/models');
 
 const LeadRepository = {
     getAll(type, states) {
-        console.log("getAll -> states", states)
         return new Promise(async (resolve, reject) => {
             let statesQuery = ''
             if (states) {
@@ -25,12 +24,9 @@ const LeadRepository = {
             return resolve(data);
         });
     },
+
     getOne(id) {
         return new Promise(async (resolve, reject) => {
-
-            "INNER JOIN users ON leads.user_id = users.id"
-        "users.fname, users.lname,"
-
             const data = await db.sequelize.query('SELECT leads.id, users.fname, users.lname, leads.email, leads.property, status.name AS status , states.name AS state, prices.price, leads.createdAt AS created FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN STATUS ON leads.status_id = STATUS.id INNER JOIN states ON leads.state_id = states.id INNER JOIN prices ON leads.id = prices.lead_id WHERE leads.id = ' + id, {
                 type: db.sequelize.QueryTypes.SELECT,
             }).catch((e) => {
