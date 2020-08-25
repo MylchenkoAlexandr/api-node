@@ -148,6 +148,73 @@ async function createLead(lead, quoter, agentId = null) {
                     const newLead = JSON.parse(res.dataValues.property);
                     const quoterInfo = {
                         birthdate: newLead.birth_date,
+                        smoker: Boolean(+newLead.tobacco),
+                        rate_class: newLead.rateClass,
+                        term: newLead.term,
+                        coverage: newLead.coverage_amount,
+                        state: newLead.state,
+                        gender: newLead.gender
+                    };
+
+                    let quotes = null;
+
+                    switch (quoter) {
+                        case "ninjaQuoter":
+                            quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
+                    }
+                    try {
+                        const price = await quotes.getPrice();
+
+                        if (price) {
+                            console.log("price", price);
+                            await processPrice(res.dataValues.id, price, "ninjaQuoter");
+                        }
+                    } catch (error) {
+                        console.error("createLead -> error", error)
+                    }
+
+                    return resolve(res.dataValues);
+                }).catch(err => {
+                    return reject(err);
+                });
+            });
+        }
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+async function updateLead(lead, quoter, agentId = null) {
+    try {
+        const source = await models.Sources.findOne({
+            where: { name: lead.property.source }
+        });
+
+        const state = await models.States.findOne({
+            where: { name: lead.property.state }
+        });
+
+        const status = await models.Status.findOne({
+            where: { name: lead.property.status }
+        });
+
+        const type = await models.Types.findOne({
+            where: { name: lead.property.type }
+        });
+
+        if (source && state && status && type) {
+            return new Promise((resolve, reject) => {
+                lead.update({
+                    user_id: agentId,
+                    status_id: 1,
+                    email: lead.property.email,
+                    fullname: lead.property.fname + ' ' + lead.property.lname || lead.property.contact,
+                    state_id: state.id,
+                    property: JSON.stringify(lead.property)
+                }).then(async res => {
+                    const newLead = JSON.parse(res.dataValues.property);
+                    const quoterInfo = {
+                        birthdate: newLead.birth_date,
                         smoker: !!+newLead.tobacco,
                         rate_class: newLead.rateClass,
                         term: newLead.term,
@@ -189,5 +256,6 @@ module.exports = {
     processLead,
     processPrice,
     asignAgent,
-    createLead
+    createLead,
+    updateLead
 }

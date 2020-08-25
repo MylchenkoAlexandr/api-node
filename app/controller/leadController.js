@@ -45,10 +45,10 @@ async function getCompaniesListByLeadData(req, res) {
     const rowLead = req.body;
 
     const quoterInfo = {
-        birthdate: rowLead.birth_date,
-        smoker: rowLead.tobacco,
-        rate_class: rowLead.rateClass,
+        birthdate: rowLead.birthdate,
+        smoker: Boolean(+rowLead.tobacco),
         term: rowLead.term,
+        rate_class: rowLead.term == 'fex' ? 'lb' : 's',
         coverage: rowLead.coverage_amount,
         state: rowLead.state,
         gender: rowLead.gender
@@ -57,13 +57,9 @@ async function getCompaniesListByLeadData(req, res) {
     const quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
 
     try {
-        const lead = await processLead(rowLead);
-
         const companies = await quotes.getCompaniesInfo();
 
         const price = await quotes.getPrice();
-
-        await processPrice(lead.id, price, "ninjaQuoter");
 
         return res.status(200).json(companies);
     } catch (error) {
