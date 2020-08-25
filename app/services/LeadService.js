@@ -184,7 +184,7 @@ async function createLead(lead, quoter, agentId = null) {
     }
 }
 
-async function updateLead(lead, quoter, agentId = null) {
+async function updateLead(exist, lead, quoter, agentId = null) {
     try {
         const source = await models.Sources.findOne({
             where: { name: lead.property.source }
@@ -204,7 +204,7 @@ async function updateLead(lead, quoter, agentId = null) {
 
         if (source && state && status && type) {
             return new Promise((resolve, reject) => {
-                lead.update({
+                exist.update({
                     user_id: agentId,
                     status_id: 1,
                     email: lead.property.email,

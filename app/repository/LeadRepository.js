@@ -18,6 +18,7 @@ const LeadRepository = {
             data = data.map((item) => {
                 item.property = JSON.parse(item.property);
                 item.price = JSON.parse(item.price);
+
                 return item;
             });
 

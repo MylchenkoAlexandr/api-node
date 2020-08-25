@@ -8,40 +8,42 @@ module.exports = server => {
 
     io.on('connection', socket => {
         console.log("Socket connection!");
-        socket.on("new-lead", async data => {
+        socket.on("process-lead", async ({ lead, agent }) => {
             try {
                 const type = await models.Types.findOne({
                     attributes: ['id'],
                     where: {
-                        name: data.property.type
+                        name: lead.property.type
                     }
                 })
 
                 if (type) {
                     const exist = await models.Leads.findOne({
                         where: {
-                            email: data.property.email,
+                            email: lead.property.email,
                             type_id: type.dataValues.id,
                         }
                     })
 
 
                     if (exist) {
-                        const candidateLead = await updateLead(exist, "ninjaQuoter", null);
+                        const candidateLead = await updateLead(exist, lead, "ninjaQuoter", agent);
 
                         if (candidateLead) {
-                            const lead = await LeadRepository.getOne(candidateLead.id);
-                            if (lead) {
-                                io.sockets.emit("UPDATE_LEAD", lead);
+                            const resLead = await LeadRepository.getOne(candidateLead.id);
+                            if (resLead) {
+                                console.log("resLead", resLead)
+
+                                io.sockets.emit("UPDATE_LEAD", resLead);
                             }
                         }
                     } else {
-                        const candidateLead = await createLead(data, "ninjaQuoter", null);
+                        const candidateLead = await createLead(lead, "ninjaQuoter", agent);
 
                         if (candidateLead) {
-                            const lead = await LeadRepository.getOne(candidateLead.id);
-                            if (lead) {
-                                io.sockets.emit("CREATE_LEAD", lead);
+                            const resLead = await LeadRepository.getOne(candidateLead.id);
+                            if (resLead) {
+                                io.sockets.emit("CREATE_LEAD", resLead);
                             }
                         }
                     }
