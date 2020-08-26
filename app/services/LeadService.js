@@ -5,7 +5,7 @@ const _ = require('lodash');
 const preferedCompanies = {
     mutual_omaha: 0,
     royal_neighbors: 0,
-    liberty_bankers: 0
+    liberty_bankers: 0,
 };
 
 async function processLead(lead, agent_id = null) {
