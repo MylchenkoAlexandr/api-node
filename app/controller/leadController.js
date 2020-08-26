@@ -166,70 +166,102 @@ async function uploadLeadFromUrl(req, res) {
 
 // TODO resolve all issues with type
 async function uploadLeadFromMediaAlpha(req, res) {
-    const rowLead = req.body;
-
-    rowLead.type = "life";
-    rowLead.status = "new";
-    rowLead.source = "mediaalpha"
+    let rowLead = req.body.lead;
 
     switch (rowLead.coverage_type) {
         case 'Term 10 Years':
-            rowLead.coverage_type = '10';
+            rowLead.term = '10';
             break;
         case 'Term 15 Years':
-            rowLead.coverage_type = '15';
+            rowLead.term = '15';
             break;
         case 'Term 20 Years':
-            rowLead.coverage_type = '20';
+            rowLead.term = '20';
             break;
         case 'Term 25 Years':
-            rowLead.coverage_type = '25';
+            rowLead.term = '25';
             break;
         case 'Term 30 Years':
-            rowLead.coverage_type = '30';
+            rowLead.term = '30';
             break;
         case 'Final Expense':
-            rowLead.coverage_type = 'fex';
+            rowLead.term = 'fex';
             break;
     }
 
-    if (rowLead.state == undefined) {
-        getZipCodeInfo = zipcodes.lookup(rowLead.zipcode || rowLead.zip)
+    rowLead.rateClass = rowLead.term == 'fex' ? 'lb' : 's';
 
-        rowLead.state = getZipCodeInfo.state
+    rowLead.state = zipcodes.lookup(rowLead.zipcode || rowLead.zip).state
+
+    rowLead.gender = rowLead.gender.toLowerCase()
+
+    let preparedLead = {
+        type: req.body.type,
+        rowLead,
     }
 
-    const quoterInfo = {
-        birthdate: rowLead.birth_date,
-        smoker: rowLead.tobacco == "1" ? true : false,
-        term: rowLead.coverage_type,
-        rate_class: rowLead.coverage_type == 'fex' ? 'lb' : 's',
-        coverage: rowLead.coverage_amount,
-        state: rowLead.state,
-        gender: rowLead.gender.toLowerCase()
-    };
+    // rowLead.type = "life";
+    // rowLead.status = "new";
+    // rowLead.source = "mediaalpha"
 
-    const quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
+    // switch (rowLead.coverage_type) {
+    //     case 'Term 10 Years':
+    //         rowLead.coverage_type = '10';
+    //         break;
+    //     case 'Term 15 Years':
+    //         rowLead.coverage_type = '15';
+    //         break;
+    //     case 'Term 20 Years':
+    //         rowLead.coverage_type = '20';
+    //         break;
+    //     case 'Term 25 Years':
+    //         rowLead.coverage_type = '25';
+    //         break;
+    //     case 'Term 30 Years':
+    //         rowLead.coverage_type = '30';
+    //         break;
+    //     case 'Final Expense':
+    //         rowLead.coverage_type = 'fex';
+    //         break;
+    // }
 
-    try {
-        const lead = await processLead(rowLead);
+    // if (rowLead.state == undefined) {
+    //     getZipCodeInfo = zipcodes.lookup(rowLead.zipcode || rowLead.zip)
 
-        const price = await quotes.getPrice();
+    //     rowLead.state = getZipCodeInfo.state
+    // }
 
-        await processPrice(lead.id, price, "ninjaQuoter");
+    // const quoterInfo = {
+    //     birthdate: rowLead.birth_date,
+    //     smoker: rowLead.tobacco == "1" ? true : false,
+    //     term: rowLead.coverage_type,
+    //     rate_class: rowLead.coverage_type == 'fex' ? 'lb' : 's',
+    //     coverage: rowLead.coverage_amount,
+    //     state: rowLead.state,
+    //     gender: rowLead.gender.toLowerCase()
+    // };
 
-        return res.status(200).json({
-            status: "success",
-            message: "Success Uploaded!"
-        });
-    } catch (error) {
-        console.error(error)
-    }
+    // const quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
 
-    return res.status(400).json({
-        status: 'failed',
-        message: "Server Error!"
-    });
+    // try {
+    //     const lead = await processLead(rowLead);
+
+    //     const price = await quotes.getPrice();
+
+    //     await processPrice(lead.id, price, "ninjaQuoter");
+
+    //     return res.status(200).json({
+    //         status: "success",
+    //         message: "Success Uploaded!"
+    //     });
+    // } catch (error) {
+    //     console.error(error)
+    // }
+
+    // return res.status(400).json({
+    //     status: 'failed',
+    //     message: "Server Error!"
+    // });
 }
 
 module.exports = {
