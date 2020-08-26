@@ -23,6 +23,7 @@ app.use('/api/call', require('./routes/call'));
 app.use('/api/lead', require('./routes/lead'));
 app.use('/api/mail', require('./routes/mail'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/agent', require('./routes/agent'));
 
 // Start server
 const server = http.createServer(app);
