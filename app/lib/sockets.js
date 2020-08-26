@@ -7,7 +7,7 @@ module.exports = server => {
     const io = require("socket.io")(server);
 
     io.on('connection', socket => {
-        console.log("Socket connection!");
+        console.log("User connection!");
         socket.on("process-lead", async ({ lead, agent }) => {
             try {
                 const type = await models.Types.findOne({
@@ -23,8 +23,7 @@ module.exports = server => {
                             email: lead.property.email,
                             type_id: type.dataValues.id,
                         }
-                    })
-
+                    });
 
                     if (exist) {
                         const candidateLead = await updateLead(exist, lead, "ninjaQuoter", agent);
@@ -32,7 +31,7 @@ module.exports = server => {
                         if (candidateLead) {
                             const resLead = await LeadRepository.getOne(candidateLead.id);
                             if (resLead) {
-                                console.log("resLead", resLead)
+                                console.log("resLead", resLead);
 
                                 io.sockets.emit("UPDATE_LEAD", resLead);
                             }
@@ -52,5 +51,15 @@ module.exports = server => {
                 console.log(error);
             }
         });
+
+        socket.on('disconnect', function() {
+            console.log('User disconnected!');
+        });
     });
+
+    // io.of('/admin').clients((error, clients) => {
+    //     console.log("Admin connection");
+    // });
+
+    return io;
 };
