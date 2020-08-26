@@ -162,18 +162,17 @@ async function createLead(lead, quoter, agentId = null) {
                         case "ninjaQuoter":
                             quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
                     }
+
                     try {
                         const price = await quotes.getPrice();
-
                         if (price) {
-                            console.log("price", price);
                             await processPrice(res.dataValues.id, price, "ninjaQuoter");
+
+                            return resolve(res.dataValues);
                         }
                     } catch (error) {
                         console.error("createLead -> error", error)
                     }
-
-                    return resolve(res.dataValues);
                 }).catch(err => {
                     return reject(err);
                 });
@@ -223,6 +222,8 @@ async function updateLead(exist, lead, quoter, agentId = null) {
                         gender: newLead.gender
                     };
 
+                    console.log("updateLead -> quoterInfo", quoterInfo)
+
                     let quotes = null;
 
                     switch (quoter) {
@@ -235,13 +236,17 @@ async function updateLead(exist, lead, quoter, agentId = null) {
 
                         if (price) {
                             console.log("price", price);
-                            await processPrice(res.dataValues.id, price, "ninjaQuoter");
+                            const waitPrice = await processPrice(res.dataValues.id, price, "ninjaQuoter");
+
+                            if (waitPrice) {
+                                console.log("updateLead -> waitPrice", waitPrice)
+                                return resolve(res.dataValues);
+                            }
                         }
                     } catch (error) {
                         console.error("createLead -> error", error)
                     }
 
-                    return resolve(res.dataValues);
                 }).catch(err => {
                     return reject(err);
                 });
