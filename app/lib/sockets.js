@@ -9,6 +9,7 @@ module.exports = server => {
     io.on('connection', socket => {
         console.log("User connection!");
         socket.on("process-lead", async ({ lead, agent }) => {
+            console.log("lead", lead)
             try {
                 const type = await models.Types.findOne({
                     attributes: ['id'],
@@ -52,7 +53,7 @@ module.exports = server => {
             }
         });
 
-        socket.on('disconnect', function() {
+        socket.on('disconnect', function () {
             console.log('User disconnected!');
         });
     });

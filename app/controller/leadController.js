@@ -58,8 +58,6 @@ async function getCompaniesListByLeadData(req, res) {
     try {
         const companies = await quotes.getCompaniesInfo();
 
-        const price = await quotes.getPrice();
-
         return res.status(200).json(companies);
     } catch (error) {
         console.error(error)
