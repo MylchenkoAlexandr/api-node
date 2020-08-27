@@ -5,6 +5,8 @@ async function createAgent(req, res) {
     try {
         const agent = req.body;
 
+        console.log("createAgent -> agent", agent)
+
         const userExist = await models.Users.findOne({
             attributes: ['id'],
             where: {

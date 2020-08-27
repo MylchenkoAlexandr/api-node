@@ -24,6 +24,7 @@ app.use('/api/lead', require('./routes/lead'));
 app.use('/api/mail', require('./routes/mail'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/agent', require('./routes/agent'));
+app.use('/api/notes', require('./routes/notes'));
 
 // Start server
 const server = http.createServer(app);
