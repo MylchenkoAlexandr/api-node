@@ -27,13 +27,12 @@ module.exports = server => {
                     });
 
                     if (exist) {
+
                         const candidateLead = await updateLead(exist, lead, "ninjaQuoter", agent);
 
                         if (candidateLead) {
                             const resLead = await LeadRepository.getOne(candidateLead.id);
                             if (resLead) {
-                                console.log("resLead", resLead);
-
                                 io.sockets.emit("UPDATE_LEAD", resLead);
                             }
                         }
@@ -47,6 +46,27 @@ module.exports = server => {
                             }
                         }
                     }
+                    // if (exist) {
+                    //     const candidateLead = await updateLead(exist, lead, "ninjaQuoter", agent);
+
+                    //     if (candidateLead) {
+                    //         const resLead = await LeadRepository.getOne(candidateLead.id);
+                    //         if (resLead) {
+                    //             console.log("resLead", resLead);
+
+                    //             io.sockets.emit("UPDATE_LEAD", resLead);
+                    //         }
+                    //     }
+                    // } else {
+                    //     const candidateLead = await createLead(lead, "ninjaQuoter", agent);
+
+                    //     if (candidateLead) {
+                    //         const resLead = await LeadRepository.getOne(candidateLead.id);
+                    //         if (resLead) {
+                    //             io.sockets.emit("CREATE_LEAD", resLead);
+                    //         }
+                    //     }
+                    // }
                 }
             } catch (error) {
                 console.log(error);

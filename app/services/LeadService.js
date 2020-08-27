@@ -2,12 +2,6 @@ const models = require('../../database/models');
 const NinjaQuoterService = require('../services/NinjaQuoterService');
 const _ = require('lodash');
 
-const preferedCompanies = {
-    mutual_omaha: 0,
-    royal_neighbors: 0,
-    liberty_bankers: 0,
-};
-
 async function processLead(lead, agent_id = null) {
     try {
         const property = await models.Leads.findOne({
@@ -116,6 +110,12 @@ async function asignAgent(agent_id, lead_id) {
 }
 
 async function createLead(lead, quoter, agentId = null) {
+    const preferedCompanies = {
+        mutual_omaha: 0,
+        royal_neighbors: 0,
+        liberty_bankers: 0,
+    };
+    
     try {
         const source = await models.Sources.findOne({
             where: { name: lead.property.source }
@@ -184,6 +184,12 @@ async function createLead(lead, quoter, agentId = null) {
 }
 
 async function updateLead(exist, lead, quoter, agentId = null) {
+    const preferedCompanies = {
+        mutual_omaha: 0,
+        royal_neighbors: 0,
+        liberty_bankers: 0,
+    };
+    
     try {
         const source = await models.Sources.findOne({
             where: { name: lead.property.source }
@@ -212,6 +218,7 @@ async function updateLead(exist, lead, quoter, agentId = null) {
                     property: JSON.stringify(lead.property)
                 }).then(async res => {
                     const newLead = JSON.parse(res.dataValues.property);
+
                     const quoterInfo = {
                         birthdate: newLead.birth_date,
                         smoker: !!+newLead.tobacco,
@@ -222,8 +229,6 @@ async function updateLead(exist, lead, quoter, agentId = null) {
                         gender: newLead.gender
                     };
 
-                    console.log("updateLead -> quoterInfo", quoterInfo)
-
                     let quotes = null;
 
                     switch (quoter) {
@@ -233,15 +238,12 @@ async function updateLead(exist, lead, quoter, agentId = null) {
 
                     try {
                         const price = await quotes.getPrice();
+                        console.log("updateLead -> price", price)
 
                         if (price) {
-                            console.log("price", price);
-                            const waitPrice = await processPrice(res.dataValues.id, price, "ninjaQuoter");
+                            await processPrice(res.dataValues.id, price, "ninjaQuoter");
 
-                            if (waitPrice) {
-                                console.log("updateLead -> waitPrice", waitPrice)
-                                return resolve(res.dataValues);
-                            }
+                            return resolve(res.dataValues);
                         }
                     } catch (error) {
                         console.error("createLead -> error", error)
