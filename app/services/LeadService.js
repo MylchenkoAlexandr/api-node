@@ -115,7 +115,7 @@ async function createLead(lead, quoter, agentId = null) {
         royal_neighbors: 0,
         liberty_bankers: 0,
     };
-    
+
     try {
         const source = await models.Sources.findOne({
             where: { name: lead.property.source }
@@ -125,15 +125,11 @@ async function createLead(lead, quoter, agentId = null) {
             where: { name: lead.property.state }
         });
 
-        const status = await models.Status.findOne({
-            where: { name: lead.property.status }
-        });
-
         const type = await models.Types.findOne({
             where: { name: lead.property.type }
         });
 
-        if (source && state && status && type) {
+        if (source && state && type) {
             return new Promise((resolve, reject) => {
                 models.Leads.create({
                     user_id: agentId,
@@ -189,7 +185,7 @@ async function updateLead(exist, lead, quoter, agentId = null) {
         royal_neighbors: 0,
         liberty_bankers: 0,
     };
-    
+
     try {
         const source = await models.Sources.findOne({
             where: { name: lead.property.source }
@@ -211,7 +207,7 @@ async function updateLead(exist, lead, quoter, agentId = null) {
             return new Promise((resolve, reject) => {
                 exist.update({
                     user_id: agentId,
-                    status_id: 1,
+                    status_id: status,
                     email: lead.property.email,
                     fullname: lead.property.fname + ' ' + lead.property.lname || lead.property.contact,
                     state_id: state.id,
