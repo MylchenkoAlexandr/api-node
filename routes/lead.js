@@ -4,7 +4,7 @@ const { test, getLeads, getLead, getCompaniesListByLeadData, processLeadDashoard
 
 router.post('/get-leads', authenticateToken, getLeads);
 router.post('/get-lead', authenticateToken, getLead);
-router.post('/get-companies', authenticateToken, getCompaniesListByLeadData);
+router.post('/get-companies', getCompaniesListByLeadData);
 router.post('/dashboard/process-lead', authenticateToken, processLeadDashoard);
 router.post('/upload/media-alpha', authenticateToken, uploadLeadFromMediaAlpha);
 router.post('/upload/media-alpha/url', authenticateToken, uploadLeadFromUrl);
