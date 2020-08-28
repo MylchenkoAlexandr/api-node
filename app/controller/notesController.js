@@ -1,51 +1,58 @@
-const models = require('../../database/models')
+const models = require('../../database/models');
+const NotesRepository = require('../repository/NotesRepository');
 
-async function get(req, res) {
+async function getNotes(req, res) {
     try {
-        const notes = await models.Notes.findAll({
-            where: {
-                lead_id: req.body.lead_id
-            }
-        });
-        
-        console.log("get -> notes", notes)
+        const notes = await NotesRepository.getAll(req.body.lead_id);
 
         if (notes) {
-            res.status(200).json(notes);
+            return res.status(200).json(notes);
         }
     } catch (e) {
         console.error(e)
     }
 
+    return res.status(400).json({ message: 'Server Error!' });
 }
 
-async function create(req, res) {
-    const note = req.body;
+async function createNote(req, res) {
 
     try {
-        const notes = await models.Notes.create({
-            user_id: note.user_id,
-            lead_id: note.lead_id,
-            message: note.message,
+        const createNote = await models.Notes.create({
+            user_id: req.body.user_id,
+            lead_id: req.body.lead_id,
+            message: req.body.message,
         });
 
-        return res.send(200).json(notes);
-    } catch (error) {
-        console.log(error)
+        if (createNote) {
+            const note = await NotesRepository.getOne(createNote.id);
+            return res.status(200).json(note);
+        }
+    } catch (e) {
+        console.error(e)
     }
 
-    return res.status(200).send(note);
+    return res.status(400).json({ message: 'Server Error!' });
 }
 
 async function deleteNote(req, res) {
     try {
-        de
-    } catch (e) {
+        await models.Notes.destroy({
+            where: {
+                id: req.body.note_id
+            }
+        });
 
+        return res.status(200).json({ deleted: true });
+    } catch (e) {
+        console.error(e)
     }
+
+    return res.status(400).json({ message: "Server Error!" });
 }
 
 module.exports = {
-    get,
-    create
+    getNotes,
+    createNote,
+    deleteNote
 }   
