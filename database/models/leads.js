@@ -38,7 +38,6 @@ module.exports = (sequelize, DataTypes) => {
     status_id: DataTypes.BIGINT.UNSIGNED,
     type_id: DataTypes.BIGINT.UNSIGNED,
     state_id: DataTypes.BIGINT.UNSIGNED,
-    blocked: DataTypes.BOOLEAN,
     email: DataTypes.STRING,
     fullname: DataTypes.STRING,
     property: {
