@@ -207,7 +207,7 @@ async function updateLead(exist, lead, quoter, agentId = null) {
             return new Promise((resolve, reject) => {
                 exist.update({
                     user_id: agentId,
-                    status_id: status,
+                    status_id: status.id,
                     email: lead.property.email,
                     fullname: lead.property.fname + ' ' + lead.property.lname || lead.property.contact,
                     state_id: state.id,
