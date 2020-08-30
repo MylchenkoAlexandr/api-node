@@ -31,6 +31,13 @@ module.exports = {
       states: {
         type: Sequelize.STRING
       },
+      // busy_lead_id: {
+      //   type: Sequelize.BIGINT.UNSIGNED,
+      //   references: {
+      //     model: 'Leads',
+      //     key: 'id',
+      //   },
+      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

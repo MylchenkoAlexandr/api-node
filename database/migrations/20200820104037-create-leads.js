@@ -56,6 +56,19 @@ module.exports = {
       property: {
         type: Sequelize.TEXT
       },
+      busy: {
+        type: Sequelize.BOOLEAN,
+        default: true,
+        defaultValue: false,
+        allowNull: false
+      },
+      busy_agent_id: {
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        type: Sequelize.BIGINT.UNSIGNED
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

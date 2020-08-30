@@ -20,16 +20,16 @@ module.exports = (sequelize, DataTypes) => {
           name: 'state_id'
         },
       }),
-        Leads.belongsTo(models.Status, {
-          foreignKey: {
-            name: 'status_id'
-          }
-        }),
-        Leads.hasOne(models.Prices, {
-          foreignKey: {
-            name: 'lead_id'
-          }
-        })
+      Leads.belongsTo(models.Status, {
+        foreignKey: {
+          name: 'status_id'
+        }
+      }),
+      Leads.hasOne(models.Prices, {
+        foreignKey: {
+          name: 'lead_id'
+        }
+      })
     }
   };
   Leads.init({
@@ -40,6 +40,8 @@ module.exports = (sequelize, DataTypes) => {
     state_id: DataTypes.BIGINT.UNSIGNED,
     email: DataTypes.STRING,
     fullname: DataTypes.STRING,
+    busy: DataTypes.BOOLEAN,
+    busy_agent_id: DataTypes.BIGINT.UNSIGNED,
     property: {
       type: DataTypes.TEXT,
       get() {

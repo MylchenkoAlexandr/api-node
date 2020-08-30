@@ -20,7 +20,7 @@ module.exports = {
         lname: 'Agent',
         email: 'agent@t.com',
         password: await bcrypt.hash('password', 10),
-        states: JSON.stringify({ fs: 'CA', ls: 'NY' }),
+        states: JSON.stringify(["CA", "NY"]),
         createdAt: new Date(),
         updatedAt: new Date()
       },]);
