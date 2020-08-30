@@ -27,7 +27,7 @@ function voice(req, res) {
         callerId: process.env.TWILIO_NUMBER,
     }, req.body.number);
 
-    return res.status(200).type('text/xml').json(voiceResponse.toString());
+    return res.type('text/xml').send(voiceResponse.toString());
 }
 
 module.exports = {
