@@ -111,6 +111,12 @@ async function asignAgent(agent_id, lead_id) {
 
 async function createLead(lead, quoter, agentId = null) {
     const preferedCompanies = {
+        mutual_omaha_express: 0,
+        foresters_express: 0,
+        sagicor_express_issue: 0,
+    };
+
+    const preferedCompaniesFEX = {
         mutual_omaha: 0,
         royal_neighbors: 0,
         liberty_bankers: 0,
@@ -156,7 +162,7 @@ async function createLead(lead, quoter, agentId = null) {
 
                     switch (quoter) {
                         case "ninjaQuoter":
-                            quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
+                            quotes = new NinjaQuoterService(quoterInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
                     }
 
                     try {
@@ -181,6 +187,12 @@ async function createLead(lead, quoter, agentId = null) {
 
 async function updateLead(exist, lead, quoter, agentId = null) {
     const preferedCompanies = {
+        mutual_omaha_express: 0,
+        foresters_express: 0,
+        sagicor_express_issue: 0,
+    };
+
+    const preferedCompaniesFEX = {
         mutual_omaha: 0,
         royal_neighbors: 0,
         liberty_bankers: 0,
@@ -229,7 +241,7 @@ async function updateLead(exist, lead, quoter, agentId = null) {
 
                     switch (quoter) {
                         case "ninjaQuoter":
-                            quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
+                            quotes = new NinjaQuoterService(quoterInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
                     }
 
                     try {
