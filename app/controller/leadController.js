@@ -3,10 +3,16 @@ const { processLead, processPrice } = require('../services/LeadService');
 const zipcodes = require('zipcodes');
 const LeadRepository = require('../repository/LeadRepository');
 
-const preferedCompanies = {
+const preferedCompaniesFEX = {
     mutual_omaha: 0,
     royal_neighbors: 0,
     liberty_bankers: 0
+};
+
+const preferedCompanies = {
+    mutual_omaha_express: 0,
+    foresters_express: 0,
+    sagicor_express_issue: 0,
 };
 
 async function test(req, res) {
@@ -53,7 +59,7 @@ async function getCompaniesListByLeadData(req, res) {
         gender: rowLead.gender
     };
 
-    const quotes = new NinjaQuoterService(preferedCompanies, quoterInfo);
+    const quotes = new NinjaQuoterService(quoterInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
 
     try {
         const companies = await quotes.getCompaniesInfo();
