@@ -1,6 +1,7 @@
 const twilio = require('twilio');
 const ClientCapability = twilio.jwt.ClientCapability;
 const VoiceResponse = twilio.twiml.VoiceResponse;
+const models = require('../../database/models')
 
 function token(req, res) {
     const capability = new ClientCapability({
