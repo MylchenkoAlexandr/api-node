@@ -25,7 +25,7 @@ function voice(req, res) {
     voiceResponse.dial({
         record: 'record-from-answer-dual',
         recordingStatusCallbackEvent: "completed",
-        recordingStatusCallback: `http://89cf9486d226.ngrok.io/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
+        recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
         callerId: process.env.TWILIO_NUMBER,
     }, req.body.number);
 
