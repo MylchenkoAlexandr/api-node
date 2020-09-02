@@ -114,6 +114,7 @@ async function createLead(lead, quoter, agentId = null) {
         mutual_omaha_express: 0,
         foresters_express: 0,
         sagicor_express_issue: 0,
+        american_general: 0
     };
 
     const preferedCompaniesFEX = {
@@ -190,6 +191,7 @@ async function updateLead(exist, lead, quoter, agentId = null) {
         mutual_omaha_express: 0,
         foresters_express: 0,
         sagicor_express_issue: 0,
+        american_general: 0
     };
 
     const preferedCompaniesFEX = {

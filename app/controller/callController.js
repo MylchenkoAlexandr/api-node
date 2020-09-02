@@ -25,15 +25,23 @@ function voice(req, res) {
     voiceResponse.dial({
         record: 'record-from-answer-dual',
         recordingStatusCallbackEvent: "completed",
-        recordingStatusCallback: 'https://call.leads.joinblueberry.com/api/call/record-callback',
+        recordingStatusCallback: `http://89cf9486d226.ngrok.io/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
         callerId: process.env.TWILIO_NUMBER,
     }, req.body.number);
 
     return res.type('text/xml').send(voiceResponse.toString());
 }
 
-function recordCallback(req, res) {
-    return res.sed(req.body);
+async function recordCallback(req, res) {
+    try {
+        await models.Records.update({
+            user_id: req.params.user_id,
+            lead_id: req.params.lead_id,
+            url: req.body.RecordingUrl
+        })
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 module.exports = {

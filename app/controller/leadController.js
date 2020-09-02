@@ -6,13 +6,14 @@ const LeadRepository = require('../repository/LeadRepository');
 const preferedCompaniesFEX = {
     mutual_omaha: 0,
     royal_neighbors: 0,
-    liberty_bankers: 0
+    liberty_bankers: 0,
 };
 
 const preferedCompanies = {
     mutual_omaha_express: 0,
     foresters_express: 0,
     sagicor_express_issue: 0,
+    american_general: 0
 };
 
 async function test(req, res) {

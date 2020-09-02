@@ -18,8 +18,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Routes
-app.use('/api/records', require('./routes/record'));
 app.use('/api/call', require('./routes/call'));
+app.use('/api/records', require('./routes/records'));
 app.use('/api/lead', require('./routes/lead'));
 app.use('/api/mail', require('./routes/mail'));
 app.use('/api/auth', require('./routes/auth'));

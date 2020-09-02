@@ -17,14 +17,8 @@ module.exports = {
           key: 'id'
         }
       },
-      datetime: {
-        type: Sequelize.DATE
-      },
-      call_sid: {
-        type: Sequelize.STRING
-      },
-      sid: {
-        type: Sequelize.STRING
+      url: {
+        type: Sequelize.TEXT
       },
       createdAt: {
         allowNull: false,
