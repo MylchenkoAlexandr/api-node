@@ -30,7 +30,12 @@ function voice(req, res) {
     return res.type('text/xml').send(voiceResponse.toString());
 }
 
+function recordCallback(req, res) {
+    return res.sed(req.body);
+}
+
 module.exports = {
     token,
-    voice
+    voice,
+    recordCallback
 }
