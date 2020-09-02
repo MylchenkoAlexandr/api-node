@@ -35,7 +35,7 @@ function voice(req, res) {
 
 async function recordCallback(req, res) {
     try {
-        await models.Records.update({
+        await models.Records.create({
             user_id: req.params.user_id,
             lead_id: req.params.lead_id,
             url: req.body.RecordingUrl
