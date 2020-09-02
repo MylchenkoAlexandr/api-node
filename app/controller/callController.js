@@ -23,9 +23,9 @@ function voice(req, res) {
     const voiceResponse = new VoiceResponse();
 
     voiceResponse.dial({
-        recordingStatusCallback: 'https://call.leads.joinblueberry.com/api/call/record-callback',
-        recordingStatusCallbackEvent="completed",
         record: 'record-from-answer-dual',
+        recordingStatusCallbackEvent: "completed",
+        recordingStatusCallback: 'https://call.leads.joinblueberry.com/api/call/record-callback',
         callerId: process.env.TWILIO_NUMBER,
     }, req.body.number);
 
