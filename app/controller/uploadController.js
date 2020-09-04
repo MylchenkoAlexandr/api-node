@@ -1,22 +1,20 @@
 const csvToJson = require('convert-csv-to-json');
+const fs = require('fs');
+const formidable = require('formidable')
 
 function uploadCSV(req, res) {
-    
-    // if (!req.files) {
-    //     return res.status(500).send({ msg: "file is not found" })
-    // }
+    const form = new formidable.IncomingForm();
 
-    const files = req.body.file;
+    form.parse(req, (err, fields, files) => {
+        const delimiter = fields.delimiter;
 
-    files.mv(`${__dirname}/public/`)
+        let data = csvToJson.fieldDelimiter(delimiter).formatValueByType().getJsonFromCsv(files["file"].path);
 
-    console.log();
-    // let json = csvToJson.getJsonFromCsv("");
-    // for (let i = 0; i < json.length; i++) {
-    //     console.log(json[i]);
-    // }
-
-    // contents = fs.readFileSync('DATA', 'utf8');
+        console.log("uploadCSV -> data", data)
+        
+        // console.log("uploadCSV -> data", data)
+        // console.log("uploadCSV -> delimiter", delimiter)
+    });
 }
 
 module.exports = {

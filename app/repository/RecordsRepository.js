@@ -11,6 +11,17 @@ const RecordsRepository = {
 
             return resolve(data);
         });
+    },
+    getOne(id){
+        return new Promise(async (resolve, reject) => {
+            let data = await db.sequelize.query(`SELECT CONCAT(users.fname, ' ' , users.lname) as fullname, records.createdAt, records.url FROM records INNER JOIN users ON records.user_id = users.id WHERE records.id = ${id}`, {
+                type: db.sequelize.QueryTypes.SELECT
+            }).catch((e) => {
+                console.error(e);
+            });
+
+            return resolve(data[0]);
+        });
     }
 }
 
