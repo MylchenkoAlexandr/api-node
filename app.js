@@ -6,6 +6,7 @@ const db = require('./database/models/index');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const fileUpload = require('express-fileupload');
 
 require('dotenv').config();
 
