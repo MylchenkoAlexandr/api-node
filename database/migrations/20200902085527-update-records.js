@@ -6,7 +6,7 @@ module.exports = {
       return Promise.all([
         queryInterface.addColumn('Records', 'user_id', {
           type: Sequelize.DataTypes.BIGINT.UNSIGNED,
-          after: "user_id",
+          after: "id",
           references: {
             model: 'Users',
             key: 'id'
