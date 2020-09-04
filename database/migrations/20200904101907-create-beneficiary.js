@@ -10,7 +10,11 @@ module.exports = {
       },
       lead_id: {
         allowNull: false,
-        type: Sequelize.BIGINT.UNSIGNED
+        type: Sequelize.BIGINT.UNSIGNED,
+        references: {
+          model: 'Leads',
+          key: 'id'
+        }
       },
       name: {
         allowNull: false,
@@ -24,7 +28,7 @@ module.exports = {
           key: 'id'
         }
       },
-      location: {
+      location_id: {
         allowNull: true,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {

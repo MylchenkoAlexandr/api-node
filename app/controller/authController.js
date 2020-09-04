@@ -67,7 +67,7 @@ async function registration(req, res) {
 
 async function verify(req, res) {
   try {
-    const decoded = jwt.decode(req.body.token, process.env.SECRET_KEY);
+    const decoded = jwt.verify(req.body.token, process.env.SECRET_KEY);
 
     const candidate = await models.Users.findOne({
       where: { email: decoded.data }

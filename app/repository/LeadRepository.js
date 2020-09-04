@@ -53,4 +53,4 @@ const LeadRepository = {
     }
 }
 
-module.exports = LeadRepository
+module.exports = LeadRepository;

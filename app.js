@@ -10,18 +10,17 @@ const fileUpload = require('express-fileupload');
 
 require('dotenv').config();
 
+//Variables application
+const server = http.createServer(app);
+const PORT = process.env.PORT || 3000;
+
+//Configuration application
 app.use(fileUpload());
-
-// Cors 
 app.use(cors());
-
-// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
 app.use(bodyParser.json());
 
-// Routes
+// Routes application
 app.use('/api/call', require('./routes/call'));
 app.use('/api/records', require('./routes/records'));
 app.use('/api/lead', require('./routes/lead'));
@@ -29,14 +28,13 @@ app.use('/api/mail', require('./routes/mail'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/agent', require('./routes/agent'));
 app.use('/api/notes', require('./routes/notes'));
+app.use('/api/beneficiary', require('./routes/beneficiary'));
 
 // Start server
-const server = http.createServer(app);
-const port = process.env.PORT || 3000;
-require("./app/lib/sockets")(server);
+require("./app/lib/sockets")(server); //Socket init
 
-server.listen(port, async () => {
-    console.log(`Server listening on port: ${port}`);
+server.listen(PORT, async () => {
+    console.log(`Server listening on port: ${PORT}`);
 
     try {
         await db.sequelize.authenticate();
