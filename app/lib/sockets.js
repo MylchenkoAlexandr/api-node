@@ -1,5 +1,6 @@
 const { createLead, updateLead } = require('../services/LeadService');
 const LeadRepository = require('../repository/LeadRepository');
+const RecordsRepository = require('../repository/RecordsRepository');
 const models = require('../../database/models')
 
 module.exports = server => {
@@ -12,6 +13,10 @@ module.exports = server => {
         socket.on("connected", user => {
             users[socket.id] = user;
             console.log('User connected! ', users[socket.id]);
+        });
+
+        socket.on('test', ({ msg }) => {
+            console.log(msg);
         });
 
         socket.on("process-lead", async ({ lead, agent }) => {
@@ -62,6 +67,7 @@ module.exports = server => {
 
         socket.on("busy-lead", async lead_id => {
             console.log("lead_id", lead_id);
+            socket.join(lead_id);
 
             try {
                 const candidate = await models.Leads.findOne({
@@ -105,6 +111,22 @@ module.exports = server => {
 
             } catch (error) {
                 console.log(error);
+            }
+        });
+
+        socket.on("record-create", async ({ user_id, lead_id, url }) => {
+
+            console.log("url", url)
+
+            const newRecord = await models.Records.create({
+                user_id: user_id,
+                lead_id: lead_id,
+                url: url
+            })
+
+            if (newRecord) {
+                const oneRecord = await RecordsRepository.getOne(newRecord.id);
+                socket.to(lead_id).emit("RECORD_ADD", oneRecord);
             }
         });
 

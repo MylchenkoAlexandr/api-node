@@ -2,6 +2,7 @@ const NinjaQuoterService = require('../services/NinjaQuoterService')
 const { processLead, processPrice } = require('../services/LeadService');
 const zipcodes = require('zipcodes');
 const LeadRepository = require('../repository/LeadRepository');
+const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 const preferedCompaniesFEX = {
     mutual_omaha: 0,
@@ -19,6 +20,8 @@ const preferedCompanies = {
 async function test(req, res) {
     const leads = await LeadRepository.getAll();
     const lead = await LeadRepository.getOne(2);
+
+    client.emit('test', { msg: req.body.msg });
 
     return res.status(200).json(lead);
 }
@@ -127,37 +130,18 @@ async function uploadLeadFromMediaAlpha(req, res) {
                 break;
         }
 
+        rowLead.type = req.body.type;
         rowLead.rateClass = rowLead.term == 'fex' ? 'lb' : 's';
-
         rowLead.state = zipcodes.lookup(rowLead.zipcode || rowLead.zip).state
-
         rowLead.gender = rowLead.gender.toLowerCase()
-
-        let preparedLead = {
-            type: req.body.type,
-            ...rowLead,
-        }
-
         rowLead.status = "new";
         rowLead.source = "mediaalpha"
-
         rowLead.tobacco = rowLead.tobacco == "1" ? true : false
 
-        // const quoterInfo = {
-        //     birthdate: rowLead.birth_date,
-        //     smoker:,
-        //     term: rowLead.term || rowLead.coverage_type,
+        console.log("uploadLeadFromMediaAlpha -> rowLead", rowLead)
+        lead = { property: rowLead }
 
-        
-        // };
-
-        // const quotes = new NinjaQuoterService(rowLead.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
-
-        try {
-                    
-        } catch (error) {
-            console.error(error)
-        }
+        client.emit("process-lead", { lead: lead, agent: null })
 
         return res.status(200).json({
             status: "success",

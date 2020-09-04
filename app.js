@@ -6,20 +6,18 @@ const db = require('./database/models/index');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const fileUpload = require('express-fileupload');
 
 require('dotenv').config();
-
-app.use(fileUpload());
 
 // Cors 
 app.use(cors());
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // parse application/json
 app.use(bodyParser.json());
+
 
 // Routes
 app.use('/api/call', require('./routes/call'));

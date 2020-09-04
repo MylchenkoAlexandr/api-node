@@ -2,6 +2,7 @@ const twilio = require('twilio');
 const ClientCapability = twilio.jwt.ClientCapability;
 const VoiceResponse = twilio.twiml.VoiceResponse;
 const models = require('../../database/models')
+const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 function token(req, res) {
     const capability = new ClientCapability({
@@ -35,14 +36,20 @@ function voice(req, res) {
 
 async function recordCallback(req, res) {
     try {
-        await models.Records.create({
+        const record = {
             user_id: req.params.user_id,
             lead_id: req.params.lead_id,
             url: req.body.RecordingUrl
-        })
+        };
+
+        client.emit('record-create', record);
+
+        return res.sendStatus(200);
     } catch (e) {
         console.error(e);
     }
+
+    return res.sendStatus(400);
 }
 
 module.exports = {
