@@ -1,20 +1,41 @@
+const { parseCSVfileToDB } = require('../services/uploadService')
+const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const csvToJson = require('convert-csv-to-json');
-const fs = require('fs');
-const formidable = require('formidable')
+const formidable = require('formidable');
 
-function uploadCSV(req, res) {
+async function uploadCSV(req, res) {
     const form = new formidable.IncomingForm();
 
-    form.parse(req, (err, fields, files) => {
-        const delimiter = fields.delimiter;
+    try {
+        const rowLeadsJSON = await new Promise((resolve, reject) => {
+            form.parse(req, (err, fields, files) => {
+                const delimiter = fields.delimiter;
 
-        let data = csvToJson.fieldDelimiter(delimiter).formatValueByType().getJsonFromCsv(files["file"].path);
+                const result = csvToJson.fieldDelimiter(delimiter).formatValueByType().getJsonFromCsv(files["file"].path);
 
-        console.log("uploadCSV -> data", data)
-        
-        // console.log("uploadCSV -> data", data)
-        // console.log("uploadCSV -> delimiter", delimiter)
-    });
+                resolve(result);
+            });
+        });
+
+        if (rowLeadsJSON) {
+            // Save to db and return array of id`s row leads from csv
+            const idArray = await parseCSVfileToDB(rowLeadsJSON);
+
+            if (idArray)
+                client.emit('row-leads', idArray);
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Success parsed CSV file into system"
+        });
+    } catch (err) {
+        res.status(400).json({
+            status: "failed",
+            message: "Server error!"
+        });
+        throw new Error(err);
+    }
 }
 
 module.exports = {

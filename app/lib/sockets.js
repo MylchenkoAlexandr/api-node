@@ -2,6 +2,7 @@ const { createLead, updateLead } = require('../services/LeadService');
 const LeadRepository = require('../repository/LeadRepository');
 const RecordsRepository = require('../repository/RecordsRepository');
 const models = require('../../database/models')
+const RowLeadRepository = require('../repository/RowLeadsRepository');
 
 module.exports = server => {
 
@@ -60,6 +61,17 @@ module.exports = server => {
                         }
                     }
                 }
+            } catch (error) {
+                console.log(error);
+            }
+        });
+
+        socket.on('row-leads', async (idArray) => {
+            try {
+                const rowLeads = await RowLeadRepository.getLatest(idArray);
+                if(rowLeads)
+                    io.sockets.emit("ROW_LEAD_ADD", rowLeads);
+                    
             } catch (error) {
                 console.log(error);
             }
@@ -155,6 +167,7 @@ module.exports = server => {
 
             delete users[socket.id];
         });
+
     });
 
     return io;
