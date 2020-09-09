@@ -19,13 +19,18 @@ const preferedCompanies = {
     american_general: 0
 };
 
-async function test(req, res) {
-    const leads = await LeadRepository.getAll();
-    const lead = await LeadRepository.getOne(2);
+async function getLeads(req, res) {
+    try {
+        const leads = await LeadRepository.getAll(req.body.type, req.body.states);
+        return res.status(200).json(leads);
+    } catch (error) {
+        console.error(error);
+    }
 
-    client.emit('test', { msg: req.body.msg });
-
-    return res.status(200).json(lead);
+    return res.status(400).json({
+        status: 'failed',
+        message: "Server error!"
+    });
 }
 
 async function getRowLeads(req, res) {
@@ -42,24 +47,19 @@ async function getRowLeads(req, res) {
     });
 }
 
-async function getLeads(req, res) {
-    try {
-        const leads = await LeadRepository.getAll(req.body.type, req.body.states);
-        return res.status(200).json(leads);
-    } catch (error) {
-        console.error(error);
-    }
-
-    return res.status(400).json({
-        status: 'failed',
-        message: "Server error!"
-    });
-}
-
 async function getLead(req, res) {
     try {
         const lead = await LeadRepository.getOne(req.body.id);
         return res.status(200).json(lead);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function getRowLead(req, res) {
+    try {
+        const rowLead = await RowLeadsRepository.getOne(req.body.id);
+        return res.status(200).json(rowLead)
     } catch (error) {
         console.error(error);
     }
@@ -152,7 +152,6 @@ async function uploadLeadFromMediaAlpha(req, res) {
         rowLead.source = "mediaalpha"
         rowLead.tobacco = rowLead.tobacco == "1" ? true : false
 
-        console.log("uploadLeadFromMediaAlpha -> rowLead", rowLead)
         lead = { property: rowLead }
 
         client.emit("process-lead", { lead: lead, agent: null })
@@ -172,11 +171,11 @@ async function uploadLeadFromMediaAlpha(req, res) {
 }
 
 module.exports = {
+    getLead,
     getLeads,
+    getRowLead,
+    getRowLeads,
     getCompaniesListByLeadData,
     uploadLeadFromMediaAlpha,
-    uploadLeadFromUrl,
-    test,
-    getRowLeads,
-    getLead
+    uploadLeadFromUrl
 }   
