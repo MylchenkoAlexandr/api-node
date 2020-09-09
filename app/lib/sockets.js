@@ -1,7 +1,7 @@
+const models = require('../../database/models');
 const { createLead, updateLead } = require('../services/LeadService');
 const LeadRepository = require('../repository/LeadRepository');
 const RecordsRepository = require('../repository/RecordsRepository');
-const models = require('../../database/models')
 const RowLeadRepository = require('../repository/RowLeadsRepository');
 
 module.exports = server => {
@@ -12,12 +12,11 @@ module.exports = server => {
     io.on('connection', socket => {
 
         socket.on("connected", user => {
-            users[socket.id] = user;
-            console.log('User connected! ', users[socket.id]);
-        });
-
-        socket.on('test', ({ msg }) => {
-            console.log(msg);
+            users[socket.id] = {
+                user,
+                socket
+            };
+            console.log('User connected! ', users[socket.id].user);
         });
 
         socket.on("process-lead", async ({ lead, agent }) => {
@@ -30,55 +29,66 @@ module.exports = server => {
                 })
 
                 if (type) {
-                    const exist = await models.Leads.findOne({
+                    const lead_exist = await models.Leads.findOne({
                         where: {
                             email: lead.property.email,
                             type_id: type.dataValues.id,
                         }
                     });
 
-                    if (exist) {
+                    if (lead_exist) {
+                        const candidate_lead = await updateLead(lead_exist, lead, "ninjaQuoter", agent);
 
-                        const candidateLead = await updateLead(exist, lead, "ninjaQuoter", agent);
+                        if (candidate_lead) {
+                            const res_lead = await LeadRepository.getOne(candidate_lead.id);
 
-                        if (candidateLead) {
-                            const resLead = await LeadRepository.getOne(candidateLead.id);
-                            if (resLead) {
-                                console.log("resLead-update", resLead)
-                                io.sockets.emit("UPDATE_LEAD", resLead);
-                                io.sockets.emit("UPDATE_LEADS", resLead);
+                            if (res_lead) {
+                                console.log("res_lead-update", res_lead);
+                                io.sockets.emit("UPDATE_LEAD", res_lead);
+                                // io.sockets.emit("UPDATE_LEADS", res_lead);
                             }
                         }
                     } else {
-                        const candidateLead = await createLead(lead, "ninjaQuoter", agent);
+                        const candidate_lead = await createLead(lead, "ninjaQuoter", agent);
 
-                        if (candidateLead) {
-                            const resLead = await LeadRepository.getOne(candidateLead.id);
-                            if (resLead) {
-                                console.log("resLead-create", resLead)
-                                io.sockets.emit("CREATE_LEAD", resLead);
+                        if (candidate_lead) {
+                            const res_lead = await LeadRepository.getOne(candidate_lead.id);
+
+                            if (res_lead) {
+                                console.log("res_lead-create", res_lead);
+
+                                for (const key in users) {
+                                    if (users.hasOwnProperty(key)) {
+                                        const user = users[key];
+
+                                        if (user.user.states) {
+                                            for (let i = 0; i < user.user.states.length; i++) {
+                                                if (user.user.states[i] == res_lead.property.state) {
+                                                    user.socket.emit("CREATE_LEAD", res_lead);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
             } catch (error) {
-                console.log(error);
+                throw new Error(error);
             }
         });
 
         socket.on('row-leads', async (idArray) => {
             try {
                 const rowLeads = await RowLeadRepository.getLatest(idArray);
-                if(rowLeads)
-                    io.sockets.emit("ROW_LEAD_ADD", rowLeads);
-                    
+                io.sockets.emit("ROW_LEAD_ADD", rowLeads);
             } catch (error) {
-                console.log(error);
+                throw new Error(error);
             }
         });
 
         socket.on("busy-lead", async lead_id => {
-            console.log("lead_id", lead_id);
             socket.join(lead_id);
 
             try {
@@ -87,23 +97,22 @@ module.exports = server => {
                 });
 
                 if (candidate) {
-                    candidate.update({
+                    await candidate.update({
                         busy: 1,
                         busy_agent_id: users[socket.id].id
-                    }).then(async res => {
-                        const lead = await LeadRepository.getOne(res.id);
+                    });
 
-                        io.sockets.emit("UPDATE_LEADS", lead);
-                    }).catch(err => console.log(err));
+                    const lead = await LeadRepository.getOne(candidate.id);
+
+                    io.sockets.emit("UPDATE_LEADS", lead);
                 }
 
             } catch (error) {
-                console.log(error);
+                throw new Error(error);
             }
         });
 
         socket.on("unbusy-lead", async lead_id => {
-            console.log("lead_id", lead_id);
 
             try {
                 const candidate = await models.Leads.findOne({
@@ -122,23 +131,25 @@ module.exports = server => {
                 }
 
             } catch (error) {
-                console.log(error);
+                throw new Error(error);
             }
         });
 
         socket.on("record-create", async ({ user_id, lead_id, url }) => {
 
-            console.log("url", url)
+            try {
+                const new_record = await models.Records.create({
+                    user_id: user_id,
+                    lead_id: lead_id,
+                    url: url
+                })
 
-            const newRecord = await models.Records.create({
-                user_id: user_id,
-                lead_id: lead_id,
-                url: url
-            })
-
-            if (newRecord) {
-                const oneRecord = await RecordsRepository.getOne(newRecord.id);
-                socket.to(lead_id).emit("RECORD_ADD", oneRecord);
+                if (new_record) {
+                    const one_record = await RecordsRepository.getOne(new_record.id);
+                    socket.to(lead_id).emit("RECORD_ADD", one_record);
+                }
+            } catch (error) {
+                throw new Error(error);
             }
         });
 
@@ -162,7 +173,7 @@ module.exports = server => {
                 }
 
             } catch (error) {
-                console.log(error);
+                throw new Error(error);
             }
 
             delete users[socket.id];
