@@ -6,7 +6,7 @@ const db = require('./database/models/index');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const fileUpload = require('express-fileupload');
+// const fileUpload = require('express-fileupload');
 
 require('dotenv').config();
 
@@ -15,7 +15,7 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 
 //Configuration application
-app.use(fileUpload());
+// app.use(fileUpload());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

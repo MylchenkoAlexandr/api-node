@@ -1,8 +1,10 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
 const { processLead, processPrice } = require('../services/LeadService');
 const zipcodes = require('zipcodes');
-const LeadRepository = require('../repository/LeadRepository');
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
+
+const LeadRepository = require('../repository/LeadRepository');
+const RowLeadsRepository = require('../repository/RowLeadsRepository')
 
 const preferedCompaniesFEX = {
     mutual_omaha: 0,
@@ -24,6 +26,20 @@ async function test(req, res) {
     client.emit('test', { msg: req.body.msg });
 
     return res.status(200).json(lead);
+}
+
+async function getRowLeads(req, res) {
+    try {
+        const rowLeads = await RowLeadsRepository.getAll();
+        return res.status(200).json(rowLeads);
+    } catch (err) {
+        console.error(err);
+    }
+
+    return res.status(400).json({
+        status: 'failed',
+        message: "Server error!"
+    });
 }
 
 async function getLeads(req, res) {
@@ -49,7 +65,6 @@ async function getLead(req, res) {
     }
 }
 
-// TODO Remove same code reusing in all function 
 async function getCompaniesListByLeadData(req, res) {
     const rowLead = req.body;
 
@@ -104,7 +119,6 @@ async function uploadLeadFromUrl(req, res) {
     });
 }
 
-// TODO resolve all issues with type
 async function uploadLeadFromMediaAlpha(req, res) {
     try {
         let rowLead = req.body.lead;
@@ -163,5 +177,6 @@ module.exports = {
     uploadLeadFromMediaAlpha,
     uploadLeadFromUrl,
     test,
+    getRowLeads,
     getLead
 }   
