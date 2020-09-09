@@ -1,35 +1,25 @@
-const nodemailer = require('nodemailer');
+const { generateMailTransporter } = require('../services/mailService');
 
 async function sendMailToClient(req, res) {
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: "danilkrivosheynodejs@gmail.com",
-            pass: "a19771606z",
-        }
-    });
+    const transporter = generateMailTransporter();
 
     const mailOptions = {
-        from: "danilkrivosheynodejs@gmail.com",
+        from: "danil@fluidweb.io",
         to: req.body.email,
         subject: "Blueberry",
-        html: `<h1></h1>`
+        text: req.body.text
     };
 
     try {
         await transporter.verify();
+        await transporter.sendMail(mailOptions);
 
-        const mail = await transporter.sendMail(mailOptions);
-
-        if (mail) {
-            return res.status(200).json({ message: "Mail send" });
-        }
-
+        return res.status(200).json({ message: "Mail send" });
     } catch (error) {
         console.error(error);
     }
 
-    return res.status(400).json({ message: "Error" });
+    return res.status(400).json({ message: "Server error" });
 }
 
 module.exports = {
