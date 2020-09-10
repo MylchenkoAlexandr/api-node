@@ -12,11 +12,16 @@ module.exports = server => {
     io.on('connection', socket => {
 
         socket.on("connected", user => {
-            users[socket.id] = {
-                user,
-                socket
-            };
-            console.log('User connected! ', users[socket.id].user);
+            users[socket.id] = user;
+            console.log('User connected! ', users[socket.id]);
+
+            if (user.states) {
+                for (let index = 0; index < user.states.length; index++) {
+                    socket.join(user.states[index]);
+                }
+            } else {
+                socket.join("all_states");
+            }
         });
 
         socket.on("process-lead", async ({ lead, agent }) => {
@@ -43,9 +48,9 @@ module.exports = server => {
                             const res_lead = await LeadRepository.getOne(candidate_lead.id);
 
                             if (res_lead) {
-                                console.log("res_lead-update", res_lead);
-                                io.sockets.emit("UPDATE_LEAD", res_lead);
-                                // io.sockets.emit("UPDATE_LEADS", res_lead);
+
+                                io.sockets.to(res_lead.id).emit("UPDATE_LEAD", res_lead);
+                                io.sockets.to("all_states").to(res_lead.property.state).emit("UPDATE_LEADS", res_lead);
                             }
                         }
                     } else {
@@ -55,21 +60,8 @@ module.exports = server => {
                             const res_lead = await LeadRepository.getOne(candidate_lead.id);
 
                             if (res_lead) {
-                                console.log("res_lead-create", res_lead);
 
-                                for (const key in users) {
-                                    if (users.hasOwnProperty(key)) {
-                                        const user = users[key];
-
-                                        if (user.user.states) {
-                                            for (let i = 0; i < user.user.states.length; i++) {
-                                                if (user.user.states[i] == res_lead.property.state) {
-                                                    user.socket.emit("CREATE_LEAD", res_lead);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
                             }
                         }
                     }
@@ -88,51 +80,53 @@ module.exports = server => {
             }
         });
 
-        socket.on("busy-lead", async lead_id => {
-            socket.join(lead_id);
+        socket.on("busy-lead", lead_id => {
+            socket.join(lead_id, async () => {
+                console.log(`User - ${users[socket.id].fname}, join to room - ${lead_id}`);
 
-            try {
-                const candidate = await models.Leads.findOne({
-                    where: { id: lead_id }
-                });
-
-                if (candidate) {
-                    await candidate.update({
-                        busy: 1,
-                        busy_agent_id: users[socket.id].id
+                try {
+                    const candidate = await models.Leads.findOne({
+                        where: { id: lead_id }
                     });
 
-                    const lead = await LeadRepository.getOne(candidate.id);
+                    if (candidate) {
+                        await candidate.update({
+                            busy: 1,
+                            busy_agent_id: users[socket.id].id
+                        });
 
-                    io.sockets.emit("UPDATE_LEADS", lead);
-                }
-
-            } catch (error) {
-                throw new Error(error);
-            }
-        });
-
-        socket.on("unbusy-lead", async lead_id => {
-
-            try {
-                const candidate = await models.Leads.findOne({
-                    where: { id: lead_id }
-                });
-
-                if (candidate) {
-                    candidate.update({
-                        busy: 0,
-                        busy_agent_id: null
-                    }).then(async res => {
-                        const lead = await LeadRepository.getOne(res.id);
+                        const lead = await LeadRepository.getOne(candidate.id);
 
                         io.sockets.emit("UPDATE_LEADS", lead);
-                    }).catch(err => console.log(err));
-                }
+                    }
 
-            } catch (error) {
-                throw new Error(error);
-            }
+                } catch (error) {
+                    throw new Error(error);
+                }
+            });
+        });
+
+        socket.on("unbusy-lead", lead_id => {
+            socket.leave(lead_id, async () => {
+                try {
+                    const candidate = await models.Leads.findOne({
+                        where: { id: lead_id }
+                    });
+
+                    if (candidate) {
+                        await candidate.update({
+                            busy: 0,
+                            busy_agent_id: null
+                        });
+                        const lead = await LeadRepository.getOne(candidate.id);
+
+                        io.sockets.emit("UPDATE_LEADS", lead);
+                    }
+
+                } catch (error) {
+                    throw new Error(error);
+                }
+            })
         });
 
         socket.on("record-create", async ({ user_id, lead_id, url }) => {
@@ -156,20 +150,21 @@ module.exports = server => {
         socket.on('disconnect', async () => {
             console.log('User disconnected! ', users[socket.id]);
 
+            socket.leaveAll();
+
             try {
                 const candidate = await models.Leads.findOne({
                     where: { busy_agent_id: users[socket.id].id }
                 });
 
                 if (candidate) {
-                    candidate.update({
+                    await candidate.update({
                         busy: 0,
                         busy_agent_id: null
-                    }).then(async res => {
-                        const lead = await LeadRepository.getOne(res.id);
+                    });
+                    const lead = await LeadRepository.getOne(candidate.id);
 
-                        io.sockets.emit("UPDATE_LEADS", lead);
-                    }).catch(err => console.log(err));
+                    io.sockets.emit("UPDATE_LEADS", lead);
                 }
 
             } catch (error) {
