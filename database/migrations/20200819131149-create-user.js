@@ -17,27 +17,29 @@ module.exports = {
         },
       },
       fname: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       lname: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       email: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       password: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       states: {
         type: Sequelize.STRING
       },
-      // busy_lead_id: {
-      //   type: Sequelize.BIGINT.UNSIGNED,
-      //   references: {
-      //     model: 'Leads',
-      //     key: 'id',
-      //   },
-      // },
+      disabled: {
+        allowNull: false,
+        defaultValue: false,
+        type: Sequelize.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

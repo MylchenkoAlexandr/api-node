@@ -62,7 +62,8 @@ async function updateAgent(req, res) {
                 lname: agent.lname,
                 email: agent.email,
                 password: agent.password,
-                states: agent.states
+                states: agent.states,
+                disabled: agent.disabled
             });
 
             return res.status(200).json({
@@ -154,9 +155,59 @@ async function updateAgentPassword(req, res) {
     }
 }
 
+async function getAgents(req, res) {
+    try {
+        const agents = await models.Users.findAll({
+            where: { role_id: 2 }
+        });
+
+        if (agents) {
+            agents.forEach(agent => {
+                delete agent.dataValues.password;
+                agent.dataValues.states = JSON.parse(agent.dataValues.states);
+            });
+
+            res.status(200).json(agents);
+        }
+
+    } catch (error) {
+        res.status(400).json({
+            status: "failed",
+            message: "Server error"
+        });
+        throw new Error(error);
+    }
+}
+
+async function getAgent(req, res) {
+    try {
+        const agent_exist = await models.Users.findOne({
+            where: { id: req.params.agent_id }
+        });
+
+        if (agent_exist) {
+            delete agent_exist.dataValues.password;
+            agent_exist.dataValues.states = JSON.parse(agent_exist.dataValues.states);
+
+            res.status(200).json({
+                agent: agent_exist
+            });
+        }
+
+    } catch (error) {
+        res.status(400).json({
+            status: "failed",
+            message: "Server error"
+        });
+        throw new Error(error);
+    }
+}
+
 // TODO CREATE FUNCTION FOR SELF EDITING OF AGENT ACCOUNT, CHANGING PASSWORD|
 
 module.exports = {
+    getAgents,
+    getAgent,
     createAgent,
     updateAgent,
     deleteAgent,
