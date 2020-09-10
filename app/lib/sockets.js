@@ -1,8 +1,7 @@
-const models = require('../../database/models');
 const { createLead, updateLead } = require('../services/LeadService');
 const LeadRepository = require('../repository/LeadRepository');
 const RecordsRepository = require('../repository/RecordsRepository');
-const RowLeadRepository = require('../repository/RowLeadsRepository');
+const models = require('../../database/models')
 
 module.exports = server => {
 
@@ -70,13 +69,15 @@ module.exports = server => {
                 throw new Error(error);
             }
         });
-
+        // socket.to(lead.state).emit(CREATE_LEAD)
         socket.on('row-leads', async (idArray) => {
             try {
-                const rowLeads = await RowLeadRepository.getLatest(idArray);
-                io.sockets.emit("ROW_LEAD_ADD", rowLeads);
+                const rowLeads = await LeadRepository.getLatest(idArray);
+                if (rowLeads)
+                    io.sockets.emit("ROW_LEAD_ADD", rowLeads);
+
             } catch (error) {
-                throw new Error(error);
+                console.log(error);
             }
         });
 

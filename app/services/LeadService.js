@@ -46,6 +46,7 @@ async function asignAgent(agent_id, lead_id) {
 }
 
 async function createLead(lead, quoter, agentId = null) {
+    console.log("TEST");
     const preferedCompanies = {
         mutual_omaha_express: 0,
         foresters_express: 0,
@@ -151,12 +152,13 @@ async function updateLead(exist, lead, quoter, agentId = null) {
 
         const type = await models.Types.findOne({
             where: { name: lead.property.type }
-        });
+        });        
 
         if (source && state && status && type) {
             return new Promise((resolve, reject) => {
                 exist.update({
                     user_id: agentId,
+                    empty: 0,
                     status_id: status.id,
                     email: lead.property.email,
                     fullname: lead.property.contact ? lead.property.contact : lead.property.fname + ' ' + lead.property.lname,
