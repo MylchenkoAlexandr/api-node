@@ -41,15 +41,20 @@ module.exports = server => {
                     });
 
                     if (lead_exist) {
+                        let emptyStatus = lead.empty == 1 ? true : false;
+
                         const candidate_lead = await updateLead(lead_exist, lead, "ninjaQuoter", agent);
 
                         if (candidate_lead) {
                             const res_lead = await LeadRepository.getOne(candidate_lead.id);
 
                             if (res_lead) {
-
                                 io.sockets.to(res_lead.id).emit("UPDATE_LEAD", res_lead);
                                 io.sockets.to("all_states").to(res_lead.property.state).emit("UPDATE_LEADS", res_lead);
+                            }
+
+                            if (emptyStatus) {
+                                io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
                             }
                         }
                     } else {
@@ -59,7 +64,6 @@ module.exports = server => {
                             const res_lead = await LeadRepository.getOne(candidate_lead.id);
 
                             if (res_lead) {
-
                                 io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
                             }
                         }
