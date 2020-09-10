@@ -13,10 +13,14 @@ module.exports = server => {
         socket.on("connected", user => {
             users[socket.id] = user;
             console.log('User connected! ', users[socket.id]);
-        });
 
-        socket.on('test', ({ msg }) => {
-            console.log(msg);
+            if (user.states) {
+                for (let index = 0; index < user.states.length; index++) {
+                    socket.join(user.states[index]);
+                }
+            } else {
+                socket.join("all_states");
+            }
         });
 
         socket.on("process-lead", async ({ lead, agent }) => {
@@ -29,35 +33,40 @@ module.exports = server => {
                 })
 
                 if (type) {
-                    const exist = await models.Leads.findOne({
+                    const lead_exist = await models.Leads.findOne({
                         where: {
                             email: lead.property.email,
                             type_id: type.dataValues.id,
                         }
                     });
 
-                    if (exist) {
-                        const candidateLead = await updateLead(exist, lead, "ninjaQuoter", agent);
+                    if (lead_exist) {
+                        const candidate_lead = await updateLead(lead_exist, lead, "ninjaQuoter", agent);
 
-                        if (candidateLead) {
-                            const resLead = await LeadRepository.getOne(candidateLead.id);
-                            if (resLead) {
-                                io.sockets.emit("UPDATE_LEADS", resLead);
+                        if (candidate_lead) {
+                            const res_lead = await LeadRepository.getOne(candidate_lead.id);
+
+                            if (res_lead) {
+
+                                io.sockets.to(res_lead.id).emit("UPDATE_LEAD", res_lead);
+                                io.sockets.to("all_states").to(res_lead.property.state).emit("UPDATE_LEADS", res_lead);
                             }
                         }
                     } else {
-                        const candidateLead = await createLead(lead, "ninjaQuoter", agent);
+                        const candidate_lead = await createLead(lead, "ninjaQuoter", agent);
 
-                        if (candidateLead) {
-                            const resLead = await LeadRepository.getOne(candidateLead.id);
-                            if (resLead) {
-                                io.sockets.emit("CREATE_LEAD", resLead);
+                        if (candidate_lead) {
+                            const res_lead = await LeadRepository.getOne(candidate_lead.id);
+
+                            if (res_lead) {
+
+                                io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
                             }
                         }
                     }
                 }
             } catch (error) {
-                console.log(error);
+                throw new Error(error);
             }
         });
         // socket.to(lead.state).emit(CREATE_LEAD)
@@ -72,73 +81,77 @@ module.exports = server => {
             }
         });
 
-        socket.on("busy-lead", async lead_id => {
-            console.log("lead_id", lead_id);
-            socket.join(lead_id);
+        socket.on("busy-lead", lead_id => {
+            socket.join(lead_id, async () => {
+                console.log(`User - ${users[socket.id].fname}, join to room - ${lead_id}`);
 
-            try {
-                const candidate = await models.Leads.findOne({
-                    where: { id: lead_id }
-                });
+                try {
+                    const candidate = await models.Leads.findOne({
+                        where: { id: lead_id }
+                    });
 
-                if (candidate) {
-                    candidate.update({
-                        busy: 1,
-                        busy_agent_id: users[socket.id].id
-                    }).then(async res => {
-                        const lead = await LeadRepository.getOne(res.id);
+                    if (candidate) {
+                        await candidate.update({
+                            busy: 1,
+                            busy_agent_id: users[socket.id].id
+                        });
+
+                        const lead = await LeadRepository.getOne(candidate.id);
 
                         io.sockets.emit("UPDATE_LEADS", lead);
-                    }).catch(err => console.log(err));
-                }
+                    }
 
-            } catch (error) {
-                console.log(error);
-            }
+                } catch (error) {
+                    throw new Error(error);
+                }
+            });
         });
 
-        socket.on("unbusy-lead", async lead_id => {
-            console.log("lead_id", lead_id);
+        socket.on("unbusy-lead", lead_id => {
+            socket.leave(lead_id, async () => {
+                try {
+                    const candidate = await models.Leads.findOne({
+                        where: { id: lead_id }
+                    });
 
-            try {
-                const candidate = await models.Leads.findOne({
-                    where: { id: lead_id }
-                });
-
-                if (candidate) {
-                    candidate.update({
-                        busy: 0,
-                        busy_agent_id: null
-                    }).then(async res => {
-                        const lead = await LeadRepository.getOne(res.id);
+                    if (candidate) {
+                        await candidate.update({
+                            busy: 0,
+                            busy_agent_id: null
+                        });
+                        const lead = await LeadRepository.getOne(candidate.id);
 
                         io.sockets.emit("UPDATE_LEADS", lead);
-                    }).catch(err => console.log(err));
-                }
+                    }
 
-            } catch (error) {
-                console.log(error);
-            }
+                } catch (error) {
+                    throw new Error(error);
+                }
+            })
         });
 
         socket.on("record-create", async ({ user_id, lead_id, url }) => {
 
-            console.log("url", url)
+            try {
+                const new_record = await models.Records.create({
+                    user_id: user_id,
+                    lead_id: lead_id,
+                    url: url
+                })
 
-            const newRecord = await models.Records.create({
-                user_id: user_id,
-                lead_id: lead_id,
-                url: url
-            })
-
-            if (newRecord) {
-                const oneRecord = await RecordsRepository.getOne(newRecord.id);
-                socket.to(lead_id).emit("RECORD_ADD", oneRecord);
+                if (new_record) {
+                    const one_record = await RecordsRepository.getOne(new_record.id);
+                    socket.to(lead_id).emit("RECORD_ADD", one_record);
+                }
+            } catch (error) {
+                throw new Error(error);
             }
         });
 
         socket.on('disconnect', async () => {
             console.log('User disconnected! ', users[socket.id]);
+
+            socket.leaveAll();
 
             try {
                 const candidate = await models.Leads.findOne({
@@ -146,18 +159,17 @@ module.exports = server => {
                 });
 
                 if (candidate) {
-                    candidate.update({
+                    await candidate.update({
                         busy: 0,
                         busy_agent_id: null
-                    }).then(async res => {
-                        const lead = await LeadRepository.getOne(res.id);
+                    });
+                    const lead = await LeadRepository.getOne(candidate.id);
 
-                        io.sockets.emit("UPDATE_LEADS", lead);
-                    }).catch(err => console.log(err));
+                    io.sockets.emit("UPDATE_LEADS", lead);
                 }
 
             } catch (error) {
-                console.log(error);
+                throw new Error(error);
             }
 
             delete users[socket.id];

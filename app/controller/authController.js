@@ -9,10 +9,10 @@ async function login(req, res) {
     });
 
     if (user) {
-      const passwordCorrect = await bcrypt.compare(req.body.password, user.password);
+      const password_mathes = await bcrypt.compare(req.body.password, user.password);
 
-      if (passwordCorrect) {
-        let accesToken = jwt.sign({ data: req.body.email }, process.env.SECRET_KEY, { expiresIn: "24h" });
+      if (password_mathes) {
+        const acces_token = jwt.sign({ data: req.body.email }, process.env.SECRET_KEY, { expiresIn: "24h" });
 
         return res.status(200).json({
           message: "Login success",
@@ -24,17 +24,18 @@ async function login(req, res) {
             states: JSON.parse(user.states),
             role_id: user.role_id
           },
-          token: accesToken
+          token: acces_token
         });
       }
+
     }
 
-    return res.status(200).json({ message: "Password or email incorrect" });
+    return res.status(401).json({ message: "Password or email incorrect" });
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ message: "Server error" });
+    throw new Error(error);
   }
 
-  return res.status(400).json({ message: "Sign In error" });
 };
 
 async function registration(req, res) {
@@ -59,10 +60,9 @@ async function registration(req, res) {
 
     return res.status(200).json({ message: "User exist" });
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ message: "Server error" });
+    throw new Error(error);
   }
-
-  return res.status(400).json({ message: "Sign Up error" });
 };
 
 async function verify(req, res) {
@@ -89,12 +89,10 @@ async function verify(req, res) {
     }
 
     return res.status(401).json({ message: "Token not found" });
-
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ message: "Server error" });
+    throw new Error(error);
   }
-
-  return res.status(401).json({ message: "Verify error" });
 }
 
 module.exports = {
