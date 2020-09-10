@@ -25,11 +25,28 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
     },
-    fname: DataTypes.STRING,
-    lname: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
+    fname: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    lname: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     states: DataTypes.STRING,
+    disabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
+    },
   }, {
     sequelize,
     modelName: 'Users',
