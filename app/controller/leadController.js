@@ -4,7 +4,6 @@ const zipcodes = require('zipcodes');
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 const LeadRepository = require('../repository/LeadRepository');
-const RowLeadsRepository = require('../repository/RowLeadsRepository')
 
 const preferedCompaniesFEX = {
     mutual_omaha: 0,
@@ -35,7 +34,7 @@ async function getLeads(req, res) {
 
 async function getRowLeads(req, res) {
     try {
-        const rowLeads = await RowLeadsRepository.getAll();
+        const rowLeads = await LeadRepository.getEmptyAll();
         return res.status(200).json(rowLeads);
     } catch (err) {
         console.error(err);
@@ -51,15 +50,6 @@ async function getLead(req, res) {
     try {
         const lead = await LeadRepository.getOne(req.body.id);
         return res.status(200).json(lead);
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-async function getRowLead(req, res) {
-    try {
-        const rowLead = await RowLeadsRepository.getOne(req.body.id);
-        return res.status(200).json(rowLead)
     } catch (error) {
         console.error(error);
     }
@@ -173,7 +163,6 @@ async function uploadLeadFromMediaAlpha(req, res) {
 module.exports = {
     getLead,
     getLeads,
-    getRowLead,
     getRowLeads,
     getCompaniesListByLeadData,
     uploadLeadFromMediaAlpha,

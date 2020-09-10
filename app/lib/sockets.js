@@ -2,7 +2,6 @@ const { createLead, updateLead } = require('../services/LeadService');
 const LeadRepository = require('../repository/LeadRepository');
 const RecordsRepository = require('../repository/RecordsRepository');
 const models = require('../../database/models')
-const RowLeadRepository = require('../repository/RowLeadsRepository');
 
 module.exports = server => {
 
@@ -38,14 +37,11 @@ module.exports = server => {
                     });
 
                     if (exist) {
-
                         const candidateLead = await updateLead(exist, lead, "ninjaQuoter", agent);
 
                         if (candidateLead) {
                             const resLead = await LeadRepository.getOne(candidateLead.id);
                             if (resLead) {
-                                console.log("resLead-update", resLead)
-                                io.sockets.emit("UPDATE_LEAD", resLead);
                                 io.sockets.emit("UPDATE_LEADS", resLead);
                             }
                         }
@@ -55,7 +51,6 @@ module.exports = server => {
                         if (candidateLead) {
                             const resLead = await LeadRepository.getOne(candidateLead.id);
                             if (resLead) {
-                                console.log("resLead-create", resLead)
                                 io.sockets.emit("CREATE_LEAD", resLead);
                             }
                         }
@@ -65,13 +60,13 @@ module.exports = server => {
                 console.log(error);
             }
         });
-
+        // socket.to(lead.state).emit(CREATE_LEAD)
         socket.on('row-leads', async (idArray) => {
             try {
-                const rowLeads = await RowLeadRepository.getLatest(idArray);
-                if(rowLeads)
+                const rowLeads = await LeadRepository.getLatest(idArray);
+                if (rowLeads)
                     io.sockets.emit("ROW_LEAD_ADD", rowLeads);
-                    
+
             } catch (error) {
                 console.log(error);
             }
