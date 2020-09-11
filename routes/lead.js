@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { authenticateToken } = require('../app/middleware/authMiddleware');
+const { authenticateToken } = require('../app/middleware/auth.middleware');
 const { getLeads, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRowLeads, uploadLeadFromUrl } = require('../app/controller/leadController');
 const { uploadCSV } = require('../app/controller/uploadController');
 

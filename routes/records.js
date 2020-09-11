@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { getAllRecords } = require('../app/controller/recordsController');
-const { authenticateToken } = require('../app/middleware/authMiddleware');
+const { authenticateToken } = require('../app/middleware/auth.middleware');
 
 router.post('/get', authenticateToken, getAllRecords);
 

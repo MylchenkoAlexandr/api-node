@@ -1,13 +1,8 @@
 const router = require('express').Router();
 const { login, verify } = require('../app/controller/authController');
+const { checkBannedAccount } = require('../app/middleware/ban.middleware');
 
-router.post('/signin', login);
-router.post('/verify', verify);
-/**
- * TODO Create function of sigOut 
- * router.post('/sign-out', signOut)
- */
-
-// router.post('/registration', registration);
+router.post('/signin', checkBannedAccount, login);
+router.post('/verify', checkBannedAccount, verify);
 
 module.exports = router;

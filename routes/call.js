@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { authenticateToken } = require('../app/middleware/authMiddleware');
+const { authenticateToken } = require('../app/middleware/auth.middleware');
 const { token, voice, recordCallback } = require('../app/controller/callController');
 
 router.get('/token', authenticateToken, token);
