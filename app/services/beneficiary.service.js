@@ -2,7 +2,9 @@ const models = require('../../database/models');
 const BeneficiaryRepository = require('../repository/BeneficiaryRepository');
 
 class BeneficiaryService {
-    state_id = null;
+    constructor() {
+        this.state_id = null;
+    }
 
     async save(beneficiary_options) {
         try {
