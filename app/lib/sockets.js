@@ -87,8 +87,6 @@ module.exports = server => {
 
         socket.on("busy-lead", lead_id => {
             socket.join(lead_id, async () => {
-                console.log(`User - ${users[socket.id].fname}, join to room - ${lead_id}`);
-
                 try {
                     const candidate = await models.Leads.findOne({
                         where: { id: lead_id }
@@ -104,7 +102,6 @@ module.exports = server => {
 
                         io.sockets.emit("UPDATE_LEADS", lead);
                     }
-
                 } catch (error) {
                     throw new Error(error);
                 }

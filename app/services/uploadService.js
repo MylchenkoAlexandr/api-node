@@ -16,6 +16,9 @@ function parseCSVfileToDB(rowLeadsJSON) {
                 if (exist)
                     return;
 
+                rowLeadsJSON[key].contact = rowLeadsJSON[key].contact.replace(/"/ig, '')
+                rowLeadsJSON[key].email = rowLeadsJSON[key].email.replace(/"/ig, '')
+
                 let clearPhone = String(rowLeadsJSON[key].phone).length == 11 ? String(rowLeadsJSON[key].phone).substring(1) : rowLeadsJSON[key].phone
 
                 rowLeadsJSON[key].phone = formatPhoneNumber(clearPhone).replace(' ', '');
@@ -24,14 +27,19 @@ function parseCSVfileToDB(rowLeadsJSON) {
                 rowLeadsJSON[key].type = "life";
                 rowLeadsJSON[key].status = "new";
 
-                let newDate = new Date(rowLeadsJSON[key].birth_date);
+                if (rowLeadsJSON[key].birth_date == 'NULL') {
+                    delete rowLeadsJSON[key].birth_date
+                } else {
+                    let newDate = new Date(rowLeadsJSON[key].birth_date);
 
-                const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
-                const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
-                const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+                    const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+                    const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+                    const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
 
-                rowLeadsJSON[key].birth_date = yy + '-' + mm + '-' + dd;
+                    rowLeadsJSON[key].birth_date = yy + '-' + mm + '-' + dd;
+                }
 
+                console.log(rowLeadsJSON[key]);
                 let rowLead = await models.Leads.create({
                     status_id: 1,
                     source_id: 1,

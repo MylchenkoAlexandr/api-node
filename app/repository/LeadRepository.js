@@ -60,6 +60,13 @@ const LeadRepository = {
                 console.error(e);
             });
 
+            data = data.map(item => {
+                item.property = JSON.parse(item.property);
+                item.price = JSON.parse(item.price);
+
+                return item;
+            });
+
             return resolve(data);
         });
     },
@@ -70,6 +77,13 @@ const LeadRepository = {
                 type: db.sequelize.QueryTypes.SELECT
             }).catch((e) => {
                 console.error(e);
+            });
+
+            data = data.map(item => {
+                item.property = JSON.parse(item.property);
+                item.price = JSON.parse(item.price);
+
+                return item;
             });
 
             return resolve(data);
