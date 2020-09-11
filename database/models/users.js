@@ -41,8 +41,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    states: DataTypes.STRING,
-    disabled: {
+    states: DataTypes.TEXT,
+    banned: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false

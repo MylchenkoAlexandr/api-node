@@ -33,9 +33,9 @@ module.exports = {
         type: Sequelize.STRING
       },
       states: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
-      disabled: {
+      banned: {
         allowNull: false,
         defaultValue: false,
         type: Sequelize.BOOLEAN
