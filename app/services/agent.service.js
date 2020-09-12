@@ -167,6 +167,14 @@ class AgentService {
 
         return agent_candidate.dataValues.banned;
     }
+
+    async checkAdmin(email) {
+        const agent_candidate = await models.Users.findOne({ 
+            where: { email } 
+        });
+
+        return agent_candidate.dataValues.role_id == 1 ? true : false;
+    }
 }
 
 module.exports = new AgentService;

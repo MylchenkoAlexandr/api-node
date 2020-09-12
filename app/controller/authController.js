@@ -1,6 +1,8 @@
 const models = require('../../database/models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const AgentService = require('../services/agent.service');
+
 
 async function login(req, res) {
   try {
@@ -68,24 +70,32 @@ async function registration(req, res) {
 async function verify(req, res) {
   try {
     const decoded = jwt.verify(req.body.token, process.env.SECRET_KEY);
+    const account_banned = await AgentService.checkedBan(decoded.data);
 
-    const candidate = await models.Users.findOne({
-      where: { email: decoded.data }
-    });
+    if (account_banned) {
+      return res.status(403).json({
+        status: 'failed',
+        message: "Your account has been banned"
+      });
+    } else {
+      const candidate = await models.Users.findOne({
+        where: { email: decoded.data }
+      });
 
-    if (candidate) {
-      const user = candidate.dataValues;
+      if (candidate) {
+        const user = candidate.dataValues;
 
-      return res.status(200).json({
-        user: {
-          id: user.id,
-          email: user.email,
-          fname: user.fname,
-          lname: user.lname,
-          states: JSON.parse(user.states),
-          role_id: user.role_id
-        }
-      })
+        return res.status(200).json({
+          user: {
+            id: user.id,
+            email: user.email,
+            fname: user.fname,
+            lname: user.lname,
+            states: JSON.parse(user.states),
+            role_id: user.role_id
+          }
+        })
+      }
     }
 
     return res.status(401).json({ message: "Token not found" });
