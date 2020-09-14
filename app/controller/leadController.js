@@ -143,7 +143,7 @@ async function uploadLeadFromMediaAlpha(req, res) {
         rowLead.tobacco = rowLead.tobacco == "1" ? true : false
 
         lead = { property: rowLead }
-
+        
         client.emit("process-lead", { lead: lead, agent: null })
 
         return res.status(200).json({

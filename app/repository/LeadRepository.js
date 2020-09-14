@@ -86,7 +86,7 @@ const LeadRepository = {
                 return item;
             });
 
-            return resolve(data);
+             return resolve(data);
         });
     },
 }

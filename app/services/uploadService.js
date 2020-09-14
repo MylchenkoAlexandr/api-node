@@ -7,39 +7,52 @@ function parseCSVfileToDB(rowLeadsJSON) {
 
         Object.keys(rowLeadsJSON).forEach(async key => {
             try {
-                let exist = await models.Leads.findOne({
-                    where: {
-                        email: rowLeadsJSON[key].email
-                    }
-                })
-
-                if (exist)
+                if (rowLeadsJSON[key].email == 0 && rowLeadsJSON[key].phone == 0) {
                     return;
+                }
 
-                rowLeadsJSON[key].contact = rowLeadsJSON[key].contact.replace(/"/ig, '')
-                rowLeadsJSON[key].email = rowLeadsJSON[key].email.replace(/"/ig, '')
+                if (rowLeadsJSON[key].email == 0) {
+                    delete rowLeadsJSON[key].email
+                } else {
+                    let exist = await models.Leads.findOne({
+                        where: {
+                            email: rowLeadsJSON[key].email
+                        }
+                    })
 
-                let clearPhone = String(rowLeadsJSON[key].phone).length == 11 ? String(rowLeadsJSON[key].phone).substring(1) : rowLeadsJSON[key].phone
+                    if (exist)
+                        return;
 
-                rowLeadsJSON[key].phone = formatPhoneNumber(clearPhone).replace(' ', '');
+                    rowLeadsJSON[key].email = rowLeadsJSON[key].email.replace(/"/ig, '');
+                }
+
+                if (rowLeadsJSON[key].contact != 0) {
+                    rowLeadsJSON[key].contact = rowLeadsJSON[key].contact.replace(/"/ig, '');
+                } else {
+                    delete rowLeadsJSON[key].contact;
+                }
+
+                if (rowLeadsJSON[key].phone != 0) {
+                    let clearPhone = String(rowLeadsJSON[key].phone).length == 11 ? String(rowLeadsJSON[key].phone).substring(1) : rowLeadsJSON[key].phone;
+                    rowLeadsJSON[key].phone = formatPhoneNumber(clearPhone).replace(' ', '');
+                } else {
+                    delete rowLeadsJSON[key].phone;
+                }
+
+                if (rowLeadsJSON[key].birth_date != 0) {
+                    let newDate = new Date(rowLeadsJSON[key].birth_date);
+                    const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+                    const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+                    const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+                    rowLeadsJSON[key].birth_date = yy + '-' + mm + '-' + dd;
+                } else {
+                    delete rowLeadsJSON[key].birth_date;
+                }
 
                 rowLeadsJSON[key].source = "blueberry";
                 rowLeadsJSON[key].type = "life";
                 rowLeadsJSON[key].status = "new";
 
-                if (rowLeadsJSON[key].birth_date == 'NULL') {
-                    delete rowLeadsJSON[key].birth_date
-                } else {
-                    let newDate = new Date(rowLeadsJSON[key].birth_date);
-
-                    const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
-                    const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
-                    const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
-
-                    rowLeadsJSON[key].birth_date = yy + '-' + mm + '-' + dd;
-                }
-
-                console.log(rowLeadsJSON[key]);
                 let rowLead = await models.Leads.create({
                     status_id: 1,
                     source_id: 1,
@@ -48,7 +61,7 @@ function parseCSVfileToDB(rowLeadsJSON) {
                     fullname: rowLeadsJSON[key].contact,
                     email: rowLeadsJSON[key].email,
                     property: JSON.stringify(rowLeadsJSON[key]),
-                })
+                });
 
                 idArray.push(rowLead.id);
 

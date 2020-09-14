@@ -18,7 +18,6 @@ async function uploadCSV(req, res) {
         });
 
         if (rowLeadsJSON) {
-            // Save to db and return array of id`s row leads from csv
             const idArray = await parseCSVfileToDB(rowLeadsJSON);
 
             if (idArray)
@@ -34,6 +33,7 @@ async function uploadCSV(req, res) {
             status: "failed",
             message: "Server error!"
         });
+        
         throw new Error(err);
     }
 }
