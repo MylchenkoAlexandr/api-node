@@ -8,10 +8,9 @@ class UploadService {
             let idArray = [];
 
             Object.keys(rowLeadsJSON).forEach(async key => {
-                let lead;
-                const formatedLead = this.formatLead(rowLeadsJSON[key]);
-
                 try {
+                    let lead;
+                    const formatedLead = this.formatLead(rowLeadsJSON[key]);
 
                     if (formatedLead.email) {
                         let exist = await models.Leads.findOne({
@@ -38,6 +37,7 @@ class UploadService {
                     }
 
                 } catch (err) {
+                    console.log(err)
                     reject(err)
                 }
             });
