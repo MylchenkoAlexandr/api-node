@@ -110,8 +110,8 @@ class UploadService {
 
     async updateLead(lead) {
         const exLead = await lead.update({
-            fullname: formatedLead.contact,
-            property: JSON.stringify(formatedLead),
+            fullname: lead.contact,
+            property: JSON.stringify(lead),
         });
 
         return exLead;
