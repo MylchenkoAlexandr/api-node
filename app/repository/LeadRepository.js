@@ -64,11 +64,12 @@ const LeadRepository = {
                 item.property = JSON.parse(item.property);
                 item.price = JSON.parse(item.price);
 
-                let newDate = new Date(item.createdAt);
-                const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
-                const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
-                const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
-                item.createdAt = mm + '/' + dd + '/' + yy;
+
+                if (item.property.birth_date)
+                    item.property.birth_date = this.formatDate(item.property.birth_date)
+
+                console.log("getEmptyAll -> item.property.birth_date", item.property.birth_date)
+                item.createdAt = this.formatDate(item.createdAt);
 
                 return item;
             });
@@ -89,11 +90,10 @@ const LeadRepository = {
                 item.property = JSON.parse(item.property);
                 item.price = JSON.parse(item.price);
 
-                let newDate = new Date(item.createdAt);
-                const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
-                const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
-                const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
-                item.createdAt = mm + '/' + dd + '/' + yy;
+                if (item.property.birth_date)
+                    item.property.birth_date = this.formatDate(item.property.birth_date)
+
+                item.createdAt = this.formatDate(item.createdAt);
 
                 return item;
             });
@@ -101,6 +101,14 @@ const LeadRepository = {
             return resolve(data);
         });
     },
+
+    formatDate(date) {
+        let newDate = new Date(date);
+        const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+        const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+        const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+        return mm + '/' + dd + '/' + yy;
+    }
 }
 
 module.exports = LeadRepository;
