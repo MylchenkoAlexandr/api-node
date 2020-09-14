@@ -1,4 +1,4 @@
-const { parseCSVfileToDB } = require('../services/uploadService')
+const UploadService = require('../services/upload.service')
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const csvToJson = require('convert-csv-to-json');
 const formidable = require('formidable');
@@ -18,7 +18,7 @@ async function uploadCSV(req, res) {
         });
 
         if (rowLeadsJSON) {
-            const idArray = await parseCSVfileToDB(rowLeadsJSON);
+            const idArray = await UploadService.parseCSVfileToDB(rowLeadsJSON);
 
             if (idArray)
                 client.emit('row-leads', idArray);
@@ -33,7 +33,7 @@ async function uploadCSV(req, res) {
             status: "failed",
             message: "Server error!"
         });
-        
+
         throw new Error(err);
     }
 }
