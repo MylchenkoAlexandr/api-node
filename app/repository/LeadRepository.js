@@ -54,7 +54,7 @@ const LeadRepository = {
 
     getEmptyAll() {
         return new Promise(async (resolve, reject) => {
-            let data = await db.sequelize.query('SELECT leads.id, leads.empty, leads.fullname, users.fname, users.lname, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.createdAt AS created FROM leads LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status .id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.empty = 1', {
+            let data = await db.sequelize.query('SELECT leads.id, leads.createdAt, leads.empty, leads.fullname, users.fname, users.lname, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.createdAt AS created FROM leads LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status .id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.empty = 1', {
                 type: db.sequelize.QueryTypes.SELECT
             }).catch((e) => {
                 console.error(e);
@@ -63,6 +63,12 @@ const LeadRepository = {
             data = data.map(item => {
                 item.property = JSON.parse(item.property);
                 item.price = JSON.parse(item.price);
+
+                let newDate = new Date(item.createdAt);
+                const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+                const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+                const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+                item.createdAt = mm + '/' + dd + '/' + yy;
 
                 return item;
             });
@@ -73,7 +79,7 @@ const LeadRepository = {
 
     getLatest(latestId) {
         return new Promise(async (resolve, reject) => {
-            let data = await db.sequelize.query(`SELECT leads.id, leads.empty, leads.fullname, users.fname, users.lname, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.createdAt AS created FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN status ON leads.status_id = status .id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id IN ('${latestId.join("', '")}')`, {
+            let data = await db.sequelize.query(`SELECT leads.id, leads.createdAt, leads.empty, leads.fullname, users.fname, users.lname, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.createdAt AS created FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN status ON leads.status_id = status .id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id IN ('${latestId.join("', '")}')`, {
                 type: db.sequelize.QueryTypes.SELECT
             }).catch((e) => {
                 console.error(e);
@@ -83,10 +89,16 @@ const LeadRepository = {
                 item.property = JSON.parse(item.property);
                 item.price = JSON.parse(item.price);
 
+                let newDate = new Date(item.createdAt);
+                const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+                const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+                const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+                item.createdAt = mm + '/' + dd + '/' + yy;
+
                 return item;
             });
 
-             return resolve(data);
+            return resolve(data);
         });
     },
 }
