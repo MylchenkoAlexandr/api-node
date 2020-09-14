@@ -8,9 +8,10 @@ class UploadService {
             let idArray = [];
 
             Object.keys(rowLeadsJSON).forEach(async key => {
+                let lead;
+                const formatedLead = this.formatLead(rowLeadsJSON[key]);
+
                 try {
-                    let lead;
-                    const formatedLead = this.formatLead(rowLeadsJSON[key]);
 
                     if (formatedLead.email) {
                         let exist = await models.Leads.findOne({
@@ -44,26 +45,26 @@ class UploadService {
     }
 
     formatLead(rowLead) {
-        if (rowLead.email == 0) {
+        if (rowLead.email == 0 && rowLead.email != 'NULL') {
             delete rowLead.email
         } else {
             rowLead.email = rowLead.email.replace(/"/ig, '');
         }
 
-        if (rowLead.contact != 0) {
+        if (rowLead.contact != 0 && rowLead.contact != 'NULL') {
             rowLead.contact = rowLead.contact.replace(/"/ig, '');
         } else {
             delete rowLead.contact;
         }
 
-        if (rowLead.phone != 0) {
+        if (rowLead.phone != 0 && rowLead.phone != 'NULL') {
             let clearPhone = String(rowLead.phone).length == 11 ? String(rowLead.phone).substring(1) : rowLead.phone;
             rowLead.phone = this.formatPhoneNumber(clearPhone).replace(' ', '');
         } else {
             delete rowLead.phone;
         }
 
-        if (rowLead.birth_date != 0) {
+        if (rowLead.birth_date != 0 && rowLead.birth_date != 'NULL') {
             let newDate = new Date(rowLead.birth_date);
             const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
             const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
@@ -90,7 +91,7 @@ class UploadService {
 
             return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
         }
-        return null;
+        return 'null';
     }
 
     async createLead(formatedLead) {
