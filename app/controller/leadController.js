@@ -1,9 +1,10 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
-const { processLead, processPrice } = require('../services/LeadService');
+const { createLead, updateLead } = require('../services/LeadService');
 const zipcodes = require('zipcodes');
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
-
+const models = require('../../database/models')
 const LeadRepository = require('../repository/LeadRepository');
+const { property } = require('lodash');
 
 const preferedCompaniesFEX = {
     mutual_omaha: 0,
@@ -86,22 +87,66 @@ async function getCompaniesListByLeadData(req, res) {
 
 // TODO write function for fetching data from url
 async function uploadLeadFromUrl(req, res) {
-    const rowLead = req.body;
+    const urlParams = req.body;
 
-    console.log("uploadLeadFromUrl -> rowLead", rowLead)
+    const type = await models.Types.findOne({
+        parameters: ['id'],
+        where: {
+            name: urlParams.type
+        }
+    });
 
-    rowLead.status = "new";
-    rowLead.source = "blueberry";
-
-    try {
-        await processLead(rowLead);
-        return res.status(200).json({
-            status: 'success',
-            message: 'Success Uploaded!'
-        });
-    } catch (error) {
-        console.error(error);
+    let rawLead = {
+        status: 1,
+        empty: 1,
+        source: 2,
+        type: type.id,
+        property: {
+            status: "new",
+            type: "auto",
+            source: "mediaalpha",
+        }
     }
+
+    if (urlParams.first_name && urlParams.last_name) {
+        rawLead.property.contact = urlParams.first_name + urlParams.last_name;
+    }
+    if (urlParams.phone) {
+        rawLead.property.phone = urlParams.phone;
+    }
+    if (urlParams.email) {
+        rawLead.property.email = urlParams.email;
+    }
+    if (urlParams.zip) {
+        rawLead.property.zipcode = urlParams.zip;
+        rawLead.property.state = zipcodes.lookup(urlParams.zip).state;
+    }
+    if (urlParams.dob) {
+        rawLead.property.dob = urlParams.dob;
+    }
+
+    let processedLead = false;
+    
+    if (rawLead.property.email) {
+        let leadExist = await models.Leads.findOne({
+            where: {
+                email: rawLead.property.email
+            }
+        });
+        
+
+        if (leadExist) {
+            processedLead = await updateLead(leadExist, rawLead, "ninjaQuoter", null);
+
+        } else {
+            processedLead = await createLead(rawLead, "ninjaQuoter", null);
+        }
+    } else {
+        processedLead = await createLead(rawLead, "ninjaQuoter", null);
+    }
+
+    if (processedLead)
+        client.emit('raw-leads', [processedLead.id]);
 
     return res.status(400).json({
         status: 'failed',
@@ -136,14 +181,15 @@ async function uploadLeadFromMediaAlpha(req, res) {
 
         rowLead.type = req.body.type;
         rowLead.rateClass = rowLead.term == 'fex' ? 'lb' : 's';
-        rowLead.state = zipcodes.lookup(rowLead.zipcode || rowLead.zip).state
+
+        rowLead.state = zipcodes.lookup(rowLead.zipcode || rowLead.zip).state;
         rowLead.gender = rowLead.gender.toLowerCase()
         rowLead.status = "new";
-        rowLead.source = "mediaalpha"
-        rowLead.tobacco = rowLead.tobacco == "1" ? true : false
+        rowLead.source = "mediaalpha";
+        rowLead.tobacco = rowLead.tobacco == "1" ? true : false;
 
         lead = { property: rowLead }
-        
+
         client.emit("process-lead", { lead: lead, agent: null })
 
         return res.status(200).json({
