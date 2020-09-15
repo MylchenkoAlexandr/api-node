@@ -109,7 +109,7 @@ async function uploadLeadFromUrl(req, res) {
     }
 
     if (urlParams.first_name && urlParams.last_name) {
-        rawLead.property.contact = urlParams.first_name + urlParams.last_name;
+        rawLead.property.contact = urlParams.first_name + ' ' + urlParams.last_name;
     }
     if (urlParams.phone) {
         rawLead.property.phone = urlParams.phone;
@@ -126,14 +126,13 @@ async function uploadLeadFromUrl(req, res) {
     }
 
     let processedLead = false;
-    
+
     if (rawLead.property.email) {
         let leadExist = await models.Leads.findOne({
             where: {
                 email: rawLead.property.email
             }
         });
-        
 
         if (leadExist) {
             processedLead = await updateLead(leadExist, rawLead, "ninjaQuoter", null);

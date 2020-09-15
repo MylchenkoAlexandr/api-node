@@ -79,7 +79,7 @@ async function createLead(lead, quoter, agentId = null) {
                     source_id: source.id,
                     status_id: 1,
                     type_id: type.id,
-                    empty: lead.empty ? lead.empty : 0, 
+                    empty: lead.empty ? lead.empty : 0,
                     email: lead.property.email,
                     fullname: lead.property.contact ? lead.property.contact : lead.property.fname + ' ' + lead.property.lname,
                     state_id: state.id,
@@ -143,7 +143,7 @@ async function updateLead(exist, lead, quoter, agentId = null) {
     try {
         const source = await models.Sources.findOne({
             where: { name: lead.property.source }
-        }); 
+        });
 
         const state = await models.States.findOne({
             where: { name: lead.property.state }
@@ -182,8 +182,8 @@ async function updateLead(exist, lead, quoter, agentId = null) {
 
                     let quotes = null;
 
-                    switch (quoter) {
-                        case "ninjaQuoter":
+                    switch (quoter + type.name) {
+                        case "ninjaQuoterlife":
                             quotes = new NinjaQuoterService(quoterInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
                     }
 
