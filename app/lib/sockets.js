@@ -52,9 +52,10 @@ module.exports = server => {
                         });
                     }
 
-                    if (lead_exist) {
-                        let emptyStatus = lead.empty == 1 ? true : false;
+                    let emptyStatus = lead.empty == 1 ? true : false;
 
+                    if (lead_exist) {
+                        
                         const candidate_lead = await updateLead(lead_exist, lead, "ninjaQuoter", agent);
 
                         if (candidate_lead) {

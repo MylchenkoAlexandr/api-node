@@ -46,7 +46,6 @@ async function asignAgent(agent_id, lead_id) {
 }
 
 async function createLead(lead, quoter, agentId = null) {
-    console.log("TEST");
     const preferedCompanies = {
         mutual_omaha_express: 0,
         foresters_express: 0,
@@ -80,6 +79,7 @@ async function createLead(lead, quoter, agentId = null) {
                     source_id: source.id,
                     status_id: 1,
                     type_id: type.id,
+                    empty: lead.empty ? lead.empty : 0, 
                     email: lead.property.email,
                     fullname: lead.property.contact ? lead.property.contact : lead.property.fname + ' ' + lead.property.lname,
                     state_id: state.id,
@@ -96,23 +96,26 @@ async function createLead(lead, quoter, agentId = null) {
                         gender: newLead.gender
                     };
 
-                    let quotes = null;
+                    if (lead.empty == 0) {
+                        let quotes = null;
 
-                    switch (quoter) {
-                        case "ninjaQuoter":
-                            quotes = new NinjaQuoterService(quoterInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
-                    }
-
-                    try {
-                        const price = await quotes.getPrice();
-                        if (price) {
-                            await processPrice(res.dataValues.id, price, "ninjaQuoter");
-
-                            return resolve(res.dataValues);
+                        switch (quoter) {
+                            case "ninjaQuoter":
+                                quotes = new NinjaQuoterService(quoterInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
                         }
-                    } catch (error) {
-                        console.error("createLead -> error", error)
+
+                        try {
+                            const price = await quotes.getPrice();
+                            if (price) {
+                                await processPrice(res.dataValues.id, price, "ninjaQuoter");
+
+                            }
+                        } catch (error) {
+                            console.error("createLead -> error", error)
+                        }
                     }
+
+                    return resolve(res.dataValues);
                 }).catch(err => {
                     return reject(err);
                 });
@@ -140,7 +143,7 @@ async function updateLead(exist, lead, quoter, agentId = null) {
     try {
         const source = await models.Sources.findOne({
             where: { name: lead.property.source }
-        });
+        }); 
 
         const state = await models.States.findOne({
             where: { name: lead.property.state }
@@ -152,13 +155,13 @@ async function updateLead(exist, lead, quoter, agentId = null) {
 
         const type = await models.Types.findOne({
             where: { name: lead.property.type }
-        });        
+        });
 
         if (source && state && status && type) {
             return new Promise((resolve, reject) => {
                 exist.update({
                     user_id: agentId,
-                    empty: 0,
+                    empty: lead.empty ? lead.empty : 0,
                     status_id: status.id,
                     email: lead.property.email,
                     fullname: lead.property.contact ? lead.property.contact : lead.property.fname + ' ' + lead.property.lname,
@@ -193,7 +196,7 @@ async function updateLead(exist, lead, quoter, agentId = null) {
                             return resolve(res.dataValues);
                         }
                     } catch (error) {
-                        console.error("createLead -> error", error)
+                        console.error(error)
                     }
 
                 }).catch(err => {
