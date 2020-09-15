@@ -96,7 +96,10 @@ async function createLead(lead, quoter, agentId = null) {
                         gender: newLead.gender
                     };
 
+                    console.log("createLead -> res.dataValues.empty", res.dataValues.empty)
                     if (res.dataValues.empty == 0) {
+                        console.log("createLead -> res.dataValues.empty", res.dataValues.empty)
+                        
                         let quotes = null;
 
                         switch (quoter) {
@@ -108,7 +111,6 @@ async function createLead(lead, quoter, agentId = null) {
                             const price = await quotes.getPrice();
                             if (price) {
                                 await processPrice(res.dataValues.id, price, "ninjaQuoter");
-
                             }
                         } catch (error) {
                             console.error("createLead -> error", error)
