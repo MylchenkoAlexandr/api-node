@@ -65,10 +65,10 @@ const LeadRepository = {
                 item.price = JSON.parse(item.price);
 
 
-                if (item.property.birth_date)
+                if (item.property.birth_date) {
                     item.property.birth_date = this.formatDate(item.property.birth_date)
+                }
 
-                console.log("getEmptyAll -> item.property.birth_date", item.property.birth_date)
                 item.createdAt = this.formatDate(item.createdAt);
 
                 return item;
@@ -90,8 +90,9 @@ const LeadRepository = {
                 item.property = JSON.parse(item.property);
                 item.price = JSON.parse(item.price);
 
-                if (item.property.birth_date)
+                if (item.property.birth_date) {
                     item.property.birth_date = this.formatDate(item.property.birth_date)
+                }
 
                 item.createdAt = this.formatDate(item.createdAt);
 

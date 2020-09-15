@@ -41,12 +41,16 @@ module.exports = server => {
                 })
 
                 if (type) {
-                    const lead_exist = await models.Leads.findOne({
-                        where: {
-                            email: lead.property.email,
-                            type_id: type.dataValues.id,
-                        }
-                    });
+                    let lead_exist = false;
+
+                    
+                    if (lead.id) {
+                        lead_exist = await models.Leads.findOne({
+                            where: {
+                                id: lead.id
+                            }
+                        });
+                    }
 
                     if (lead_exist) {
                         let emptyStatus = lead.empty == 1 ? true : false;
