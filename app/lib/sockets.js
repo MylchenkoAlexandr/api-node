@@ -43,7 +43,7 @@ module.exports = server => {
                 if (type) {
                     let lead_exist = false;
 
-                    
+
                     if (lead.id) {
                         lead_exist = await models.Leads.findOne({
                             where: {
@@ -88,11 +88,11 @@ module.exports = server => {
             }
         });
 
-        socket.on('row-leads', async (idArray) => {
+        socket.on('raw-leads', async (idArray) => {
             try {
-                const rowLeads = await LeadRepository.getLatest(idArray);
-                if (rowLeads)
-                    io.sockets.emit("ROW_LEAD_ADD", rowLeads);
+                const rawLeads = await LeadRepository.getLatest(idArray);
+                if (rawLeads)
+                    io.sockets.emit("RAW_LEAD_ADD", rawLeads);
 
             } catch (error) {
                 console.log(error);

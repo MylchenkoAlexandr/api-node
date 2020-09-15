@@ -7,7 +7,7 @@ async function uploadCSV(req, res) {
     const form = new formidable.IncomingForm();
 
     try {
-        const rowLeadsJSON = await new Promise((resolve, reject) => {
+        const rawLeadsJSON = await new Promise((resolve, reject) => {
             form.parse(req, (err, fields, files) => {
                 const delimiter = fields.delimiter;
 
@@ -17,11 +17,11 @@ async function uploadCSV(req, res) {
             });
         });
 
-        if (rowLeadsJSON) {
-            const idArray = await UploadService.parseCSVfileToDB(rowLeadsJSON);
+        if (rawLeadsJSON) {
+            const idArray = await UploadService.parseCSVfileToDB(rawLeadsJSON);
 
             if (idArray)
-                client.emit('row-leads', idArray);
+                client.emit('raw-leads', idArray);
         }
 
         res.status(200).json({

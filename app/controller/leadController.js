@@ -32,7 +32,7 @@ async function getLeads(req, res) {
     });
 }
 
-async function getRowLeads(req, res) {
+async function getRawLeads(req, res) {
     try {
         const rowLeads = await LeadRepository.getEmptyAll();
         return res.status(200).json(rowLeads);
@@ -163,7 +163,7 @@ async function uploadLeadFromMediaAlpha(req, res) {
 module.exports = {
     getLead,
     getLeads,
-    getRowLeads,
+    getRawLeads,
     getCompaniesListByLeadData,
     uploadLeadFromMediaAlpha,
     uploadLeadFromUrl
