@@ -7,6 +7,7 @@ class BeneficiaryService {
     }
 
     async save(beneficiary_options) {
+        console.log("BeneficiaryService -> save -> beneficiary_options", beneficiary_options)
         try {
             const beneficiary = await models.Beneficiaries.findOne({
                 where: { lead_id: beneficiary_options.lead_id }
@@ -18,9 +19,12 @@ class BeneficiaryService {
                 });
 
                 this.state_id = state.dataValues.id;
+            } else {
+                this.state_id = null;
             }
 
             if (beneficiary) {
+                console.log("ben update - location = ", this.state_id);
                 await beneficiary.update({
                     name: beneficiary_options.name,
                     relative_id: beneficiary_options.relative_id,
@@ -31,6 +35,8 @@ class BeneficiaryService {
 
                 return { code: 200, status: "success", message: "Beneficiary updated!" };
             } else {
+                console.log("ben create - location = ", this.state_id);
+
                 await models.Beneficiaries.create({
                     lead_id: beneficiary_options.lead_id,
                     name: beneficiary_options.name,
