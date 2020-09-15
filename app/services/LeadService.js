@@ -96,7 +96,7 @@ async function createLead(lead, quoter, agentId = null) {
                         gender: newLead.gender
                     };
 
-                    if (lead.empty == 0) {
+                    if (res.dataValues.empty == 0) {
                         let quotes = null;
 
                         switch (quoter) {
