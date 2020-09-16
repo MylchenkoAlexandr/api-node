@@ -69,7 +69,7 @@ const LeadRepository = {
                     item.property.birth_date = this.formatDate(item.property.birth_date)
                 }
 
-                // item.createdAt = this.formatDate(item.createdAt);
+                item.createdAt = this.formatDate(item.createdAt, true);
 
                 return item;
             });
@@ -94,7 +94,7 @@ const LeadRepository = {
                     item.property.birth_date = this.formatDate(item.property.birth_date)
                 }
 
-                // item.createdAt = this.formatDate(item.createdAt);
+                item.createdAt = this.formatDate(item.createdAt, true);
 
                 return item;
             });
@@ -103,11 +103,17 @@ const LeadRepository = {
         });
     },
 
-    formatDate(date) {
+    formatDate(date, time = null) {
         let newDate = new Date(date);
         const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
         const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
         const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+        const timeF = newDate.getTime();
+
+        if (time) {
+            return `${mm}/${dd}/${yy} ${timeF}`;
+        }
+
         return mm + '/' + dd + '/' + yy;
     }
 }
