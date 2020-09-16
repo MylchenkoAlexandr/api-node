@@ -43,10 +43,10 @@ module.exports = server => {
                 if (type) {
                     let lead_exist;
 
-                    if (lead.email) {
+                    if (lead.property.email) {
                         lead_exist = await models.Leads.findOne({
                             where: {
-                                email: lead.email
+                                email: lead.property.email
                             }
                         });
                     } else if (lead.id) {
