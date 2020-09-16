@@ -108,7 +108,7 @@ const LeadRepository = {
         const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
         const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
         const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
-        const timeF =  date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();;
+        const timeF = newDate.getHours() + ":" + newDate.getMinutes() + ":" + newDate.getSeconds();;
 
         if (time) {
             return `${mm}/${dd}/${yy} ${timeF}`;
