@@ -43,8 +43,13 @@ module.exports = server => {
                 if (type) {
                     let lead_exist = false;
 
-
-                    if (lead.id) {
+                    if (lead.email) {
+                        lead_exist = await models.Leads.findOne({
+                            where: {
+                                email: lead.email
+                            }
+                        });
+                    } else if (lead.id) {
                         lead_exist = await models.Leads.findOne({
                             where: {
                                 id: lead.id
@@ -55,7 +60,7 @@ module.exports = server => {
                     let emptyStatus = lead.empty == 1 ? true : false;
 
                     if (lead_exist) {
-                        
+
                         const candidate_lead = await updateLead(lead_exist, lead, "ninjaQuoter", agent);
 
                         if (candidate_lead) {

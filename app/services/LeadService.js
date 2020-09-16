@@ -86,6 +86,7 @@ async function createLead(lead, quoter, agentId = null) {
                     property: JSON.stringify(lead.property)
                 }).then(async res => {
                     const newLead = JSON.parse(res.dataValues.property);
+                    
                     const quoterInfo = {
                         birthdate: newLead.birth_date,
                         smoker: Boolean(+newLead.tobacco),
@@ -96,7 +97,6 @@ async function createLead(lead, quoter, agentId = null) {
                         gender: newLead.gender
                     };
 
-                    console.log("createLead -> res.dataValues.empty", res.dataValues.empty)
                     if (res.dataValues.empty == 0) {
                         console.log("createLead -> res.dataValues.empty", res.dataValues.empty)
                         
