@@ -69,7 +69,7 @@ const LeadRepository = {
                     item.property.birth_date = this.formatDate(item.property.birth_date)
                 }
 
-                item.createdAt = this.formatDate(item.createdAt);
+                // item.createdAt = this.formatDate(item.createdAt);
 
                 return item;
             });
@@ -94,7 +94,7 @@ const LeadRepository = {
                     item.property.birth_date = this.formatDate(item.property.birth_date)
                 }
 
-                item.createdAt = this.formatDate(item.createdAt);
+                // item.createdAt = this.formatDate(item.createdAt);
 
                 return item;
             });
