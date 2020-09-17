@@ -4,19 +4,7 @@ const zipcodes = require('zipcodes');
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const models = require('../../database/models')
 const LeadRepository = require('../repository/LeadRepository');
-
-const preferedCompaniesFEX = {
-    mutual_omaha: 0,
-    royal_neighbors: 0,
-    liberty_bankers: 0,
-};
-
-const preferedCompanies = {
-    mutual_omaha_express: 0,
-    foresters_express: 0,
-    sagicor_express_issue: 0,
-    american_general: 0
-};
+const FormatService = require('../services/format.service');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
@@ -63,17 +51,9 @@ async function getLead(req, res) {
 async function getCompaniesListByLeadData(req, res) {
     const rowLead = req.body;
 
-    const quoterInfo = {
-        birthdate: rowLead.birthdate,
-        smoker: Boolean(+rowLead.tobacco),
-        term: rowLead.term,
-        rate_class: rowLead.term == 'fex' ? 'lb' : 's',
-        coverage: rowLead.coverage_amount,
-        state: rowLead.state,
-        gender: rowLead.gender
-    };
+    const formatedLeadForQuote = await FormatService.formatLeadForQuote(req.body);
 
-    const quotes = new NinjaQuoterService(quoterInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
+    const quotes = new NinjaQuoterService(formatedLeadForQuote);
 
     try {
         const companies = await quotes.getCompaniesInfo();
@@ -89,63 +69,37 @@ async function getCompaniesListByLeadData(req, res) {
     });
 }
 
-// TODO write function for fetching data from url
 async function uploadLeadFromUrl(req, res) {
-    const urlParams = req.body;
+    const urlData = req.body;
+    let rawLead = {};
 
-    const type = await models.Types.findOne({
-        parameters: ['id'],
-        where: {
-            name: urlParams.type
-        }
-    });
-
-    let rawLead = {
-        status: 1,
-        empty: 1,
-        source: 2,
-        type: type.id,
-        property: {
-            status: "new",
-            type: "auto",
-            source: "mediaalpha",
-        }
-    }
-
-    if (urlParams.first_name && urlParams.last_name) {
-        rawLead.property.contact = urlParams.first_name + ' ' + urlParams.last_name;
-    }
-    if (urlParams.phone) {
-        rawLead.property.phone = urlParams.phone;
-    }
-    if (urlParams.email) {
-        rawLead.property.email = urlParams.email;
-    }
-    if (urlParams.zip) {
-        rawLead.property.zipcode = urlParams.zip;
-        rawLead.property.state = zipcodes.lookup(urlParams.zip).state;
-    }
-    if (urlParams.dob) {
-        rawLead.property.dob = urlParams.dob;
-    }
-
-    let processedLead = false;
-
-    if (rawLead.property.email) {
-        let leadExist = await models.Leads.findOne({
-            where: {
-                email: rawLead.property.email
-            }
-        });
-
-        if (leadExist) {
-            processedLead = await updateLead(leadExist, rawLead, "ninjaQuoter", null);
-
-        } else {
-            processedLead = await createLead(rawLead, "ninjaQuoter", null);
-        }
+    if ("phone" in urlData) {
+        rawLead.phone = urlData.phone;
     } else {
-        processedLead = await createLead(rawLead, "ninjaQuoter", null);
+        throw new Error('Missed phone number, we use phone number for all opertion, so it`s required field.');
+    }
+
+    rawLead = {
+        type: urlData.type,
+        source: "blueberry",
+        empty: 1,
+    };
+
+    if ("first_name" in urlData && "last_name" in urlData) {
+        rawLead.fname = urlData.first_name;
+        rawLead.lname = urlData.last_name;
+    }
+
+    if ("email" in urlData) {
+        rawLead.email = urlData.email;
+    }
+
+    if ("zip" in urlData) {
+        rawLead.zip = urlData.zip;
+    }
+
+    if ("dob" in urlData) {
+        rawLead.birth_date = urlData.dob;
     }
 
     if (processedLead)

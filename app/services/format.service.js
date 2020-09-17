@@ -84,19 +84,19 @@ class FormatService {
             }
 
             if (!("state" in lead)) {
-                lead.state = zipcodes.lookup(lead.zip || lead.zipcode).state;
+                lead.state = zipcodes.lookup(lead.zipcode || lead.zipcode);
+            }
 
-                if (lead.state) {
-                    state = await models.States.findOne({
-                        attributes: ['id'],
-                        where: {
-                            name: lead.state
-                        }
-                    });
-
-                    if (state.dataValues.id) {
-                        formatedLead.state_id = state.id;
+            if ("state" in lead) {
+                state = await models.States.findOne({
+                    attributes: ['id'],
+                    where: {
+                        name: lead.state
                     }
+                });
+
+                if (state.dataValues.id) {
+                    formatedLead.state_id = state.id;
                 }
             }
 
@@ -169,6 +169,10 @@ class FormatService {
         }
     }
 
+    /**
+     * Function for formating lead data for quoters
+     * @param {object} lead 
+     */
     async formatLeadForQuote(lead) {
         let formatedLead = {
             birthdate: lead.birth_date,

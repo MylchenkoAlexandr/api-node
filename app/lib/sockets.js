@@ -46,12 +46,24 @@ module.exports = server => {
 
                 let uploadedLead;
 
-                if (exist != null) {
+                if (exist) {
                     uploadedLead = await updateLead(exist, formatedLead, '');
+
+                    if (uploadedLead) {
+                        io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
+                        io.sockets.to("all_states").to(uploadedLead.property.state).emit("UPDATE_LEADS", uploadedLead);
+
+                        if (formatedLead.empty) {
+                            io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
+                        }
+                    }
                 } else {
                     uploadedLead = await createLead(formatedLead, '');
-                }
 
+                    if (uploadLead) {
+                        io.sockets.to("all_states").to(uploadLead.property.state).emit("CREATE_LEAD", uploadLead);
+                    }
+                }
 
                 // if (lead.property.email) {
                 //     lead_exist = await models.Leads.findOne({
