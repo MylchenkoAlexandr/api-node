@@ -1,6 +1,7 @@
 const models = require('../../database/models');
 const NinjaQuoterService = require('../services/NinjaQuoterService');
 const _ = require('lodash');
+const FormatService = require('./format.service')
 
 async function processPrice(lead_id, price, quoter) {
     const quoterFromDB = await models.Quoters.findOne({
@@ -45,169 +46,61 @@ async function asignAgent(agent_id, lead_id) {
     }
 }
 
-async function createLead(lead, quoter, agentId = null) {
-    const preferedCompanies = {
-        mutual_omaha_express: 0,
-        foresters_express: 0,
-        sagicor_express_issue: 0,
-        american_general: 0
-    };
-
-    const preferedCompaniesFEX = {
-        mutual_omaha: 0,
-        royal_neighbors: 0,
-        liberty_bankers: 0,
-    };
-
+async function createLead(lead, quoter) {
     try {
-        const source = await models.Sources.findOne({
-            where: { name: lead.property.source }
+        let { dataValues: createdLead } = await models.Leads.create({
+            user_id: lead.user_id,
+            source_id: lead.source_id,
+            status_id: lead.status_id,
+            type_id: lead.type_id,
+            state_id: lead.state_id,
+            empty: lead.empty,
+            email: lead.email,
+            phone: lead.phone,
+            fullname: lead.fullname,
+            property: JSON.stringify(lead.property)
         });
 
-        const state = await models.States.findOne({
-            where: { name: lead.property.state }
-        });
+        const leadProperty = JSON.parse(createdLead.property);
 
-        const type = await models.Types.findOne({
-            where: { name: lead.property.type }
-        });
+        const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
 
-        if (source && state && type) {
-            return new Promise((resolve, reject) => {
-                models.Leads.create({
-                    user_id: agentId,
-                    source_id: source.id,
-                    status_id: 1,
-                    type_id: type.id,
-                    empty: lead.empty ? lead.empty : 0,
-                    email: lead.property.email,
-                    fullname: lead.property.contact ? lead.property.contact : lead.property.fname + ' ' + lead.property.lname,
-                    state_id: state.id,
-                    property: JSON.stringify(lead.property)
-                }).then(async res => {
-                    const newLead = JSON.parse(res.dataValues.property);
-                    
-                    const quoterInfo = {
-                        birthdate: newLead.birth_date,
-                        smoker: Boolean(+newLead.tobacco),
-                        rate_class: newLead.rateClass,
-                        term: newLead.term,
-                        coverage: newLead.coverage_amount,
-                        state: newLead.state,
-                        gender: newLead.gender
-                    };
+        let guoter = new NinjaQuoterService(formatedLeadForQuote);
 
-                    if (res.dataValues.empty == 0) {
-                        console.log("createLead -> res.dataValues.empty", res.dataValues.empty)
-                        
-                        let quotes = null;
+        const price = await guoter.getPrice();
 
-                        switch (quoter) {
-                            case "ninjaQuoter":
-                                quotes = new NinjaQuoterService(quoterInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
-                        }
-
-                        try {
-                            const price = await quotes.getPrice();
-                            if (price) {
-                                await processPrice(res.dataValues.id, price, "ninjaQuoter");
-                            }
-                        } catch (error) {
-                            console.error("createLead -> error", error)
-                        }
-                    }
-
-                    return resolve(res.dataValues);
-                }).catch(err => {
-                    return reject(err);
-                });
-            });
-        }
-    } catch (error) {
-        console.error(error)
+        await processPrice(createdLead.id, price, "ninjaQuoter");
+    } catch (err) {
+        throw err;
     }
 }
 
-async function updateLead(exist, lead, quoter, agentId = null) {
-    const preferedCompanies = {
-        mutual_omaha_express: 0,
-        foresters_express: 0,
-        sagicor_express_issue: 0,
-        american_general: 0
-    };
-
-    const preferedCompaniesFEX = {
-        mutual_omaha: 0,
-        royal_neighbors: 0,
-        liberty_bankers: 0,
-    };
-
+async function updateLead(exist, lead, quoter) {
     try {
-        const source = await models.Sources.findOne({
-            where: { name: lead.property.source }
+        let { dataValues: updatedLead } = await exist.update({
+            user_id: lead.user_id,
+            source_id: lead.source_id,
+            status_id: lead.status_id,
+            type_id: lead.type_id,
+            state_id: lead.state_id,
+            empty: lead.empty,
+            email: lead.email,
+            phone: lead.phone,
+            fullname: lead.fullname,
+            property: JSON.stringify(lead.property)
         });
 
-        const state = await models.States.findOne({
-            where: { name: lead.property.state }
-        });
+        const leadProperty = JSON.parse(updatedLead.property);
 
-        const status = await models.Status.findOne({
-            where: { name: lead.property.status }
-        });
+        const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
 
-        const type = await models.Types.findOne({
-            where: { name: lead.property.type }
-        });
+        let guoter = new NinjaQuoterService(formatedLeadForQuote);
 
-        if (source && state && status && type) {
-            return new Promise((resolve, reject) => {
-                exist.update({
-                    user_id: agentId,
-                    empty: lead.empty ? lead.empty : 0,
-                    status_id: status.id,
-                    email: lead.property.email,
-                    fullname: lead.property.contact ? lead.property.contact : lead.property.fname + ' ' + lead.property.lname,
-                    state_id: state.id,
-                    property: JSON.stringify(lead.property)
-                }).then(async res => {
-                    const newLead = JSON.parse(res.dataValues.property);
+        const price = await guoter.getPrice();
 
-                    const quoterInfo = {
-                        birthdate: newLead.birth_date,
-                        smoker: !!+newLead.tobacco,
-                        rate_class: newLead.rateClass,
-                        term: newLead.term,
-                        coverage: newLead.coverage_amount,
-                        state: newLead.state,
-                        gender: newLead.gender
-                    };
-
-                    let quotes = null;
-
-                    switch (quoter + type.name) {
-                        case "ninjaQuoterlife":
-                            quotes = new NinjaQuoterService(quoterInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies, quoterInfo);
-                    }
-
-                    try {
-                        const price = await quotes.getPrice();
-
-                        if (price) {
-                            await processPrice(res.dataValues.id, price, "ninjaQuoter");
-
-                            return resolve(res.dataValues);
-                        }
-                    } catch (error) {
-                        console.error(error)
-                    }
-
-                }).catch(err => {
-                    return reject(err);
-                });
-            });
-        }
-    } catch (error) {
-        console.error(error)
+        await processPrice(updatedLead.id, price, "ninjaQuoter");
+    } catch (err) {
+        throw err;
     }
 }
 

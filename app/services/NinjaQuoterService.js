@@ -3,8 +3,21 @@ const _ = require('lodash');
 
 class NinjaQuoterService {
 
-    constructor(companiesList, customerInfo) {
-        this.companies = companiesList;
+    constructor(customerInfo) {
+        const preferedCompanies = {
+            mutual_omaha_express: 0,
+            foresters_express: 0,
+            sagicor_express_issue: 0,
+            american_general: 0
+        };
+
+        const preferedCompaniesFEX = {
+            mutual_omaha: 0,
+            royal_neighbors: 0,
+            liberty_bankers: 0,
+        };
+
+        this.companies = customerInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies;
         this.customerQuoteFilds = customerInfo;
     }
 

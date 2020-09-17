@@ -3,6 +3,7 @@ const AgentService = require('../services/agent.service');
 const LeadRepository = require('../repository/LeadRepository');
 const RecordsRepository = require('../repository/RecordsRepository');
 const models = require('../../database/models');
+const FormatService = require('../services/format.service')
 
 module.exports = server => {
     const io = require("socket.io")(server);
@@ -23,7 +24,7 @@ module.exports = server => {
             }
         });
 
-        socket.on("process-lead", async ({ lead, agent }) => {
+        socket.on("process-lead", async (lead) => {
             try {
                 // const account_banned = await AgentService.checkedBan(users[socket.id].email);
 
@@ -33,65 +34,72 @@ module.exports = server => {
                 //         message: "Your account has been banned"
                 //     });
                 // } else {
-                const type = await models.Types.findOne({
-                    attributes: ['id'],
+
+                const formatedLead = await FormatService.formatLead(lead);
+
+                let exist = await models.Leads.findOne({
                     where: {
-                        name: lead.property.type
+                        type_id: formatedLead.type_id,
+                        phone: formatedLead.phone
                     }
-                })
+                });
 
-                if (type) {
-                    let lead_exist;
+                let uploadedLead;
 
-                    if (lead.property.email) {
-                        lead_exist = await models.Leads.findOne({
-                            where: {
-                                email: lead.property.email
-                            }
-                        });
-                    } else if (lead.id) {
-                        lead_exist = await models.Leads.findOne({
-                            where: {
-                                id: lead.id
-                            }
-                        });
-                    } else {
-                        lead_exist = false;
-                    }
-
-                    let emptyStatus = lead.empty == 1 ? true : false;
-
-                    if (lead_exist) {
-                        const candidate_lead = await updateLead(lead_exist, lead, "ninjaQuoter", agent);
-
-                        if (candidate_lead) {
-                            const res_lead = await LeadRepository.getOne(candidate_lead.id);
-
-                            if (res_lead) {
-                                io.sockets.to(res_lead.id).emit("UPDATE_LEAD", res_lead);
-                                io.sockets.to("all_states").to(res_lead.property.state).emit("UPDATE_LEADS", res_lead);
-                            }
-
-                            if (emptyStatus) {
-                                io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
-                            }
-                        }
-                    } else {
-                        const candidate_lead = await createLead(lead, "ninjaQuoter", agent);
-
-                        if (candidate_lead) {
-                            const res_lead = await LeadRepository.getOne(candidate_lead.id);
-
-                            if (res_lead) {
-                                io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
-                            }
-                        }
-                    }
+                if (exist != null) {
+                    uploadedLead = await updateLead(exist, formatedLead, '');
+                } else {
+                    uploadedLead = await createLead(formatedLead, '');
                 }
+
+
+                // if (lead.property.email) {
+                //     lead_exist = await models.Leads.findOne({
+                //         where: {
+                //             email: lead.property.email
+                //         }
+                //     });
+                // } else if (lead.id) {
+                //     lead_exist = await models.Leads.findOne({
+                //         where: {
+                //             id: lead.id
+                //         }
+                //     });
+                // } else {
+                //     lead_exist = false;
                 // }
 
-            } catch (error) {
-                throw new Error(error);
+                // let emptyStatus = lead.empty == 1 ? true : false;
+
+                // if (lead_exist) {
+                //     const candidate_lead = await updateLead(lead_exist, lead, "ninjaQuoter", agent);
+
+                //     if (candidate_lead) {
+                //         const res_lead = await LeadRepository.getOne(candidate_lead.id);
+
+                //         if (res_lead) {
+                //             io.sockets.to(res_lead.id).emit("UPDATE_LEAD", res_lead);
+                //             io.sockets.to("all_states").to(res_lead.property.state).emit("UPDATE_LEADS", res_lead);
+                //         }
+
+                //         if (emptyStatus) {
+                //             io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
+                //         }
+                //     }
+                // } else {
+                //     const candidate_lead = await createLead(lead, "ninjaQuoter", agent);
+
+                //     if (candidate_lead) {
+                //         const res_lead = await LeadRepository.getOne(candidate_lead.id);
+
+                //         if (res_lead) {
+                //             io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
+                //         }
+                //     }
+                // }
+                // }
+            } catch (err) {
+                throw err;
             }
         });
 

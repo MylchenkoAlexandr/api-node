@@ -4,7 +4,6 @@ const zipcodes = require('zipcodes');
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const models = require('../../database/models')
 const LeadRepository = require('../repository/LeadRepository');
-const { property } = require('lodash');
 
 const preferedCompaniesFEX = {
     mutual_omaha: 0,
@@ -19,12 +18,17 @@ const preferedCompanies = {
     american_general: 0
 };
 
+async function test(req, res) {
+    const lead = await FormatService.formatLead(req.body);
+    return res.status(200).send(lead);
+}
+
 async function getLeads(req, res) {
     try {
         const leads = await LeadRepository.getAll(req.body.type, req.body.states);
         return res.status(200).json(leads);
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
+        throw err;
     }
 
     return res.status(400).json({
@@ -155,48 +159,23 @@ async function uploadLeadFromUrl(req, res) {
 
 async function uploadLeadFromMediaAlpha(req, res) {
     try {
-        let rowLead = req.body.lead;
+        const rawLead = req.body;
 
-        switch (rowLead.coverage_type) {
-            case 'Term 10 Years':
-                rowLead.term = '10';
-                break;
-            case 'Term 15 Years':
-                rowLead.term = '15';
-                break;
-            case 'Term 20 Years':
-                rowLead.term = '20';
-                break;
-            case 'Term 25 Years':
-                rowLead.term = '25';
-                break;
-            case 'Term 30 Years':
-                rowLead.term = '30';
-                break;
-            case 'Final Expense':
-                rowLead.term = 'fex';
-                break;
-        }
+        const preparedLead = {
+            source: "mediaalpha",
+            type: rawLead.type,
+            empty: 0,
+            ...rawLead.lead
+        };
 
-        rowLead.type = req.body.type;
-        rowLead.rateClass = rowLead.term == 'fex' ? 'lb' : 's';
-
-        rowLead.state = zipcodes.lookup(rowLead.zipcode || rowLead.zip).state;
-        rowLead.gender = rowLead.gender.toLowerCase()
-        rowLead.status = "new";
-        rowLead.source = "mediaalpha";
-        rowLead.tobacco = rowLead.tobacco == "1" ? true : false;
-
-        lead = { property: rowLead }
-
-        client.emit("process-lead", { lead: lead, agent: null })
+        client.emit("process-lead", preparedLead);
 
         return res.status(200).json({
             status: "success",
             message: "Success Uploaded!"
         });
-    } catch (e) {
-        console.error(e);
+    } catch (err) {
+        throw err;
     }
 
     return res.status(400).json({
@@ -206,6 +185,7 @@ async function uploadLeadFromMediaAlpha(req, res) {
 }
 
 module.exports = {
+    test,
     getLead,
     getLeads,
     getRawLeads,

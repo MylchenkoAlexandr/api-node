@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const { authenticateToken } = require('../app/middleware/auth.middleware');
-const { getLeads, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRawLeads, uploadLeadFromUrl } = require('../app/controller/leadController');
+const { test, getLeads, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRawLeads, uploadLeadFromUrl } = require('../app/controller/leadController');
 const { uploadCSV } = require('../app/controller/uploadController');
 
+router.post('/test', test);
 router.post('/get-raws', authenticateToken, getRawLeads);
 router.post('/get-lead', authenticateToken, getLead);
 router.post('/get-leads', authenticateToken, getLeads);
