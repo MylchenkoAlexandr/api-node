@@ -1,5 +1,3 @@
-
-const { property } = require('lodash');
 const models = require('../../database/models')
 
 class UploadService {

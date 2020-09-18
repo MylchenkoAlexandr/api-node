@@ -1,13 +1,12 @@
-const UploadService = require('../services/upload.service')
-const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const csvToJson = require('convert-csv-to-json');
 const formidable = require('formidable');
+const FormatService = require('../services/format.service');
 
 async function uploadCSV(req, res) {
     const form = new formidable.IncomingForm();
 
     try {
-        const rawLeadsJSON = await new Promise((resolve, reject) => {
+        const rawLeads = await new Promise((resolve, reject) => {
             form.parse(req, (err, fields, files) => {
                 const delimiter = fields.delimiter;
 
@@ -17,12 +16,15 @@ async function uploadCSV(req, res) {
             });
         });
 
-        if (rawLeadsJSON) {
-            const idArray = await UploadService.parseCSVfileToDB(rawLeadsJSON);
-
-            if (idArray)
-                client.emit('raw-leads', idArray);
+        if (rawLeads) {
+            const formatedLead = await FormatService.formatRawLeads(rawLeads);
         }
+        // if (rawLeadsJSON) {
+        //     const idArray = await UploadService.parseCSVfileToDB(rawLeadsJSON);
+
+        //     if (idArray)
+        //         client.emit('raw-leads', idArray);
+        // }
 
         res.status(200).json({
             status: "success",
