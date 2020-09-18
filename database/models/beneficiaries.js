@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     lead_id: DataTypes.BIGINT.UNSIGNED,
     name: DataTypes.STRING,
     relative_id: DataTypes.BIGINT.UNSIGNED,
+    dob: DataTypes.STRING,
     location_id: DataTypes.BIGINT.UNSIGNED,
     grand_kids: DataTypes.INTEGER,
     work_status: DataTypes.STRING

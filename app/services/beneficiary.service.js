@@ -2,46 +2,36 @@ const models = require('../../database/models');
 const BeneficiaryRepository = require('../repository/BeneficiaryRepository');
 
 class BeneficiaryService {
-    constructor() {
-        this.state_id = null;
-    }
 
     async save(beneficiary_options) {
-        console.log("BeneficiaryService -> save -> beneficiary_options", beneficiary_options)
         try {
             const beneficiary = await models.Beneficiaries.findOne({
                 where: { lead_id: beneficiary_options.lead_id }
             });
 
-            if (beneficiary_options.location) {
-                const state = await models.States.findOne({
-                    where: { name: beneficiary_options.location }
-                });
-
-                this.state_id = state.dataValues.id;
-            } else {
-                this.state_id = null;
-            }
+            const { dataValues: state } = await models.States.findOne({
+                attributes: ["id"],
+                where: { name: beneficiary_options.location }
+            });
 
             if (beneficiary) {
-                console.log("ben update - location = ", this.state_id);
                 await beneficiary.update({
                     name: beneficiary_options.name,
+                    dob: beneficiary_options.dob,
                     relative_id: beneficiary_options.relative_id,
-                    location_id: this.state_id,
+                    location_id: state.id,
                     grand_kids: beneficiary_options.grand_kids,
                     work_status: beneficiary_options.work_status
                 });
 
                 return { code: 200, status: "success", message: "Beneficiary updated!" };
             } else {
-                console.log("ben create - location = ", this.state_id);
-
                 await models.Beneficiaries.create({
                     lead_id: beneficiary_options.lead_id,
                     name: beneficiary_options.name,
+                    dob: beneficiary_options.dob,
                     relative_id: beneficiary_options.relative_id,
-                    location_id: this.state_id,
+                    location_id: state.id,
                     grand_kids: beneficiary_options.grand_kids,
                     work_status: beneficiary_options.work_status
                 });
@@ -50,7 +40,7 @@ class BeneficiaryService {
             }
 
         } catch (error) {
-            throw new Error(error);
+            throw error;
         }
     }
 
@@ -60,7 +50,7 @@ class BeneficiaryService {
 
             return { code: 200, status: "success", message: "Success", beneficiary: beneficiary || {} };
         } catch (error) {
-            throw new Error(error);
+            throw error;
         }
     }
 }
