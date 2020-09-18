@@ -12,9 +12,10 @@ async function saveBeneficiary(req, res) {
         });
     } catch (error) {
         res.status(400).json({
+            status: "error",
             message: "Server error"
         });
-        throw new Error(error);
+        throw error;
     }
 }
 
@@ -32,7 +33,7 @@ async function getBeneficiary(req, res) {
             status: "error",
             message: "Server error"
         });
-        throw new Error(error);
+        throw error;
     }
 }
 
