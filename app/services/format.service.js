@@ -222,9 +222,50 @@ class FormatService {
         Object.keys(rawLead).forEach(index => {
             rawLead[index].source = SOURCE;
             rawLead[index].type = "life";
+
+            if (rawLead[index].contact) {
+                rawLead[index].contact = rawLead[index].contact.replace(/"/ig, '');
+            }
+
+            if (rawLead[index].email != 'NULL' || rawLead.email != 0) {
+                rawLead[index].email = rawLead[index].email.replace(/"/ig, '');
+            } else {
+                delete rawLead.email
+            }
+
+            if (rawLead.birth_date != 0 && rawLead.birth_date != 'NULL') {
+                let newDate = new Date(rawLead.birth_date);
+                const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+                const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+                const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+                rawLead.birth_date = yy + '-' + mm + '-' + dd;
+            } else {
+                delete rawLead.birth_date;
+            }
+
+            if (rowLead.phone != 0 && rowLead.phone != 'NULL') {
+                let clearPhone = String(rowLead.phone).length == 11 ? String(rowLead.phone).substring(1) : rowLead.phone;
+                rowLead.phone = this.formatPhoneNumber(clearPhone).replace(' ', '');
+            } else {
+                delete rowLead.phone;
+            }
+
+            rawLead[index] = await this.formatLead(rawLead[index]);
         });
 
         return rawLead;
+    }
+
+    formatPhoneNumber(phoneNumberString) {
+        let cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+
+        let match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
+
+        if (match) {
+            let intlCode = (match[1] ? '+1 ' : '');
+
+            return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
+        }
     }
 }
 

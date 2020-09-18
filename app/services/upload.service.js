@@ -62,15 +62,15 @@ class UploadService {
             delete rowLead.phone;
         }
 
-        if (rowLead.birth_date != 0 && rowLead.birth_date != 'NULL') {
-            let newDate = new Date(rowLead.birth_date);
-            const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
-            const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
-            const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
-            rowLead.birth_date = yy + '-' + mm + '-' + dd;
-        } else {
-            delete rowLead.birth_date;
-        }
+        // if (rowLead.birth_date != 0 && rowLead.birth_date != 'NULL') {
+        //     let newDate = new Date(rowLead.birth_date);
+        //     const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+        //     const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+        //     const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+        //     rowLead.birth_date = yy + '-' + mm + '-' + dd;
+        // } else {
+        //     delete rowLead.birth_date;
+        // }
 
         rowLead.source = "blueberry";
         rowLead.type = "life";
@@ -89,7 +89,6 @@ class UploadService {
 
             return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
         }
-        return 'null';
     }
 
     async createLead(formatedLead) {

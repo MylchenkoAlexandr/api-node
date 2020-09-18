@@ -18,6 +18,7 @@ async function uploadCSV(req, res) {
 
         if (rawLeads) {
             const formatedLead = await FormatService.formatRawLeads(rawLeads);
+            console.log("uploadCSV -> formatedLead", formatedLead)
         }
         // if (rawLeadsJSON) {
         //     const idArray = await UploadService.parseCSVfileToDB(rawLeadsJSON);
