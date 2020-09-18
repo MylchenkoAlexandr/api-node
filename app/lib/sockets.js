@@ -47,8 +47,8 @@ module.exports = server => {
 
                 const formatedLead = await FormatService.formatLead(lead);
 
-                let exist = LeadService.foundExistLead(formatedLead);
-
+                let exist = await LeadService.foundExistLead(formatedLead);
+                
                 let uploadedLead;
 
                 if (exist) {

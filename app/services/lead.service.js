@@ -90,20 +90,13 @@ class LeadService {
     async foundExistLead(formatedLead) {
         let exist;
 
-        if ("email" in formatedLead && "phone" in formatedLead) {
-            exist = await models.Leads.findOne({
-                where: {
-                    type_id: formatedLead.type_id,
-                    email: formatedLead.email,
-                    phone: formatedLead.phone
-                }
-            });
-
-            if (!exist) {
+        try {
+            if ("email" in formatedLead && "phone" in formatedLead) {
                 exist = await models.Leads.findOne({
                     where: {
                         type_id: formatedLead.type_id,
-                        email: formatedLead.email
+                        email: formatedLead.email,
+                        phone: formatedLead.phone
                     }
                 });
 
@@ -111,28 +104,39 @@ class LeadService {
                     exist = await models.Leads.findOne({
                         where: {
                             type_id: formatedLead.type_id,
-                            phone: formatedLead.phone
+                            email: formatedLead.email
                         }
                     });
-                }
-            }
-        } else if ("email" in formatedLead && !("phone" in formatedLead)) {
-            exist = await models.Leads.findOne({
-                where: {
-                    type_id: formatedLead.type_id,
-                    email: formatedLead.email
-                }
-            });
-        } else if ("phone" in formatedLead && !("email" in formatedLead)) {
-            exist = await models.Leads.findOne({
-                where: {
-                    type_id: formatedLead.type_id,
-                    phone: formatedLead.phone
-                }
-            });
-        }
 
-        return exist;
+                    if (!exist) {
+                        exist = await models.Leads.findOne({
+                            where: {
+                                type_id: formatedLead.type_id,
+                                phone: formatedLead.phone
+                            }
+                        });
+                    }
+                }
+            } else if ("email" in formatedLead && !("phone" in formatedLead)) {
+                exist = await models.Leads.findOne({
+                    where: {
+                        type_id: formatedLead.type_id,
+                        email: formatedLead.email
+                    }
+                });
+            } else if ("phone" in formatedLead && !("email" in formatedLead)) {
+                exist = await models.Leads.findOne({
+                    where: {
+                        type_id: formatedLead.type_id,
+                        phone: formatedLead.phone
+                    }
+                });
+            }
+
+            return exist;
+        } catch (err) {
+            console.error(err)
+        }
     }
 }
 

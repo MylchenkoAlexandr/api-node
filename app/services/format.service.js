@@ -219,7 +219,7 @@ class FormatService {
     async formatRawLeads(rawLead, type) {
         const SOURCE = "blueberry";
 
-        Object.keys(rawLead).forEach(index => {
+        Object.keys(rawLead).forEach(async index => {
             rawLead[index].source = SOURCE;
             rawLead[index].type = "life";
 
