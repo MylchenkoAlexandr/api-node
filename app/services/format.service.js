@@ -12,8 +12,11 @@ class FormatService {
             throw new Error('Lead object is empty!');
         }
 
+        if (!("email" in lead) && !("phone" in lead)) {
+            throw new Error("Phone and Email is empty, lead is invalid");
+        }
+
         const mandatoryFields = [
-            "phone",
             "source",
             "type"
         ];
@@ -45,9 +48,9 @@ class FormatService {
                     attributes: ['id'],
                     where: {
                         name: lead.type
+
                     }
                 })
-
                 if (type.dataValues.id) {
                     delete lead.type;
                 }
@@ -66,25 +69,23 @@ class FormatService {
                 }
             }
 
+            let formatedLead = {
+                source_id: source.id,
+                type_id: type.id,
+            }
+
             if ("email" in lead) {
-                email = lead.email;
+                formatedLead.email = lead.email;
                 delete lead.email;
             }
 
             if ("phone" in lead) {
-                phone = lead.phone;
+                formatedLead.phone = lead.phone.replace(' ', '');
                 delete lead.phone;
             }
 
-            let formatedLead = {
-                source_id: source.id,
-                type_id: type.id,
-                email: email,
-                phone: phone.replace(' ', '')
-            }
-
             if (!("state" in lead)) {
-                lead.state = zipcodes.lookup(lead.zipcode || lead.zipcode);
+                lead.state = zipcodes.lookup(lead.zip || lead.zipcode).state;
             }
 
             if ("state" in lead) {
@@ -213,6 +214,17 @@ class FormatService {
         formatedLead.rate_class = formatedLead.term == 'fex' ? 'lb' : 's';
 
         return formatedLead;
+    }
+
+    async formatRawLeads(rawLead, type) {
+        const SOURCE = "blueberry";
+
+        Object.keys(rawLead).forEach(index => {
+            rawLead[index].source = SOURCE;
+            rawLead[index].type = "life";
+        });
+
+        return rawLead;
     }
 }
 

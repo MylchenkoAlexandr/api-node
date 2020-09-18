@@ -1,5 +1,5 @@
 const NinjaQuoterService = require('../services/NinjaQuoterService')
-const { createLead, updateLead } = require('../services/LeadService');
+const { createLead, updateLead } = require('../services/lead.service');
 const zipcodes = require('zipcodes');
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const models = require('../../database/models')
@@ -16,7 +16,7 @@ async function getLeads(req, res) {
         const leads = await LeadRepository.getAll(req.body.type, req.body.states);
         return res.status(200).json(leads);
     } catch (err) {
-        throw err;
+        console.error(err);
     }
 
     return res.status(400).json({
@@ -49,14 +49,16 @@ async function getLead(req, res) {
 }
 
 async function getCompaniesListByLeadData(req, res) {
-    const rowLead = req.body;
+    const rawLead = req.body;
 
-    const formatedLeadForQuote = await FormatService.formatLeadForQuote(req.body);
+    const formatedLeadForQuote = await FormatService.formatLeadForQuote(rawLead);
 
     const quotes = new NinjaQuoterService(formatedLeadForQuote);
 
     try {
         const companies = await quotes.getCompaniesInfo();
+        
+        client.emit("process-lead", rawLead);
 
         return res.status(200).json(companies);
     } catch (error) {
@@ -70,40 +72,47 @@ async function getCompaniesListByLeadData(req, res) {
 }
 
 async function uploadLeadFromUrl(req, res) {
-    const urlData = req.body;
-    let rawLead = {};
+    try {
+        const urlData = req.body;
+        let rawLead = {};
 
-    if ("phone" in urlData) {
-        rawLead.phone = urlData.phone;
-    } else {
-        throw new Error('Missed phone number, we use phone number for all opertion, so it`s required field.');
+        if ("phone" in urlData) {
+            rawLead.phone = urlData.phone;
+        } else {
+            throw new Error('Missed phone number, we use phone number for all opertion, so it`s required field.');
+        }
+
+        rawLead = {
+            type: urlData.type,
+            source: "blueberry",
+            empty: 1,
+        };
+
+        if ("first_name" in urlData && "last_name" in urlData) {
+            rawLead.fname = urlData.first_name;
+            rawLead.lname = urlData.last_name;
+        }
+
+        if ("email" in urlData) {
+            rawLead.email = urlData.email;
+        }
+
+        if ("zip" in urlData) {
+            rawLead.zip = urlData.zip;
+        }
+
+        if ("dob" in urlData) {
+            rawLead.birth_date = urlData.dob;
+        }
+
+        // client.emit("process-lead", rawLead);
+
+        // client.emit('raw-leads', [processedLead.id]);
+    }
+    catch (err) {
+        console.error(err);
     }
 
-    rawLead = {
-        type: urlData.type,
-        source: "blueberry",
-        empty: 1,
-    };
-
-    if ("first_name" in urlData && "last_name" in urlData) {
-        rawLead.fname = urlData.first_name;
-        rawLead.lname = urlData.last_name;
-    }
-
-    if ("email" in urlData) {
-        rawLead.email = urlData.email;
-    }
-
-    if ("zip" in urlData) {
-        rawLead.zip = urlData.zip;
-    }
-
-    if ("dob" in urlData) {
-        rawLead.birth_date = urlData.dob;
-    }
-
-    if (processedLead)
-        client.emit('raw-leads', [processedLead.id]);
 
     return res.status(400).json({
         status: 'failed',

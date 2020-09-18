@@ -1,4 +1,4 @@
-const { createLead, updateLead } = require('../services/LeadService');
+const LeadService = require('../services/lead.service');
 const AgentService = require('../services/agent.service');
 const LeadRepository = require('../repository/LeadRepository');
 const RecordsRepository = require('../repository/RecordsRepository');
@@ -35,19 +35,24 @@ module.exports = server => {
                 //     });
                 // } else {
 
+                let quoter = "ninjaQuoter";
+
+                if (lead.type) {
+                    switch (lead.type) {
+                        case "life":
+                            quoter = "ninjaQuoter";
+                            break;
+                    }
+                }
+
                 const formatedLead = await FormatService.formatLead(lead);
 
-                let exist = await models.Leads.findOne({
-                    where: {
-                        type_id: formatedLead.type_id,
-                        phone: formatedLead.phone
-                    }
-                });
+                let exist = LeadService.foundExistLead(formatedLead);
 
                 let uploadedLead;
 
                 if (exist) {
-                    uploadedLead = await updateLead(exist, formatedLead, '');
+                    uploadedLead = await LeadService.updateLead(exist, formatedLead, quoter);
 
                     if (uploadedLead) {
                         io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
@@ -58,30 +63,12 @@ module.exports = server => {
                         }
                     }
                 } else {
-                    uploadedLead = await createLead(formatedLead, '');
+                    uploadedLead = await LeadService.createLead(formatedLead, quoter);
 
-                    if (uploadLead) {
-                        io.sockets.to("all_states").to(uploadLead.property.state).emit("CREATE_LEAD", uploadLead);
+                    if (uploadedLead) {
+                        io.sockets.to("all_states").to(uploadedLead.property.state).emit("CREATE_LEAD", uploadedLead);
                     }
                 }
-
-                // if (lead.property.email) {
-                //     lead_exist = await models.Leads.findOne({
-                //         where: {
-                //             email: lead.property.email
-                //         }
-                //     });
-                // } else if (lead.id) {
-                //     lead_exist = await models.Leads.findOne({
-                //         where: {
-                //             id: lead.id
-                //         }
-                //     });
-                // } else {
-                //     lead_exist = false;
-                // }
-
-                // let emptyStatus = lead.empty == 1 ? true : false;
 
                 // if (lead_exist) {
                 //     const candidate_lead = await updateLead(lead_exist, lead, "ninjaQuoter", agent);
@@ -109,6 +96,7 @@ module.exports = server => {
                 //         }
                 //     }
                 // }
+
                 // }
             } catch (err) {
                 throw err;
@@ -118,6 +106,7 @@ module.exports = server => {
         socket.on('raw-leads', async (idArray) => {
             try {
                 const rawLeads = await LeadRepository.getLatest(idArray);
+                
                 if (rawLeads)
                     io.sockets.emit("RAW_LEAD_ADD", rawLeads);
 
