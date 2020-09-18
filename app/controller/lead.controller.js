@@ -57,7 +57,7 @@ async function getCompaniesListByLeadData(req, res) {
 
     try {
         const companies = await quotes.getCompaniesInfo();
-        
+
         client.emit("process-lead", rawLead);
 
         return res.status(200).json(companies);
@@ -138,7 +138,7 @@ async function uploadLeadFromMediaAlpha(req, res) {
             message: "Success Uploaded!"
         });
     } catch (err) {
-        throw err;
+        console.error(err);
     }
 
     return res.status(400).json({
