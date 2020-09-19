@@ -17,20 +17,17 @@ async function uploadCSV(req, res) {
         });
 
         if (rawLeads) {
-            const formatedLead = await FormatService.formatRawLeads(rawLeads);
-            console.log("uploadCSV -> formatedLead", formatedLead)
-        }
-        // if (rawLeadsJSON) {
-        //     const idArray = await UploadService.parseCSVfileToDB(rawLeadsJSON);
+            const formatedLead = await FormatService.formatRawLeads(rawLeads, "blueberry", "life");
 
-        //     if (idArray)
+            res.status(200).json({
+                status: "success",
+                message: "Success parsed CSV file into system"
+            });
+        }
+        
+        // if (idArray)
         //         client.emit('raw-leads', idArray);
         // }
-
-        res.status(200).json({
-            status: "success",
-            message: "Success parsed CSV file into system"
-        });
     } catch (err) {
         res.status(400).json({
             status: "failed",
