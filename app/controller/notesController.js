@@ -1,54 +1,43 @@
-const models = require('../../database/models');
-const NotesRepository = require('../repository/NotesRepository');
+const NotesService = require('../services/notes.service');
 
 async function getNotes(req, res) {
     try {
-        const notes = await NotesRepository.getAll(req.body.lead_id);
+        const notes = await NotesService.getAll(req.body.lead_id);
 
-        if (notes) {
-            return res.status(200).json(notes);
-        }
+        res.status(200).json({
+            status: 'success',
+            message: 'All notes',
+            notes
+        });
     } catch (e) {
-        console.error(e)
+        res.status(400).json({ status: 'error', message: 'Server Error!' });
+        throw e;
     }
-
-    return res.status(400).json({ message: 'Server Error!' });
 }
 
 async function createNote(req, res) {
+    const note_param = req.body;
 
     try {
-        const createNote = await models.Notes.create({
-            user_id: req.body.user_id,
-            lead_id: req.body.lead_id,
-            message: req.body.message,
-        });
+        const note = await NotesService.create(note_param);
 
-        if (createNote) {
-            const note = await NotesRepository.getOne(createNote.id);
-            return res.status(200).json(note);
-        }
+        res.status(201).json({ status: 'success', message: 'Note created!', note });
     } catch (e) {
-        console.error(e)
+        res.status(400).json({ status: 'error', message: 'Server Error!' });
+        throw e;
     }
-
-    return res.status(400).json({ message: 'Server Error!' });
 }
 
 async function deleteNote(req, res) {
     try {
-        await models.Notes.destroy({
-            where: {
-                id: req.body.note_id
-            }
-        });
+        const deleted = await NotesService.delete(req.body.note_id);
 
-        return res.status(200).json({ deleted: true });
+        res.status(200).json({ status: 'success', message: 'Note deleted!', deleted });
     } catch (e) {
-        console.error(e)
+        res.status(400).json({ status: 'error', message: 'Server Error!' });
+        throw e;``
     }
 
-    return res.status(400).json({ message: "Server Error!" });
 }
 
 module.exports = {
