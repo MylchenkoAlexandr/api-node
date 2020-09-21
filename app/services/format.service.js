@@ -162,7 +162,11 @@ class FormatService {
             }
 
             if ("type" in lead || "coverage_type" in lead) {
+                lead.term = this.formatTerms(lead);
 
+                if ("coverage_type" in lead) {
+                    delete lead.coverage_type;
+                }
             }
 
             formatedLead.property = {
@@ -188,7 +192,7 @@ class FormatService {
             coverage: lead.coverage_amount
         };
 
-
+        const term = this.formatTerms(lead);
 
         formatedLead.term = term;
         formatedLead.rate_class = formatedLead.term == 'fex' ? 'lb' : 's';
@@ -235,42 +239,39 @@ class FormatService {
             }
 
             rawLead[index] = await this.formatLead(rawLead[index]);
-
-            console.log("FormatService -> formatRawLeads -> rawLead[index]", rawLead[index])
         });
 
         return rawLead;
     }
 
-    async formatTerms(term) {
-        let term = 10;
-
+    formatTerms(lead) {
+        let correctTerm;
         if ("coverage_type" in lead) {
             switch (lead.coverage_type) {
                 case 'Term 10 Years':
-                    term = '10';
+                    correctTerm = '10';
                     break;
                 case 'Term 15 Years':
-                    term = '15';
+                    correctTerm = '15';
                     break;
                 case 'Term 20 Years':
-                    term = '20';
+                    correctTerm = '20';
                     break;
                 case 'Term 25 Years':
-                    term = '25';
+                    correctTerm = '25';
                     break;
                 case 'Term 30 Years':
-                    term = '30';
+                    correctTerm = '30';
                     break;
                 case 'Final Expense':
-                    term = 'fex';
+                    correctTerm = 'fex';
                     break;
             }
-        } else {
-            term = lead.term;
+        } else if ("term" in lead) {
+            correctTerm = lead.term;
         }
 
-        return term;
+        return correctTerm;
     }
 }
 

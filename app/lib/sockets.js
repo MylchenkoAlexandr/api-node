@@ -13,7 +13,7 @@ module.exports = server => {
 
         socket.on("connected", user => {
             users[socket.id] = user;
-            console.log('User connected! ', users[socket.id]);
+            console.log('User connected!', users[socket.id].email);
 
             if (user.states) {
                 for (let index = 0; index < user.states.length; index++) {
@@ -181,30 +181,30 @@ module.exports = server => {
         });
 
         socket.on('disconnect', async () => {
-            console.log('User disconnected! ', users[socket.id]);
+            if (users[socket.id]) {
+                socket.leaveAll();
+                try {
+                    console.log('User disconnected!', users[socket.id].email);
 
-            socket.leaveAll();
-
-            try {
-                const candidate = await models.Leads.findOne({
-                    where: { busy_agent_id: users[socket.id].id }
-                });
-
-                if (candidate) {
-                    await candidate.update({
-                        busy: 0,
-                        busy_agent_id: null
+                    const candidate = await models.Leads.findOne({
+                        where: { busy_agent_id: users[socket.id].id }
                     });
-                    const lead = await LeadRepository.getOne(candidate.id);
 
-                    io.sockets.emit("UPDATE_LEADS", lead);
+                    if (candidate) {
+                        await candidate.update({
+                            busy: 0,
+                            busy_agent_id: null
+                        });
+                        const lead = await LeadRepository.getOne(candidate.id);
+
+                        io.sockets.emit("UPDATE_LEADS", lead);
+                    }
+
+                } catch (error) {
+                    throw error;
                 }
-
-            } catch (error) {
-                throw new Error(error);
+                delete users[socket.id];
             }
-
-            delete users[socket.id];
         });
 
     });

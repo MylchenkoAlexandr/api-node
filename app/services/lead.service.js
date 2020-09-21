@@ -7,8 +7,8 @@ const LeadRepository = require('../repository/LeadRepository');
 class LeadService {
     /**
      * Create new lead
-     * @param {object} lead 
-     * @param {string} quoter 
+     * @param {object} lead
+     * @param {string} quoter
      */
     async createLead(lead, quoter) {
         try {
@@ -45,10 +45,9 @@ class LeadService {
 
     /**
      * Update exist lead record
-     * @param {object} exist 
-     * @param {object} lead 
-     * 
-     * @param {string} quoter 
+     * @param {object} exist
+     * @param {object} lead
+     * @param {string} quoter
      */
     async updateLead(exist, lead, quoter) {
         try {
@@ -85,7 +84,7 @@ class LeadService {
 
     /**
      * Function for found exist lead
-     * @param {object} formatedLead 
+     * @param {object} formatedLead
      */
     async foundExistLead(formatedLead) {
         let exist;

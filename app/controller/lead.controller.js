@@ -105,9 +105,13 @@ async function uploadLeadFromUrl(req, res) {
             rawLead.birth_date = urlData.dob;
         }
 
-        // client.emit("process-lead", rawLead);
+        client.emit("process-lead", rawLead);
 
         // client.emit('raw-leads', [processedLead.id]);
+        return res.status(400).json({
+            status: 'success',
+            message: 'Lead Uploaded'
+        });
     }
     catch (err) {
         console.error(err);
