@@ -3,6 +3,17 @@ const BeneficiaryRepository = require('../repository/BeneficiaryRepository');
 
 class BeneficiaryService {
 
+    /**
+     * Function for create and update beneficiary for one lead  
+     * @param {Object} beneficiary_options - The beneficiary which come in request
+     * @param {string} beneficiary_options.name - The name of a beneficiary
+     * @param {string} beneficiary_options.dob - The dob of a beneficiary
+     * @param {number} beneficiary_options.relative_id - The relatives type id of a beneficiary
+     * @param {number} beneficiary_options.grand_kids - The amount of grandkids of a beneficiary
+     * @param {number} beneficiary_options.work_status - The id work status of a beneficiary
+     * @param {number} state.id
+     * @returns {Response} response parameters
+     */
     async save(beneficiary_options) {
         try {
             const beneficiary = await models.Beneficiaries.findOne({
@@ -44,6 +55,10 @@ class BeneficiaryService {
         }
     }
 
+    /**
+     * Function for get beneficiary for the one lead
+     * @param {number} lead_id
+     */
     async getOne(lead_id) {
         try {
             const beneficiary = await BeneficiaryRepository.getOne(lead_id);
