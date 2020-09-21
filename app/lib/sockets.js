@@ -46,9 +46,10 @@ module.exports = server => {
                 }
 
                 const formatedLead = await FormatService.formatLead(lead);
+                console.log("formatedLead", formatedLead)
 
                 let exist = await LeadService.foundExistLead(formatedLead);
-                
+
                 let uploadedLead;
 
                 if (exist) {
@@ -106,7 +107,7 @@ module.exports = server => {
         socket.on('raw-leads', async (idArray) => {
             try {
                 const rawLeads = await LeadRepository.getLatest(idArray);
-                
+
                 if (rawLeads)
                     io.sockets.emit("RAW_LEAD_ADD", rawLeads);
 

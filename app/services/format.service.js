@@ -1,6 +1,6 @@
 const models = require('../../database/models');
 const zipcodes = require('zipcodes');
-const _ = require('lodash');
+const TransformationHelper = require('../helpers/transformation.helper');
 
 class FormatService {
     /**
@@ -41,7 +41,7 @@ class FormatService {
          *  - medication
          */
         try {
-            let source, status, type, email, phone, state, fullname;
+            let source, status, type, state, fullname;
 
             if ("type" in lead) {
                 type = await models.Types.findOne({
@@ -51,6 +51,7 @@ class FormatService {
 
                     }
                 })
+
                 if (type.dataValues.id) {
                     delete lead.type;
                 }
@@ -84,7 +85,7 @@ class FormatService {
                 delete lead.phone;
             }
 
-            if (!("state" in lead)) {
+            if (!("state" in lead) && ("zip" in lead || "zipcode" in lead)) {
                 lead.state = zipcodes.lookup(lead.zip || lead.zipcode).state;
             }
 
@@ -160,6 +161,10 @@ class FormatService {
                 lead.medications = medications;
             }
 
+            if ("type" in lead || "coverage_type" in lead) {
+
+            }
+
             formatedLead.property = {
                 ...lead
             }
@@ -183,6 +188,61 @@ class FormatService {
             coverage: lead.coverage_amount
         };
 
+
+
+        formatedLead.term = term;
+        formatedLead.rate_class = formatedLead.term == 'fex' ? 'lb' : 's';
+
+        return formatedLead;
+    }
+
+    /**
+     * Format row lead from csv file
+     * @param {object} rawLead 
+     * @param {string} sourece 
+     * @param {string} type 
+     */
+    async formatRawLeads(rawLead, source, type) {
+        Object.keys(rawLead).forEach(async index => {
+            rawLead[index].source = source;
+            rawLead[index].type = type;
+
+            if (rawLead[index].contact) {
+                rawLead[index].contact = rawLead[index].contact.replace(/"/ig, '');
+            }
+
+            if (rawLead[index].email != 'NULL' || rawLead[index].email != 0) {
+                rawLead[index].email = rawLead[index].email.replace(/"/ig, '');
+            } else {
+                delete rawLead[index].email
+            }
+
+            if (rawLead[index].birth_date != 0 && rawLead[index].birth_date != 'NULL') {
+                let newDate = new Date(rawLead[index].birth_date);
+                const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+                const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+                const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+                rawLead[index].birth_date = yy + '-' + mm + '-' + dd;
+            } else {
+                delete rawLead.birth_date;
+            }
+
+            if (rawLead[index].phone != 0 && rawLead[index].phone != 'NULL') {
+                let clearPhone = String(rawLead[index].phone).length == 11 ? String(rawLead[index].phone).substring(1) : rawLead[index].phone;
+                rawLead[index].phone = TransformationHelper.phoneNumber(clearPhone).replace(' ', '');
+            } else {
+                delete rawLead[index].phone;
+            }
+
+            rawLead[index] = await this.formatLead(rawLead[index]);
+
+            console.log("FormatService -> formatRawLeads -> rawLead[index]", rawLead[index])
+        });
+
+        return rawLead;
+    }
+
+    async formatTerms(term) {
         let term = 10;
 
         if ("coverage_type" in lead) {
@@ -210,62 +270,7 @@ class FormatService {
             term = lead.term;
         }
 
-        formatedLead.term = term;
-        formatedLead.rate_class = formatedLead.term == 'fex' ? 'lb' : 's';
-
-        return formatedLead;
-    }
-
-    async formatRawLeads(rawLead, type) {
-        const SOURCE = "blueberry";
-
-        Object.keys(rawLead).forEach(async index => {
-            rawLead[index].source = SOURCE;
-            rawLead[index].type = "life";
-
-            if (rawLead[index].contact) {
-                rawLead[index].contact = rawLead[index].contact.replace(/"/ig, '');
-            }
-
-            if (rawLead[index].email != 'NULL' || rawLead.email != 0) {
-                rawLead[index].email = rawLead[index].email.replace(/"/ig, '');
-            } else {
-                delete rawLead.email
-            }
-
-            if (rawLead.birth_date != 0 && rawLead.birth_date != 'NULL') {
-                let newDate = new Date(rawLead.birth_date);
-                const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
-                const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
-                const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
-                rawLead.birth_date = yy + '-' + mm + '-' + dd;
-            } else {
-                delete rawLead.birth_date;
-            }
-
-            if (rowLead.phone != 0 && rowLead.phone != 'NULL') {
-                let clearPhone = String(rowLead.phone).length == 11 ? String(rowLead.phone).substring(1) : rowLead.phone;
-                rowLead.phone = this.formatPhoneNumber(clearPhone).replace(' ', '');
-            } else {
-                delete rowLead.phone;
-            }
-
-            rawLead[index] = await this.formatLead(rawLead[index]);
-        });
-
-        return rawLead;
-    }
-
-    formatPhoneNumber(phoneNumberString) {
-        let cleaned = ('' + phoneNumberString).replace(/\D/g, '');
-
-        let match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
-
-        if (match) {
-            let intlCode = (match[1] ? '+1 ' : '');
-
-            return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
-        }
+        return term;
     }
 }
 
