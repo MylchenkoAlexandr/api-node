@@ -5,6 +5,7 @@ const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const models = require('../../database/models')
 const LeadRepository = require('../repository/LeadRepository');
 const FormatService = require('../services/format.service');
+const { raw } = require('body-parser');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
@@ -57,6 +58,12 @@ async function getCompaniesListByLeadData(req, res) {
 
     try {
         const companies = await quotes.getCompaniesInfo();
+
+        rawLead.medications = rawLead['medications[]'];
+
+        if ("medications" in rawLead) {
+            delete rawLead['medications[]']
+        }
 
         client.emit("process-lead", rawLead);
 

@@ -46,28 +46,35 @@ module.exports = server => {
                 }
 
                 const formatedLead = await FormatService.formatLead(lead);
-                console.log("formatedLead", formatedLead)
 
-                let exist = await LeadService.foundExistLead(formatedLead);
+                const exist = await LeadService.foundExistLead(formatedLead);
 
                 let uploadedLead;
 
                 if (exist) {
                     uploadedLead = await LeadService.updateLead(exist, formatedLead, quoter);
 
-                    if (uploadedLead) {
+                    if (uploadedLead && uploadedLead.empty == 0) {
                         io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
-                        io.sockets.to("all_states").to(uploadedLead.property.state).emit("UPDATE_LEADS", uploadedLead);
+                        io.sockets.to("all_states").to(uploadedLead.state).emit("UPDATE_LEADS", uploadedLead);
 
-                        if (formatedLead.empty) {
-                            io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
+                        // TODO write socket/function which should move lead from rawLead to lead table
+
+                        if (lead.empty == 1 && uploadedLead.empty == 0) {
+                            io.sockets.to("all_states").to(res_lead.state).emit("CREATE_LEAD", res_lead);
                         }
                     }
                 } else {
                     uploadedLead = await LeadService.createLead(formatedLead, quoter);
 
                     if (uploadedLead) {
-                        io.sockets.to("all_states").to(uploadedLead.property.state).emit("CREATE_LEAD", uploadedLead);
+                        if (uploadedLead.empty == 0) {
+                            io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
+                        }
+
+                        if (uploadedLead.empty == 1) {
+                            io.sockets.emit("RAW_LEAD_ADD", uploadedLead);
+                        }
                     }
                 }
 
@@ -97,24 +104,28 @@ module.exports = server => {
                 //         }
                 //     }
                 // }
-
-                // }
             } catch (err) {
                 throw err;
             }
         });
 
-        socket.on('raw-leads', async (idArray) => {
-            try {
-                const rawLeads = await LeadRepository.getLatest(idArray);
+        // TODO socket.on('process-raw-lead');
 
-                if (rawLeads)
-                    io.sockets.emit("RAW_LEAD_ADD", rawLeads);
+        // socket.on('process-raw-lead', async (ids) => {
 
-            } catch (error) {
-                console.log(error);
-            }
-        });
+        // });
+
+        // socket.on('raw-leads', async (idArray) => {
+        //     try {
+        //         const rawLeads = await LeadRepository.getLatest(idArray);
+
+        //         if (rawLeads)
+        //             io.sockets.emit("RAW_LEAD_ADD", rawLeads);
+
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // });
 
         socket.on("busy-lead", lead_id => {
             socket.join(lead_id, async () => {

@@ -26,7 +26,7 @@ class LeadService {
             });
 
             if (createdLead.empty == 0) {
-                const leadProperty = JSON.parse(createdLead.property);
+                const leadProperty = lead.property;
 
                 const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
 
@@ -35,9 +35,11 @@ class LeadService {
                 const priceFromQuoter = await guoter.getPrice();
 
                 await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
+
+                return LeadRepository.getOne(createdLead.id);
             }
 
-            return LeadRepository.getOne(createdLead.id);
+            return LeadRepository.getRawLead(createdLead.id);
         } catch (err) {
             throw err;
         }
@@ -74,9 +76,11 @@ class LeadService {
                 const priceFromQuoter = await guoter.getPrice();
 
                 await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
+
+                return LeadRepository.getOne(updatedLead.id);
             }
 
-            return LeadRepository.getOne(updatedLead.id);
+            return LeadRepository.getRawLead(updatedLead.id);
         } catch (err) {
             throw err;
         }

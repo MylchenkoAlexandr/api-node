@@ -85,7 +85,12 @@ class FormatService {
                 delete lead.phone;
             }
 
-            if (!("state" in lead) && ("zip" in lead || "zipcode" in lead)) {
+            if ("zip" in lead) {
+                lead.zipcode = lead.zip;
+                delete lead.zip;
+            }
+
+            if (!("state" in lead) && "zipcode" in lead) {
                 lead.state = zipcodes.lookup(lead.zip || lead.zipcode).state;
             }
 
@@ -104,6 +109,8 @@ class FormatService {
 
             if ("agent" in lead) {
                 formatedLead.user_id = lead.agent;
+
+                delete lead.agent;
             }
 
             if ("status" in lead) {
@@ -163,10 +170,13 @@ class FormatService {
 
             if ("type" in lead || "coverage_type" in lead) {
                 lead.term = this.formatTerms(lead);
-
                 if ("coverage_type" in lead) {
                     delete lead.coverage_type;
                 }
+            }
+
+            if ("term" in lead && !("rate_class" in lead)) {
+                lead.rate_class = lead.term == 'fex' ? 'lb' : 's';
             }
 
             formatedLead.property = {
@@ -203,47 +213,49 @@ class FormatService {
     /**
      * Format row lead from csv file
      * @param {object} rawLead 
-     * @param {string} sourece 
+     * @param {string} source 
      * @param {string} type 
      */
-    async formatRawLeads(rawLead, source, type) {
-        Object.keys(rawLead).forEach(async index => {
-            rawLead[index].source = source;
-            rawLead[index].type = type;
+    formatRawLead(rawLead, source, type) {
+        rawLead.source = source;
+        rawLead.type = type;
+        rawLead.empty = 1;
 
-            if (rawLead[index].contact) {
-                rawLead[index].contact = rawLead[index].contact.replace(/"/ig, '');
-            }
+        if (rawLead.contact) {
+            rawLead.contact = rawLead.contact.replace(/"/ig, '');
+        }
 
-            if (rawLead[index].email != 'NULL' || rawLead[index].email != 0) {
-                rawLead[index].email = rawLead[index].email.replace(/"/ig, '');
-            } else {
-                delete rawLead[index].email
-            }
+        if (rawLead.email != 'NULL' || rawLead.email != 0) {
+            rawLead.email = rawLead.email.replace(/"/ig, '');
+        } else {
+            delete rawLead.email
+        }
 
-            if (rawLead[index].birth_date != 0 && rawLead[index].birth_date != 'NULL') {
-                let newDate = new Date(rawLead[index].birth_date);
-                const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
-                const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
-                const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
-                rawLead[index].birth_date = yy + '-' + mm + '-' + dd;
-            } else {
-                delete rawLead.birth_date;
-            }
+        if (rawLead.birth_date != 0 && rawLead.birth_date != 'NULL') {
+            let newDate = new Date(rawLead.birth_date);
+            const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+            const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+            const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+            rawLead.birth_date = yy + '-' + mm + '-' + dd;
+        } else {
+            delete rawLead.birth_date;
+        }
 
-            if (rawLead[index].phone != 0 && rawLead[index].phone != 'NULL') {
-                let clearPhone = String(rawLead[index].phone).length == 11 ? String(rawLead[index].phone).substring(1) : rawLead[index].phone;
-                rawLead[index].phone = TransformationHelper.phoneNumber(clearPhone).replace(' ', '');
-            } else {
-                delete rawLead[index].phone;
-            }
-
-            rawLead[index] = await this.formatLead(rawLead[index]);
-        });
+        if (rawLead.phone != 0 && rawLead.phone != 'NULL') {
+            let clearPhone = String(rawLead.phone).length == 11 ? String(rawLead.phone).substring(1) : rawLead.phone;
+            rawLead.phone = TransformationHelper.phoneNumber(clearPhone).replace(' ', '');
+        } else {
+            delete rawLead.phone;
+        }
 
         return rawLead;
     }
 
+    /**
+     * Get term from lead and return correct value for quoter
+     * @param {object} lead 
+     * @returns {string} correctTerm
+     */
     formatTerms(lead) {
         let correctTerm;
         if ("coverage_type" in lead) {
