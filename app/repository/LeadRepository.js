@@ -59,7 +59,6 @@ const LeadRepository = {
 
                 delete lead.property;
 
-                console.log("getOne -> lead", lead)
                 return resolve(lead);
             }
         });

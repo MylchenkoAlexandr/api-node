@@ -47,26 +47,30 @@ module.exports = server => {
 
                 const formatedLead = await FormatService.formatLead(lead);
 
-                const exist = await LeadService.foundExistLead(formatedLead);
+                let exist = await LeadService.foundExistLead(formatedLead);
 
                 let uploadedLead;
 
                 if (exist) {
-                    uploadedLead = await LeadService.updateLead(exist, formatedLead, quoter);
+                    const emptyStatus = exist.empty;
+                    if (exist.empty == 0 && formatedLead.empty == 1) {
+                        console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);
+                    } else {
+                        uploadedLead = await LeadService.updateLead(exist, formatedLead, quoter);
 
-                    if (uploadedLead && uploadedLead.empty == 0) {
-                        io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
-                        io.sockets.to("all_states").to(uploadedLead.state).emit("UPDATE_LEADS", uploadedLead);
+                        if (uploadedLead) {
+                            io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
+                            io.sockets.to("all_states").to(uploadedLead.state).emit("UPDATE_LEADS", uploadedLead);
 
-                        // TODO write socket/function which should move lead from rawLead to lead table
-
-                        if (lead.empty == 1 && uploadedLead.empty == 0) {
-                            io.sockets.to("all_states").to(res_lead.state).emit("CREATE_LEAD", res_lead);
+                            if (emptyStatus) {
+                                io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
+                                // TODO Write emit for removing raw lead from table
+                            }
                         }
                     }
                 } else {
                     uploadedLead = await LeadService.createLead(formatedLead, quoter);
-
+                    
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
                             io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
@@ -109,12 +113,6 @@ module.exports = server => {
             }
         });
 
-        // TODO socket.on('process-raw-lead');
-
-        // socket.on('process-raw-lead', async (ids) => {
-
-        // });
-
         // socket.on('raw-leads', async (idArray) => {
         //     try {
         //         const rawLeads = await LeadRepository.getLatest(idArray);
@@ -145,7 +143,7 @@ module.exports = server => {
                         io.sockets.emit("UPDATE_LEADS", lead);
                     }
                 } catch (error) {
-                    throw new Error(error);
+                    throw error;
                 }
             });
         });
