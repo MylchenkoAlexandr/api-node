@@ -20,7 +20,7 @@ class BeneficiaryService {
                 where: { lead_id: beneficiary_options.lead_id }
             });
 
-            const { dataValues: state } = await models.States.findOne({
+            const state = await models.States.findOne({
                 attributes: ["id"],
                 where: { name: beneficiary_options.location }
             });
