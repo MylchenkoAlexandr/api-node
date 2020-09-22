@@ -18,28 +18,30 @@ class LeadService {
                 status_id: lead.status_id,
                 type_id: lead.type_id,
                 state_id: lead.state_id,
-                empty: lead.empty,
+                empty: lead.empty || 0,
                 email: lead.email || null,
                 phone: lead.phone || null,
                 fullname: lead.fullname || null,
                 property: JSON.stringify(lead.property)
             });
+            
+            if (createdLead) {
+                if (createdLead.empty == 0) {
+                    const leadProperty = lead.property;
 
-            if (createdLead.empty == 0) {
-                const leadProperty = lead.property;
+                    const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
 
-                const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
+                    let guoter = new NinjaQuoterService(formatedLeadForQuote);
 
-                let guoter = new NinjaQuoterService(formatedLeadForQuote);
+                    const priceFromQuoter = await guoter.getPrice();
 
-                const priceFromQuoter = await guoter.getPrice();
+                    await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
 
-                await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
+                    return LeadRepository.getOne(createdLead.id);
+                }
 
-                return LeadRepository.getOne(createdLead.id);
+                return LeadRepository.getRawLead(createdLead.id);
             }
-
-            return LeadRepository.getRawLead(createdLead.id);
         } catch (err) {
             throw err;
         }
@@ -59,28 +61,30 @@ class LeadService {
                 status_id: lead.status_id,
                 type_id: lead.type_id,
                 state_id: lead.state_id,
-                empty: lead.empty,
+                empty: lead.empty || 0,
                 email: lead.email || null,
                 phone: lead.phone || null,
                 fullname: lead.fullname || null,
                 property: JSON.stringify(lead.property)
             });
 
-            if (updatedLead.empty == 0) {
-                const leadProperty = JSON.parse(updatedLead.property);
+            if (updatedLead) {
+                if (updatedLead.empty == 0) {
+                    const leadProperty = JSON.parse(updatedLead.property);
 
-                const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
+                    const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
 
-                let guoter = new NinjaQuoterService(formatedLeadForQuote);
+                    let guoter = new NinjaQuoterService(formatedLeadForQuote);
 
-                const priceFromQuoter = await guoter.getPrice();
+                    const priceFromQuoter = await guoter.getPrice();
 
-                await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
+                    await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
 
-                return LeadRepository.getOne(updatedLead.id);
+                    return LeadRepository.getOne(updatedLead.id);
+                }
+
+                return LeadRepository.getRawLead(updatedLead.id);
             }
-
-            return LeadRepository.getRawLead(updatedLead.id);
         } catch (err) {
             throw err;
         }

@@ -50,22 +50,22 @@ async function getLead(req, res) {
 }
 
 async function getCompaniesListByLeadData(req, res) {
-    const rawLead = req.body;
+    const rawLead = JSON.parse(JSON.stringify(req.body));
 
-    const formatedLeadForQuote = await FormatService.formatLeadForQuote(rawLead);
+    rawLead.medications = rawLead['medications[]'];
 
-    const quotes = new NinjaQuoterService(formatedLeadForQuote);
+    if ("medications" in rawLead) {
+        delete rawLead['medications[]']
+    }
+
+    client.emit("process-lead", rawLead);
 
     try {
+        const formatedLeadForQuote = await FormatService.formatLeadForQuote(rawLead);
+
+        const quotes = new NinjaQuoterService(formatedLeadForQuote);
+
         const companies = await quotes.getCompaniesInfo();
-
-        rawLead.medications = rawLead['medications[]'];
-
-        if ("medications" in rawLead) {
-            delete rawLead['medications[]']
-        }
-
-        client.emit("process-lead", rawLead);
 
         return res.status(200).json(companies);
     } catch (error) {
