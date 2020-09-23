@@ -89,7 +89,19 @@ class AgentService {
                 return agents;
             }
         } catch (error) {
-            throw new Error(error);
+            throw error;
+        }
+    }
+
+    async find(email) {
+        try {
+            const user = await models.Users.findOne({
+                where: { email }
+            });
+
+            return user;
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -161,19 +173,33 @@ class AgentService {
     }
 
     async checkedBan(email) {
-        const agent_candidate = await models.Users.findOne({ 
-            where: { email } 
+        const agent_candidate = await models.Users.findOne({
+            where: { email }
         });
 
         return agent_candidate.dataValues.banned;
     }
 
     async checkAdmin(email) {
-        const agent_candidate = await models.Users.findOne({ 
-            where: { email } 
+        const agent_candidate = await models.Users.findOne({
+            where: { email }
         });
 
         return agent_candidate.dataValues.role_id == 1 ? true : false;
+    }
+
+    async create({ role_id, email, name, password, states }) {
+        try {
+            await models.Users.create({
+                role_id,
+                email,
+                name,
+                password,
+                states
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

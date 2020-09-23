@@ -1,14 +1,10 @@
-const models = require('../../database/models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const AgentService = require('../services/agent.service');
 
-
 async function login(req, res) {
   try {
-    const user = await models.Users.findOne({
-      where: { email: req.body.email }
-    });
+    const user = await AgentService.find(req.body.email);
 
     if (user) {
       const password_mathes = await bcrypt.compare(req.body.password, user.password);
@@ -17,6 +13,7 @@ async function login(req, res) {
         const acces_token = jwt.sign({ data: req.body.email }, process.env.SECRET_KEY, { expiresIn: "24h" });
 
         return res.status(200).json({
+          status: "success",
           message: "Login success",
           user: {
             id: user.id,
@@ -29,79 +26,81 @@ async function login(req, res) {
           token: acces_token
         });
       }
-
     }
 
-    return res.status(401).json({ message: "Password or email incorrect" });
+    return res.status(401).json({ status: 'error', message: "Password or email incorrect" });
   } catch (error) {
-    res.status(400).json({ message: "Server error" });
-    throw new Error(error);
+    res.status(400).json({ status: 'error', message: "Server error" });
+    throw error;
   }
 
 };
 
 async function registration(req, res) {
   try {
-    const user = await models.Users.findOne({
-      where: { email: req.body.email }
-    });
+    const user = await AgentService.find(req.body.email);
 
     if (!user) {
       const hash = await bcrypt.hash(req.body.password, 10);
 
-      const user = await models.Users.create({
+      const user = {
         role_id: req.body.role,
         email: req.body.email,
         name: req.body.name,
         password: hash,
         states: req.body.states
-      })
+      }
 
-      if (user) return res.status(201).json({ message: "User registration" });
+      await AgentService.create(user);
+
+      return res.status(201).json({ message: "User registration" });
     }
 
     return res.status(200).json({ message: "User exist" });
   } catch (error) {
     res.status(400).json({ message: "Server error" });
-    throw new Error(error);
+    throw error;
   }
 };
 
 async function verify(req, res) {
+  const jwt_token = req.body.token;
+
+  if (!jwt_token) {
+    return res.status(401).json({ status: 'error', message: "Token not found" });
+  }
+
   try {
-    const decoded = jwt.verify(req.body.token, process.env.SECRET_KEY);
+    const decoded = jwt.verify(jwt_token, process.env.SECRET_KEY);
     const account_banned = await AgentService.checkedBan(decoded.data);
 
     if (account_banned) {
       return res.status(403).json({
-        status: 'failed',
+        status: 'error',
         message: "Your account has been banned"
       });
     } else {
-      const candidate = await models.Users.findOne({
-        where: { email: decoded.data }
-      });
+      const candidate = await AgentService.find(decoded.data);
 
       if (candidate) {
-        const user = candidate.dataValues;
 
         return res.status(200).json({
+          status: "success",
+          message: "Verify success",
           user: {
-            id: user.id,
-            email: user.email,
-            fname: user.fname,
-            lname: user.lname,
-            states: JSON.parse(user.states),
-            role_id: user.role_id
+            id: candidate.id,
+            email: candidate.email,
+            fname: candidate.fname,
+            lname: candidate.lname,
+            states: JSON.parse(candidate.states),
+            role_id: candidate.role_id
           }
-        })
+        });
       }
     }
-
-    return res.status(401).json({ message: "Token not found" });
   } catch (error) {
-    res.status(400).json({ message: "Server error" });
-    throw new Error(error);
+    res.status(400).json({ status: 'failed', message: "Server error" });
+    throw error;
   }
 }
 
