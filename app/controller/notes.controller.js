@@ -4,14 +4,14 @@ async function getNotes(req, res) {
     try {
         const notes = await NotesService.getAll(req.body.lead_id);
 
-        res.status(200).json({
+        return res.status(200).json({
             status: 'success',
             message: 'All notes',
             notes
         });
-    } catch (e) {
+    } catch (err) {
         res.status(400).json({ status: 'error', message: 'Server Error!' });
-        throw e;
+        throw err;
     }
 }
 
@@ -21,10 +21,10 @@ async function createNote(req, res) {
     try {
         const note = await NotesService.create(note_param);
 
-        res.status(201).json({ status: 'success', message: 'Note created!', note });
-    } catch (e) {
+        return res.status(201).json({ status: 'success', message: 'Note created!', note });
+    } catch (err) {
         res.status(400).json({ status: 'error', message: 'Server Error!' });
-        throw e;
+        throw err;
     }
 }
 
@@ -32,10 +32,10 @@ async function deleteNote(req, res) {
     try {
         const deleted = await NotesService.delete(req.body.note_id);
 
-        res.status(200).json({ status: 'success', message: 'Note deleted!', deleted });
-    } catch (e) {
+        return res.status(200).json({ status: 'success', message: 'Note deleted!', deleted });
+    } catch (err) {
         res.status(400).json({ status: 'error', message: 'Server Error!' });
-        throw e;``
+        throw err;
     }
 
 }

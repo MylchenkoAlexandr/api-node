@@ -34,7 +34,7 @@ class AgentService {
                 }
             }
         } catch (error) {
-            throw new Error(error);
+            throw error;
         }
     }
 
@@ -70,7 +70,7 @@ class AgentService {
             return { code: 200, status: "error", message: 'Agent not found' };
 
         } catch (error) {
-            throw new Error(error);
+            throw error;
         }
     }
 
@@ -127,7 +127,7 @@ class AgentService {
                 }
             }
         } catch (error) {
-            throw new Error(error);
+            throw error;
         }
     }
 
@@ -168,35 +168,29 @@ class AgentService {
                 }
             }
         } catch (error) {
-            throw new Error(error);
+            throw error;
         }
     }
 
     async checkedBan(email) {
-        const agent_candidate = await models.Users.findOne({
-            where: { email }
-        });
+        try {
+            const agent_candidate = await models.Users.findOne({
+                where: { email }
+            });
 
-        return agent_candidate.dataValues.banned;
+            return agent_candidate.dataValues.banned;
+        } catch (error) {
+            throw error;
+        }
     }
 
     async checkAdmin(email) {
-        const agent_candidate = await models.Users.findOne({
-            where: { email }
-        });
-
-        return agent_candidate.dataValues.role_id == 1 ? true : false;
-    }
-
-    async create({ role_id, email, name, password, states }) {
         try {
-            await models.Users.create({
-                role_id,
-                email,
-                name,
-                password,
-                states
+            const agent_candidate = await models.Users.findOne({
+                where: { email }
             });
+
+            return agent_candidate.dataValues.role_id == 1 ? true : false;
         } catch (error) {
             throw error;
         }
