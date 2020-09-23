@@ -7,8 +7,6 @@ async function createAgent(req, res) {
         agent.password = await bcrypt.hash(agent.password, 10);
         agent.states = JSON.stringify(agent.states);
 
-        console.log("createAgent -> agent", agent)
-
         const response = await AgentService.create(agent);
 
         res.status(response.code).json({
@@ -103,8 +101,6 @@ async function getAgents(req, res) {
         throw new Error(error);
     }
 }
-
-// TODO CREATE FUNCTION FOR SELF EDITING OF AGENT ACCOUNT, CHANGING PASSWORD|
 
 module.exports = {
     getAgents,

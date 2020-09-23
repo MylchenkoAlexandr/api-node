@@ -12,14 +12,24 @@ class AgentService {
             })
 
             if (!user_exist) {
-                await models.Users.create({
-                    role_id: 2,
-                    fname: agent.fname,
-                    lname: agent.lname,
-                    email: agent.email,
-                    password: agent.password,
-                    states: agent.states
-                });
+                // await models.Users.create({
+                //     role_id: 2,
+                //     fname: agent.fname,
+                //     lname: agent.lname,
+                //     email: agent.email,
+                //     password: agent.password,
+                //     states: agent.states
+                // });
+
+                let states = JSON.parse(agent.states)
+                
+                console.log("AgentService -> create -> agent.states", states);
+
+                states.map(i => {
+                    console.log(i);
+                })
+                
+                // await UsersStates.create
 
                 return {
                     code: 201,
@@ -161,16 +171,16 @@ class AgentService {
     }
 
     async checkedBan(email) {
-        const agent_candidate = await models.Users.findOne({ 
-            where: { email } 
+        const agent_candidate = await models.Users.findOne({
+            where: { email }
         });
 
         return agent_candidate.dataValues.banned;
     }
 
     async checkAdmin(email) {
-        const agent_candidate = await models.Users.findOne({ 
-            where: { email } 
+        const agent_candidate = await models.Users.findOne({
+            where: { email }
         });
 
         return agent_candidate.dataValues.role_id == 1 ? true : false;

@@ -4,7 +4,7 @@ class AsigmentService {
      * @param {string} state 
      */
     getSuitableAgent(state) {
-        return id;
+        // SELECT leads.user_id, COUNT(leads.id) as `count` FROM leads WHERE state_id = (SELECT states.id FROM states WHERE states.name = "CA") GROUP BY leads.user_id ORDER BY `count` ASC LIMIT 1
     }
 }
 
