@@ -14,7 +14,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   UsersStates.init({
-    user_id: DataTypes.BIGINT.UNSIGNED,
+    user_id: {
+      primaryKey: true,
+      type: DataTypes.BIGINT.UNSIGNED
+    },
     state_id: DataTypes.BIGINT.UNSIGNED
   }, {
     sequelize,

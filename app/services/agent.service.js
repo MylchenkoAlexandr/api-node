@@ -1,6 +1,6 @@
 const models = require('../../database/models');
 const bcrypt = require('bcrypt');
-
+const StatesRepository = require('../repository/states.repository');
 class AgentService {
     async create(agent) {
         try {
@@ -12,24 +12,29 @@ class AgentService {
             })
 
             if (!user_exist) {
-                // await models.Users.create({
-                //     role_id: 2,
-                //     fname: agent.fname,
-                //     lname: agent.lname,
-                //     email: agent.email,
-                //     password: agent.password,
-                //     states: agent.states
-                // });
+                const createdAgent = await models.Users.create({
+                    role_id: 2,
+                    fname: agent.fname,
+                    lname: agent.lname,
+                    email: agent.email,
+                    password: agent.password,
+                    states: agent.states
+                });
 
-                let states = JSON.parse(agent.states)
-                
-                console.log("AgentService -> create -> agent.states", states);
+                if (createdAgent) {
+                    let states = JSON.parse(agent.states)
 
-                states.map(i => {
-                    console.log(i);
-                })
-                
-                // await UsersStates.create
+                    states.map(async (state) => {
+                        let stateId = await StatesRepository.getOne(state);
+
+                        if (stateId) {
+                            await models.UsersStates.create({
+                                user_id: createdAgent.id,
+                                state_id: stateId.id
+                            });
+                        }
+                    });
+                }
 
                 return {
                     code: 201,
@@ -74,6 +79,28 @@ class AgentService {
                         banned: agent.banned
                     });
                 }
+
+                let states = JSON.parse(agent.states)
+
+                states.map(async (state) => {
+                    let stateId = await StatesRepository.getOne(state);
+
+                    if (stateId) {
+                        await models.UsersStates.destroy({
+                            where: {
+                                user_id: agent.id,
+                            }
+                        });
+
+                        // TODO remove user_id form leads if it not contait it 
+
+                        await models.UsersStates.create({
+                            user_id: agent.id,
+                            state_id: stateId.id
+                        });
+                    }
+
+                });
 
                 return { code: 200, status: "success", message: 'Agent updated' };
             }
@@ -196,20 +223,6 @@ class AgentService {
         });
 
         return agent_candidate.dataValues.role_id == 1 ? true : false;
-    }
-
-    async create({ role_id, email, name, password, states }) {
-        try {
-            await models.Users.create({
-                role_id,
-                email,
-                name,
-                password,
-                states
-            });
-        } catch (error) {
-            throw error;
-        }
     }
 }
 
