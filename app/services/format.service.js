@@ -1,6 +1,7 @@
 const models = require('../../database/models');
 const zipcodes = require('zipcodes');
 const TransformationHelper = require('../helpers/transformation.helper');
+const AgentRepository = require('../repository/agent.repository');
 
 class FormatService {
     /**
@@ -111,6 +112,11 @@ class FormatService {
                 formatedLead.user_id = lead.agent;
 
                 delete lead.agent;
+            } else if ("state_id" in formatedLead) {
+                const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
+                if (suitableAgent) {
+                    formatedLead.user_id = suitableAgent;
+                }
             }
 
             if ("status" in lead) {

@@ -22,6 +22,8 @@ module.exports = server => {
             } else {
                 socket.join("all_states");
             }
+
+            // TODO create room for user_id
         });
 
         socket.on("process-lead", async (lead) => {
@@ -70,7 +72,7 @@ module.exports = server => {
                     }
                 } else {
                     uploadedLead = await LeadService.createLead(formatedLead, quoter);
-                    
+
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
                             io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
@@ -172,7 +174,6 @@ module.exports = server => {
         });
 
         socket.on("record-create", async ({ user_id, lead_id, url }) => {
-
             try {
                 const new_record = await models.Records.create({
                     user_id: user_id,
