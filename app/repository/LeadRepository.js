@@ -115,9 +115,32 @@ const LeadRepository = {
         });
     },
 
-    getByUserId(type, user_id){
-        return 
-    }
+    getByUserId(type, user_id) {
+        console.log("getByUserId -> type, user_id", type, user_id)
+        return new Promise(async (resolve, reject) => {
+            let data = await db.sequelize.query("SELECT leads.id, leads.user_id, leads.phone, leads.empty, leads.fullname, users.fname, users.lname, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.createdAt AS created, sources.name AS `source` FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.user_id = '" + user_id + "' AND leads.type_id = (SELECT types.id FROM types WHERE types.name = '" + type.toLowerCase() + "')", {
+                type: db.sequelize.QueryTypes.SELECT,
+            }).catch(e => {
+                console.error(e);
+            });
+            
+            console.log("getByUserId -> data", data);
+
+            data = data.map(lead => {
+                lead.property = JSON.parse(lead.property);
+                lead.price = JSON.parse(lead.price);
+
+                lead.created = this.formatDate(lead.created, true);
+
+                lead = { ...lead, ...lead.property };
+
+                return lead;
+            });
+
+            return resolve(data);
+        });
+        return null
+    },
 
     // getLatest(latestId) {
     //     return new Promise(async (resolve, reject) => {
