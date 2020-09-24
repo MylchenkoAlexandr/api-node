@@ -68,11 +68,11 @@ module.exports = server => {
 
                         if (uploadedLead) {
                             io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
-                            io.sockets.to("all_leads").to(uploadedLead.id).emit("UPDATE_LEADS", uploadedLead);
+                            io.sockets.to("all_leads").to(uploadedLead.user_id).emit("UPDATE_LEADS", uploadedLead);
 
 
                             // if(uploadedLead.user_id != user.id){
-                                // io.sockets.to(uploadedLead.id).emit("DELETE_LEAD", uploadedLead);
+                            // io.sockets.to(uploadedLead.id).emit("DELETE_LEAD", uploadedLead);
                             // }
 
                             if (emptyStatus) {
