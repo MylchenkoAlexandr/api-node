@@ -1,11 +1,12 @@
-const NinjaQuoterService = require('../services/NinjaQuoterService')
-const { createLead, updateLead } = require('../services/lead.service');
-const zipcodes = require('zipcodes');
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
-const models = require('../../database/models')
 const LeadRepository = require('../repository/LeadRepository');
 const FormatService = require('../services/format.service');
-const { raw } = require('body-parser');
+const NinjaQuoterService = require('../services/NinjaQuoterService');
+const MailService = require('../services/mail.service');
+// const zipcodes = require('zipcodes');
+// const { createLead, updateLead } = require('../services/lead.service');
+// const models = require('../../database/models')
+// const { raw } = require('body-parser');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
@@ -17,13 +18,12 @@ async function getLeads(req, res) {
         const leads = await LeadRepository.getAll(req.body.type, req.body.states);
         return res.status(200).json(leads);
     } catch (err) {
-        console.error(err);
+        res.status(400).json({
+            status: 'error',
+            message: "Server Error!"
+        });
+        throw err;
     }
-
-    return res.status(400).json({
-        status: 'failed',
-        message: "Server error!"
-    });
 }
 
 async function getRawLeads(req, res) {
@@ -31,21 +31,24 @@ async function getRawLeads(req, res) {
         const rowLeads = await LeadRepository.getEmptyAll();
         return res.status(200).json(rowLeads);
     } catch (err) {
-        console.error(err);
+        res.status(400).json({
+            status: 'error',
+            message: "Server Error!"
+        });
+        throw err;
     }
-
-    return res.status(400).json({
-        status: 'failed',
-        message: "Server error!"
-    });
 }
 
 async function getLead(req, res) {
     try {
         const lead = await LeadRepository.getOne(req.body.id);
         return res.status(200).json(lead);
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
+        res.status(400).json({
+            status: 'error',
+            message: "Server Error!"
+        });
+        throw err;
     }
 }
 
@@ -67,15 +70,27 @@ async function getCompaniesListByLeadData(req, res) {
 
         const companies = await quotes.getCompaniesInfo();
 
-        return res.status(200).json(companies);
-    } catch (error) {
-        console.error(error)
-    }
+        if("email" in rawLead) {
+            const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
 
-    return res.status(400).json({
-        status: 'failed',
-        message: "Server Error!"
-    });
+            const mail_options = {
+                from: process.env.MAIL_SERVICE_USER_EMAIL,
+                to: rawLead.email,
+                subject: "Blueberry Insurance",
+                html
+            };
+
+            MailService.send(mail_options);
+        }
+
+        return res.status(200).json(companies);
+    } catch (err) {
+        res.status(400).json({
+            status: 'error',
+            message: "Server Error!"
+        });
+        throw err;
+    }
 }
 
 async function uploadLeadFromUrl(req, res) {
@@ -121,14 +136,12 @@ async function uploadLeadFromUrl(req, res) {
         });
     }
     catch (err) {
-        console.error(err);
+        res.status(400).json({
+            status: 'error',
+            message: "Server Error!"
+        });
+        throw err;
     }
-
-
-    return res.status(400).json({
-        status: 'failed',
-        message: 'Server Error!'
-    });
 }
 
 async function uploadLeadFromMediaAlpha(req, res) {
@@ -149,13 +162,13 @@ async function uploadLeadFromMediaAlpha(req, res) {
             message: "Success Uploaded!"
         });
     } catch (err) {
-        console.error(err);
+        res.status(400).json({
+            status: 'error',
+            message: "Server Error!"
+        });
+        throw err;
     }
 
-    return res.status(400).json({
-        status: 'failed',
-        message: "Server Error!"
-    });
 }
 
 module.exports = {

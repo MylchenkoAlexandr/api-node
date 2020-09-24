@@ -36,33 +36,6 @@ async function login(req, res) {
 
 };
 
-async function registration(req, res) {
-  try {
-    const user = await AgentService.find(req.body.email);
-
-    if (!user) {
-      const hash = await bcrypt.hash(req.body.password, 10);
-
-      const user = {
-        role_id: req.body.role,
-        email: req.body.email,
-        name: req.body.name,
-        password: hash,
-        states: req.body.states
-      }
-
-      await AgentService.create(user);
-
-      return res.status(201).json({ message: "User registration" });
-    }
-
-    return res.status(200).json({ message: "User exist" });
-  } catch (error) {
-    res.status(400).json({ message: "Server error" });
-    throw error;
-  }
-};
-
 async function verify(req, res) {
   const jwt_token = req.body.token;
 
@@ -106,6 +79,5 @@ async function verify(req, res) {
 
 module.exports = {
   login,
-  registration,
   verify
 }

@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const ejs = require('ejs');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
 
@@ -12,26 +13,36 @@ class MailService {
             process.env.MAIL_SERVICE_CLIENT_SECRET,
             process.env.MAIL_SERVICE_REDIRECT_URI
         );
+
+        this.transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: {
+                type: "OAuth2",
+                user: process.env.MAIL_SERVICE_USER_EMAIL, //your gmail account you used to set the project up in google cloud console"
+                clientId: process.env.MAIL_SERVICE_CLIENT_ID,
+                clientSecret: process.env.MAIL_SERVICE_CLIENT_SECRET,
+                refreshToken: process.env.MAIL_SERVICE_REFRESH_TOKEN,
+                accessToken: process.env.MAIL_SERVICE_ACCESS_TOKEN, //access token variable we defined earlier
+                expires: process.env.MAIL_SERVICE_EXPIRY_DATE
+            }
+        });
     }
 
-    async generateMailTransporter() {
+    async send(mail_options) {
         try {
-            const transporter = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true,
-                auth: {
-                    type: "OAuth2",
-                    user: process.env.MAIL_SERVICE_USER_EMAIL, //your gmail account you used to set the project up in google cloud console"
-                    clientId: process.env.MAIL_SERVICE_CLIENT_ID,
-                    clientSecret: process.env.MAIL_SERVICE_CLIENT_SECRET,
-                    refreshToken: process.env.MAIL_SERVICE_REFRESH_TOKEN,
-                    accessToken: process.env.MAIL_SERVICE_ACCESS_TOKEN, //access token variable we defined earlier
-                    expires: process.env.MAIL_SERVICE_EXPIRY_DATE
-                }
-            });
+            await this.transporter.verify();
+            await this.transporter.sendMail(mail_options);
+        } catch (error) {
+            throw error;
+        }
+    }
 
-            return transporter;
+    async createToken() {
+        try {
+            const { tokens } = await this.oauth2Client.getToken(process.env.MAIL_SERVICE_AUTH_CODE);
+            return tokens;
         } catch (error) {
             throw error;
         }
@@ -52,14 +63,16 @@ class MailService {
         console.log(auth_url);
     }
 
-    async createToken() {
-        try {
-            const { tokens } = await this.oauth2Client.getToken(process.env.MAIL_SERVICE_AUTH_CODE);
-            return tokens;
-        } catch (error) {
-            throw error;
-        }
+    generateQuotesHtmlTemplate(filename, companies) {
+        let html;
+        ejs.renderFile(__dirname + '/../../emails/' + filename, { companies }, (err, html_code) => {
+            if (err) throw err;
+            html = html_code;
+        });
+
+        return html;
     }
+
 }
 
 module.exports = new MailService;

@@ -1,18 +1,16 @@
 const MailService = require('../services/mail.service');
 
 async function sendMailToClient(req, res) {
-
-    const mailOptions = {
-        from: req.body.email_agent,
-        to: req.body.email,
-        subject: "Blueberry Insurance",
-        text: req.body.text
-    };
-
     try {
-        const transporter = await MailService.generateMailTransporter();
-        await transporter.verify();
-        await transporter.sendMail(mailOptions);
+        // const html = MailService.generateHtmlTemplate('quote.ejs');
+        const mail_options = {
+            from: req.body.email_agent,
+            to: req.body.email,
+            subject: "Blueberry Insurance",
+            text: req.body.text
+        };
+
+        await MailService.send(mail_options);
 
         return res.status(200).json({
             status: "success",
@@ -42,6 +40,8 @@ async function createToken(req, res) {
         throw error;
     }
 }
+
+
 
 module.exports = {
     sendMailToClient,

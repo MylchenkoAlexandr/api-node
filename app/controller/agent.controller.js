@@ -18,7 +18,7 @@ async function createAgent(req, res) {
             status: "error",
             message: "Server error!"
         });
-        throw new Error(error);
+        throw error;
     }
 }
 
@@ -44,7 +44,7 @@ async function updateAgent(req, res) {
             status: "error",
             message: 'Server error'
         });
-        throw new Error(error);
+        throw error;
     }
 }
 
@@ -62,7 +62,7 @@ async function deleteAgent(req, res) {
             status: "error",
             message: "Server error"
         });
-        throw new Error(error);
+        throw error;
     }
 }
 
@@ -81,10 +81,10 @@ async function updateAgentPassword(req, res) {
         });
     } catch (error) {
         res.status(400).json({
-            status: 'failed',
+            status: 'error',
             message: "Server error!"
         });
-        throw new Error(error);
+        throw error;
     }
 }
 
@@ -98,7 +98,7 @@ async function getAgents(req, res) {
             status: "error",
             message: "Server error"
         });
-        throw new Error(error);
+        throw error;
     }
 }
 
