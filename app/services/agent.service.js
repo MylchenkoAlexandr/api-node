@@ -80,7 +80,19 @@ class AgentService {
                     });
                 }
 
-                let states = JSON.parse(agent.states)
+                let states = JSON.parse(agent.states);
+
+                let leads = await models.Leads.findAll({
+                    where: {
+                        user_id: agent.id
+                    }
+                });
+
+                Object.keys(leads).forEach(index => {
+                    leads[index].update({
+                        user_id: null
+                    });
+                });
 
                 states.map(async (state) => {
                     let stateId = await StatesRepository.getOne(state);
@@ -92,7 +104,13 @@ class AgentService {
                             }
                         });
 
-                        // TODO remove user_id form leads if it not contait it 
+                        Object.keys(leads).forEach(index => {
+                            if (leads[index].state_id == stateId.id) {
+                                leads[index].update({
+                                    user_id: agent.id,
+                                });
+                            }
+                        });
 
                         await models.UsersStates.create({
                             user_id: agent.id,
