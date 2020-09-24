@@ -5,7 +5,7 @@ const { uploadCSV } = require('../app/controller/upload.controller');
 
 router.post('/test', test);
 router.post('/get-raws', authenticateToken, getRawLeads);
-router.post('/get-lead', authenticateToken, getLead);
+router.get('/get-lead/:lead_id', authenticateToken, getLead);
 router.post('/get-leads', authenticateToken, getLeads);
 router.post('/get-companies', getCompaniesListByLeadData);
 router.post('/upload/bulk-csv', authenticateToken, uploadCSV)

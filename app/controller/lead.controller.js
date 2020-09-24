@@ -1,12 +1,8 @@
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
-const LeadRepository = require('../repository/LeadRepository');
 const FormatService = require('../services/format.service');
+const LeadService = require('../services/lead.service');
 const NinjaQuoterService = require('../services/NinjaQuoterService');
 const MailService = require('../services/mail.service');
-// const zipcodes = require('zipcodes');
-// const { createLead, updateLead } = require('../services/lead.service');
-// const models = require('../../database/models')
-// const { raw } = require('body-parser');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
@@ -15,8 +11,12 @@ async function test(req, res) {
 
 async function getLeads(req, res) {
     try {
-        const leads = await LeadRepository.getAll(req.body.type, req.body.states);
-        return res.status(200).json(leads);
+        const leads = await LeadService.getAll(req.body.type, req.body.states);
+        return res.status(200).json({
+            status: "success",
+            message: "All leads sending",
+            leads
+        });
     } catch (err) {
         res.status(400).json({
             status: 'error',
@@ -28,8 +28,12 @@ async function getLeads(req, res) {
 
 async function getRawLeads(req, res) {
     try {
-        const rowLeads = await LeadRepository.getEmptyAll();
-        return res.status(200).json(rowLeads);
+        const rowLeads = await LeadService.getRawLeads();
+        return res.status(200).json({
+            status: "success",
+            message: "All empty leads sending",
+            rowLeads
+        });
     } catch (err) {
         res.status(400).json({
             status: 'error',
@@ -41,8 +45,12 @@ async function getRawLeads(req, res) {
 
 async function getLead(req, res) {
     try {
-        const lead = await LeadRepository.getOne(req.body.id);
-        return res.status(200).json(lead);
+        const lead = await LeadService.getOne(req.params.lead_id);
+        return res.status(200).json({
+            status: "success",
+            message: "Lead sending",
+            lead
+        });
     } catch (err) {
         res.status(400).json({
             status: 'error',
@@ -70,7 +78,7 @@ async function getCompaniesListByLeadData(req, res) {
 
         const companies = await quotes.getCompaniesInfo();
 
-        if("email" in rawLead) {
+        if ("email" in rawLead) {
             const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
 
             const mail_options = {

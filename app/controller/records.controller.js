@@ -1,8 +1,16 @@
-const RecordsRepository = require('../repository/RecordsRepository');
+const RecordsService = require('../services/records.service');
 
 async function getAllRecords(req, res) {
-    const records = await RecordsRepository.getAll(req.body.lead_id);
-    return res.status(200).json(records);
+    try {
+        const records = await RecordsService.getAll(req.params.lead_id);
+        return res.status(200).json({
+            status: "success",
+            message: "All records sending",
+            records
+        });
+    } catch (error) {
+        throw error;
+    }
 }
 
 module.exports = {

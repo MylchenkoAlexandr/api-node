@@ -43,6 +43,7 @@ class NotesService {
             throw error;
         }
     }
+
 }
 
 module.exports = new NotesService;

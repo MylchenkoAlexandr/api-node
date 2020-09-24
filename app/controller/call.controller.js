@@ -1,7 +1,6 @@
 const twilio = require('twilio');
 const ClientCapability = twilio.jwt.ClientCapability;
 const VoiceResponse = twilio.twiml.VoiceResponse;
-const models = require('../../database/models')
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 function token(req, res) {

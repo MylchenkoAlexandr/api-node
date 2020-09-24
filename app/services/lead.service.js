@@ -24,7 +24,7 @@ class LeadService {
                 fullname: lead.fullname || null,
                 property: JSON.stringify(lead.property)
             });
-            
+
             if (createdLead) {
                 if (createdLead.empty == 0) {
                     const leadProperty = lead.property;
@@ -143,6 +143,46 @@ class LeadService {
             return exist;
         } catch (err) {
             console.error(err)
+        }
+    }
+
+    /** 
+     * Function for get all leads
+     * @param {string} type
+     * @param {string} states
+    */
+    async getAll(type, states) {
+        try {
+            const leads = await LeadRepository.getAll(type, states);
+
+            return leads;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /** 
+     * Function for get one lead
+     * @param {number} lead_id
+    */
+    async getOne(lead_id) {
+        try {
+            const lead = await LeadRepository.getOne(lead_id);
+            return lead;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /** 
+     * Function for get all empty leads
+    */
+    async getRawLeads() {
+        try {
+            const row_leads = await LeadRepository.getEmptyAll();
+            return row_leads;
+        } catch (error) {
+            throw error;
         }
     }
 }
