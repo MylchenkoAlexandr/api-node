@@ -17,6 +17,22 @@ const AgentRepository = {
         } catch (error) {
             throw error;
         }
+    },
+
+    async getRole(user_id) {
+        try {
+            const data = await db.sequelize.query("SELECT roles.name AS role FROM users INNER JOIN roles ON roles.id = users.role_id WHERE users.id = " + user_id, {
+                type: db.sequelize.QueryTypes.SELECT,
+            });
+
+            console.log("getRole -> data", data)
+
+            if (data) {
+                return data[0].role
+            }
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

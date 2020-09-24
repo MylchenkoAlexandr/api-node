@@ -1,6 +1,7 @@
 const LeadService = require('../services/lead.service');
 const AgentService = require('../services/agent.service');
 const LeadRepository = require('../repository/LeadRepository');
+const AgentRepository = require('../repository/agent.repository');
 const RecordsRepository = require('../repository/RecordsRepository');
 const models = require('../../database/models');
 const FormatService = require('../services/format.service')
@@ -11,21 +12,24 @@ module.exports = server => {
 
     io.on('connection', socket => {
 
-        socket.on("connected", user => {
+        socket.on("connected", async user => {
             users[socket.id] = user;
             console.log('User connected!', users[socket.id].email);
 
-            if (!user.states) {         
+            const role = await AgentRepository.getRole(user.id);
+
+            console.log("role", role)
+
+            if (role == 'admin') {
                 //    if (user.states) {
                 //     for (let index = 0; index < user.states.length; index++) {
                 //         socket.join(user.states[index]);
                 //     }
                 // } else {
-                socket.join("all_states");
+                socket.join("all_leads");
+            } else if (role == 'agent') {
+                socket.join(user.id);
             }
-
-            // TODO create room for user_id
-            socket.join(user.id);
         });
 
         socket.on("process-lead", async (lead) => {
@@ -64,10 +68,16 @@ module.exports = server => {
 
                         if (uploadedLead) {
                             io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
-                            io.sockets.to("all_states").to(uploadedLead.state).emit("UPDATE_LEADS", uploadedLead);
+                            io.sockets.to("all_leads").to(uploadedLead.user_id).emit("UPDATE_LEADS", uploadedLead);
+
+
+                            // if(uploadedLead.user_id != user.id){
+                            // io.sockets.to(uploadedLead.id).emit("DELETE_LEAD", uploadedLead);
+                            // }
 
                             if (emptyStatus) {
-                                io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
+                                io.sockets.to("all_leads").emit("CREATE_LEAD", uploadedLead);
+                                // io.sockets.emit("RAW_LEAD_DELETE", uploadedLead);
                                 // TODO Write emit for removing raw lead from table
                             }
                         }
@@ -79,10 +89,12 @@ module.exports = server => {
                         if (uploadedLead.empty == 0) {
                             if (uploadedLead.user_id) {
                                 io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
-                            } else {
-                                // io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
-                                io.sockets.to("all_states").emit("CREATE_LEAD", uploadedLead);
                             }
+
+                            //  else {
+                            // io.sockets.to("all_leads").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
+                            // }
+                            io.sockets.to("all_leads").emit("CREATE_LEAD", uploadedLead);
                         }
 
                         if (uploadedLead.empty == 1) {

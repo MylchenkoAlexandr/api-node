@@ -11,7 +11,8 @@ async function test(req, res) {
 
 async function getLeads(req, res) {
     try {
-        const leads = await LeadService.getAll(req.body.type, req.body.states);
+        const leads = await LeadService.getAll(req.body.type, req.body.user_id);
+
         return res.status(200).json({
             status: "success",
             message: "All leads sending",
@@ -79,16 +80,16 @@ async function getCompaniesListByLeadData(req, res) {
         const companies = await quotes.getCompaniesInfo();
 
         if ("email" in rawLead) {
-            const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
-
-            const mail_options = {
-                from: process.env.MAIL_SERVICE_USER_EMAIL,
-                to: rawLead.email,
-                subject: "Blueberry Insurance",
-                html
-            };
-
-            MailService.send(mail_options);
+                const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
+    
+                const mail_options = {
+                    from: process.env.MAIL_SERVICE_USER_EMAIL,
+                    to: rawLead.email,
+                    subject: "Blueberry Insurance",
+                    html
+                };
+    
+                MailService.send(mail_options);
         }
 
         return res.status(200).json(companies);

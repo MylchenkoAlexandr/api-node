@@ -3,6 +3,7 @@ const NinjaQuoterService = require('./NinjaQuoterService');
 const FormatService = require('./format.service');
 const PriceService = require('./price.service');
 const LeadRepository = require('../repository/LeadRepository');
+const AgentRepository = require('../repository/agent.repository');
 
 class LeadService {
     /**
@@ -151,11 +152,23 @@ class LeadService {
      * @param {string} type
      * @param {string} states
     */
-    async getAll(type, states) {
+    async getAll(type, user_id) {
         try {
-            const leads = await LeadRepository.getAll(type, states);
+            let leads;
 
-            return leads;
+            const role = await AgentRepository.getRole(user_id);
+
+            if (role) {
+                if (role == 'admin') {
+                    leads = await LeadRepository.getAll(type);
+                } else if (role == 'agent') {
+                    leads = await LeadRepository.getByUserId(type, user_id);
+                }
+            }
+
+            if (leads) {
+                return leads;
+            }
         } catch (error) {
             throw error;
         }
