@@ -113,9 +113,11 @@ class FormatService {
 
                 delete lead.agent;
             } else if ("state_id" in formatedLead) {
-                const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
-                if (suitableAgent) {
-                    formatedLead.user_id = suitableAgent;
+                if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
+                    const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
+                    if (suitableAgent) {
+                        formatedLead.user_id = suitableAgent;
+                    }
                 }
             }
 

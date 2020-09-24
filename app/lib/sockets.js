@@ -15,11 +15,12 @@ module.exports = server => {
             users[socket.id] = user;
             console.log('User connected!', users[socket.id].email);
 
-            if (user.states) {
-                for (let index = 0; index < user.states.length; index++) {
-                    socket.join(user.states[index]);
-                }
-            } else {
+            if (!user.states) {         
+                //    if (user.states) {
+                //     for (let index = 0; index < user.states.length; index++) {
+                //         socket.join(user.states[index]);
+                //     }
+                // } else {
                 socket.join("all_states");
             }
 
@@ -77,9 +78,10 @@ module.exports = server => {
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
                             if (uploadedLead.user_id) {
-                                io.sockets.to("all_states").to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
+                                io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
                             } else {
-                                io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
+                                // io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
+                                io.sockets.to("all_states").emit("CREATE_LEAD", uploadedLead);
                             }
                         }
 
