@@ -136,8 +136,7 @@ async function uploadLeadFromUrl(req, res) {
         }
 
         client.emit("process-lead", rawLead);
-
-        // client.emit('raw-leads', [processedLead.id]);
+        
         return res.status(400).json({
             status: 'success',
             message: 'Lead Uploaded'
