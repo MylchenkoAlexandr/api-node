@@ -24,6 +24,7 @@ module.exports = server => {
             }
 
             // TODO create room for user_id
+            socket.join(user.id);
         });
 
         socket.on("process-lead", async (lead) => {
@@ -75,7 +76,11 @@ module.exports = server => {
 
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
-                            io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
+                            if (uploadedLead.user_id) {
+                                io.sockets.to("all_states").to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
+                            } else {
+                                io.sockets.to("all_states").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
+                            }
                         }
 
                         if (uploadedLead.empty == 1) {
@@ -83,49 +88,10 @@ module.exports = server => {
                         }
                     }
                 }
-
-                // if (lead_exist) {
-                //     const candidate_lead = await updateLead(lead_exist, lead, "ninjaQuoter", agent);
-
-                //     if (candidate_lead) {
-                //         const res_lead = await LeadRepository.getOne(candidate_lead.id);
-
-                //         if (res_lead) {
-                //             io.sockets.to(res_lead.id).emit("UPDATE_LEAD", res_lead);
-                //             io.sockets.to("all_states").to(res_lead.property.state).emit("UPDATE_LEADS", res_lead);
-                //         }
-
-                //         if (emptyStatus) {
-                //             io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
-                //         }
-                //     }
-                // } else {
-                //     const candidate_lead = await createLead(lead, "ninjaQuoter", agent);
-
-                //     if (candidate_lead) {
-                //         const res_lead = await LeadRepository.getOne(candidate_lead.id);
-
-                //         if (res_lead) {
-                //             io.sockets.to("all_states").to(res_lead.property.state).emit("CREATE_LEAD", res_lead);
-                //         }
-                //     }
-                // }
             } catch (err) {
                 throw err;
             }
         });
-
-        // socket.on('raw-leads', async (idArray) => {
-        //     try {
-        //         const rawLeads = await LeadRepository.getLatest(idArray);
-
-        //         if (rawLeads)
-        //             io.sockets.emit("RAW_LEAD_ADD", rawLeads);
-
-        //     } catch (error) {
-        //         console.log(error);
-        //     }
-        // });
 
         socket.on("busy-lead", lead_id => {
             socket.join(lead_id, async () => {

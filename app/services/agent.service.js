@@ -117,7 +117,6 @@ class AgentService {
                             state_id: stateId.id
                         });
                     }
-
                 });
 
                 return { code: 200, status: "success", message: 'Agent updated' };
