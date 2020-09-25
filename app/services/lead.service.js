@@ -198,6 +198,32 @@ class LeadService {
             throw error;
         }
     }
+
+    /** 
+     * Function for get all blueberry leads
+    */
+    async blueberryLeads() {
+        try {
+            const leads = await LeadRepository.getLeadsBySource(1);
+
+            return leads;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /** 
+     * Function for get all MediaAlpha leads
+    */
+    async mediaAlphaLeads() {
+        try {
+            const leads = await LeadRepository.getLeadsBySource(2);
+
+            return leads;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new LeadService;

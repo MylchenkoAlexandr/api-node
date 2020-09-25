@@ -137,7 +137,7 @@ async function uploadLeadFromUrl(req, res) {
         }
 
         client.emit("process-lead", rawLead);
-        
+
         return res.status(400).json({
             status: 'success',
             message: 'Lead Uploaded'
@@ -179,6 +179,40 @@ async function uploadLeadFromMediaAlpha(req, res) {
 
 }
 
+async function getBlueberryLeads(req, res) {
+    try {
+        const leads = await LeadService.blueberryLeads();
+        return res.status(200).json({
+            status: "success",
+            message: "All leads sending",
+            leads
+        });
+    } catch (err) {
+        res.status(400).json({
+            status: 'error',
+            message: "Server Error!"
+        });
+        throw err;
+    }
+}
+
+async function getMediaAlphaLeads(req, res) {
+    try {
+        const leads = await LeadService.mediaAlphaLeads();
+        return res.status(200).json({
+            status: "success",
+            message: "All leads sending",
+            leads
+        });
+    } catch (err) {
+        res.status(400).json({
+            status: 'error',
+            message: "Server Error!"
+        });
+        throw err;
+    }
+}
+
 module.exports = {
     test,
     getLead,
@@ -186,5 +220,7 @@ module.exports = {
     getRawLeads,
     getCompaniesListByLeadData,
     uploadLeadFromMediaAlpha,
-    uploadLeadFromUrl
+    uploadLeadFromUrl,
+    getBlueberryLeads,
+    getMediaAlphaLeads
 }   
