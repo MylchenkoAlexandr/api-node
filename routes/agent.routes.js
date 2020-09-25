@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const { authenticateToken, checkedAdminRole } = require('../app/middleware/auth.middleware');
-const { getAgents, createAgent, updateAgent, deleteAgent, updateAgentPassword } = require('../app/controller/agent.controller');
+const { getAgents, getSuitableAgents, createAgent, updateAgent, deleteAgent, updateAgentPassword } = require('../app/controller/agent.controller');
 
 router.get('/', authenticateToken, checkedAdminRole, getAgents);
+router.post('/suitable', authenticateToken, checkedAdminRole, getSuitableAgents);
 router.post('/create', authenticateToken, checkedAdminRole, createAgent);
 router.post('/update/:agent_id', authenticateToken, checkedAdminRole, updateAgent);
 router.delete('/delete/:agent_id', authenticateToken, checkedAdminRole, deleteAgent);
