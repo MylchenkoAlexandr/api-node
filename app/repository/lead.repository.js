@@ -48,17 +48,17 @@ const LeadRepository = {
 
             if (data) {
                 let lead = data[0];
-                
+
                 lead.property = JSON.parse(lead.property);
 
                 lead.price = JSON.parse(lead.price);
-                
+
                 lead = { ...lead, ...lead.property };
-                
+
                 lead.created = this.formatDate(lead.created, true);
-                
+
                 delete lead.property;
-                
+
                 return resolve(lead);
             }
         });
@@ -122,7 +122,7 @@ const LeadRepository = {
             }).catch(e => {
                 console.error(e);
             });
-            
+
             console.log("getByUserId -> data", data);
 
             data = data.map(lead => {
@@ -186,6 +186,19 @@ const LeadRepository = {
             });
 
             return data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async getAssignUserID(lead_id) {
+        try {
+            const data = await db.sequelize.query('SELECT leads.user_id FROM leads WHERE leads.id = ' + lead_id, {
+                type: db.sequelize.QueryTypes.SELECT,
+                plain: true
+            });
+
+            return data.user_id;
         } catch (error) {
             throw error;
         }

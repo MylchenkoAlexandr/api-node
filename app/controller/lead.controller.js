@@ -1,7 +1,7 @@
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const FormatService = require('../services/format.service');
 const LeadService = require('../services/lead.service');
-const NinjaQuoterService = require('../services/NinjaQuoterService');
+const NinjaQuoterService = require('../services/ninja-quoter.service');
 const MailService = require('../services/mail.service');
 
 async function test(req, res) {
@@ -44,7 +44,7 @@ async function getRawLeads(req, res) {
 
 async function getLead(req, res) {
     try {
-        const lead = await LeadService.getOne(req.params.lead_id);
+        const lead = await LeadService.getOne(req.body.lead_id);
         return res.status(200).json({
             status: "success",
             lead

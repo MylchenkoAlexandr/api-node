@@ -1,5 +1,5 @@
 const models = require('../../database/models');
-const BeneficiaryRepository = require('../repository/BeneficiaryRepository');
+const BeneficiaryRepository = require('../repository/beneficiary.repository');
 
 class BeneficiaryService {
 
