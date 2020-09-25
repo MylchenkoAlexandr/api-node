@@ -1,5 +1,5 @@
 const models = require('../../database/models');
-const NinjaQuoterService = require('./NinjaQuoterService');
+const NinjaQuoterService = require('./ninja-quoter.service');
 const FormatService = require('./format.service');
 const PriceService = require('./price.service');
 const LeadRepository = require('../repository/lead.repository');
@@ -250,6 +250,23 @@ class LeadService {
             }
         } catch (err) {
             throw err;
+        }
+    }
+
+    async agentIsAssigned(lead_id, user_id) {
+        try {
+            const assign_user_id = await LeadRepository.getAssignUserID(lead_id);
+            const agent_role = await AgentRepository.getRole(user_id);
+
+            if (agent_role === 'admin') {
+                return true;
+            }
+            else if (assign_user_id == user_id) {
+                return true;
+            }
+            return false;
+        } catch (error) {
+            throw error;
         }
     }
 }

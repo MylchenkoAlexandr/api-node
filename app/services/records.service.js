@@ -1,4 +1,4 @@
-const RecordsRepository = require('../repository/RecordsRepository');
+const RecordsRepository = require('../repository/records.repository');
 const models = require('../../database/models/index');
 
 class RecordsService {

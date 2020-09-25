@@ -1,5 +1,5 @@
 const models = require('../../database/models');
-const NotesRepository = require('../repository/NotesRepository');
+const NotesRepository = require('../repository/notes.repository');
 
 class NotesService {
     async getAll(lead_id) {

@@ -21,7 +21,7 @@ const authenticateToken = (req, res, next) => {
 
       next();
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   });
 };
@@ -43,7 +43,7 @@ const checkBannedAccount = async (req, res, next) => {
       status: 'error',
       message: "Server error"
     });
-    throw new Error(error);
+    throw error;
   }
 }
 
@@ -67,7 +67,7 @@ const checkedAdminRole = async (req, res, next) => {
 
       next();
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   });
 }
