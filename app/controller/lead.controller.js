@@ -3,10 +3,22 @@ const FormatService = require('../services/format.service');
 const LeadService = require('../services/lead.service');
 const NinjaQuoterService = require('../services/NinjaQuoterService');
 const MailService = require('../services/mail.service');
+const LeadRepository = require('../repository/LeadRepository');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
     return res.status(200).send(lead);
+}
+
+async asugnNewAgent(req, res){
+    let user_id = res.body.user_id,
+        lead_id = res.body.lead_id;
+
+    try {
+        const updatedLead = await LeadRepositor
+    } catch (error) {
+        throw error;
+    }
 }
 
 async function getLeads(req, res) {

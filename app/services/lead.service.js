@@ -224,6 +224,23 @@ class LeadService {
             throw error;
         }
     }
+
+    /**
+     * Asign agent
+     * @param {number} lead_id 
+     * @param {number} user_id 
+     */
+    async asignAgent(lead_id, user_id) {
+        let updatedLead = models.Leads.update({
+            user_id: user_id
+        }, {
+            where: {
+                id: lead_id
+            }
+        });
+
+        return LeadRepository.getOne(updatedLead.id);
+    }
 }
 
 module.exports = new LeadService;
