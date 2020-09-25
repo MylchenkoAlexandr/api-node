@@ -79,18 +79,22 @@ module.exports = server => {
                         uploadedLead = await LeadService.updateLead(exist, formatedLead, quoter);
 
                         if (uploadedLead) {
+
+                            for (user in users) {
+                                if (users[user].id != uploadedLead.user_id) {
+                                    io.sockets.to(users[user].id).emit("DELETE_LEAD", uploadedLead.id);
+                                } else {
+                                    io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
+                                }
+                            }
+
                             io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
                             io.sockets.to(uploadedLead.user_id).emit("UPDATE_LEADS", uploadedLead);
 
-                            // if(uploadedLead.user_id != user.id){
-                            //  io.sockets.to(uploadedLead.id).emit("DELETE_LEAD", uploadedLead);
-                            // }
-
                             if (emptyStatus) {
                                 io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
- 
+
                                 // io.sockets.emit("RAW_LEAD_DELETE", uploadedLead);
- 
                                 // TODO Write emit for removing raw lead from table
 
                                 if (uploadedLead.source === 'blueberry') {
@@ -99,7 +103,6 @@ module.exports = server => {
                                     io.sockets.to("media-alpha_leads").emit("CREATE_LEAD", uploadedLead);
                                 }
                             }
-
                         }
                     }
                 } else {
@@ -133,21 +136,30 @@ module.exports = server => {
             }
         });
 
-        socket.on("asign-agent", lead => {
+        socket.on("assign-agent", async (lead_id, user_id) => {
             try {
-                io.sockets.to(lead.id).emit("UPDATE_LEAD", lead);
-                io.sockets.to(lead.user_id).emit("UPDATE_LEADS", lead);
+                const updatedLead = await LeadService.assignAgent(lead_id, user_id);
 
-                if (lead.source === 'blueberry') {
-                    io.sockets.to("blueberry_leads").emit("CREATE_LEAD", lead);
+                io.sockets.to(updatedLead.id).emit("UPDATE_LEAD", updatedLead);
+                io.sockets.to(updatedLead.user_id).emit("UPDATE_LEADS", updatedLead);
 
-                } else if (lead.source === 'mediaalpha') {
-                    io.sockets.to("media-alpha_leads").emit("CREATE_LEAD", lead);
+                for (user in users) {
+                    if (users[user].id != updatedLead.user_id) {
+                        io.sockets.to(users[user].id).emit("DELETE_LEAD", updatedLead.id);
+                    } else {
+                        io.sockets.to(updatedLead.user_id).emit("CREATE_LEAD", updatedLead);
+                    }
+                }
+
+                if (updatedLead.source === 'blueberry') {
+                    io.sockets.to("blueberry_leads").emit("UPDATE_LEADS", updatedLead);
+                } else if (updatedLead.source === 'mediaalpha') {
+                    io.sockets.to("media-alpha_leads").emit("UPDATE_LEADS", updatedLead);
                 }
             } catch (err) {
                 throw err;
             }
-        })
+        });
 
         socket.on("busy-lead", lead_id => {
             socket.join(lead_id, async () => {

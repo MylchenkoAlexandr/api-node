@@ -181,7 +181,7 @@ class LeadService {
     async getOne(lead_id) {
         try {
             const lead = await LeadRepository.getOne(lead_id);
-            
+
             return lead;
         } catch (error) {
             throw error;
@@ -227,20 +227,30 @@ class LeadService {
     }
 
     /**
-     * Asign agent
+     * Assign agent
      * @param {number} lead_id 
      * @param {number} user_id 
      */
-    async asignAgent(lead_id, user_id) {
-        let updatedLead = models.Leads.update({
-            user_id: user_id
-        }, {
-            where: {
-                id: lead_id
-            }
-        });
+    async assignAgent(lead_id, user_id) {
+        try {
+            let lead = await models.Leads.findOne({
+                where: {
+                    id: lead_id
+                }
+            });
 
-        return LeadRepository.getOne(updatedLead.id);
+            if (lead) {
+                let updatedLead = await lead.update({
+                    user_id: user_id
+                });
+
+                if (updatedLead) {
+                    return await LeadRepository.getOne(updatedLead.id);
+                }
+            }
+        } catch (err) {
+            throw err;
+        }
     }
 }
 

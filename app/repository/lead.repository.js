@@ -123,8 +123,6 @@ const LeadRepository = {
                 console.error(e);
             });
             
-            console.log("getByUserId -> data", data);
-
             data = data.map(lead => {
                 lead.property = JSON.parse(lead.property);
                 lead.price = JSON.parse(lead.price);

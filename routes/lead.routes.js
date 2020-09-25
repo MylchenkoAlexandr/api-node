@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { authenticateToken, checkedAdminRole } = require('../app/middleware/auth.middleware');
-const { test, getLeads, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRawLeads, uploadLeadFromUrl, getBlueberryLeads, getMediaAlphaLeads } = require('../app/controller/lead.controller');
+const { test, getLeads, assignNewAgent, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRawLeads, uploadLeadFromUrl, getBlueberryLeads, getMediaAlphaLeads } = require('../app/controller/lead.controller');
 const { uploadCSV } = require('../app/controller/upload.controller');
 
 router.post('/test', test);
