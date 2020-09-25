@@ -104,7 +104,8 @@ async function getAgents(req, res) {
 
 async function getSuitableAgents(req, res) {
     try {
-        const agents = await AgentService.getAll(req.body.state_id);
+        console.log("getSuitableAgents -> req.body", req.body)
+        const agents = await AgentService.getAllSuitable(req.body.state_id);
 
         res.status(200).json(agents);
     } catch (err) {
