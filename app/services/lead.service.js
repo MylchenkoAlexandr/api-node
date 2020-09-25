@@ -2,7 +2,7 @@ const models = require('../../database/models');
 const NinjaQuoterService = require('./NinjaQuoterService');
 const FormatService = require('./format.service');
 const PriceService = require('./price.service');
-const LeadRepository = require('../repository/LeadRepository');
+const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 
 class LeadService {

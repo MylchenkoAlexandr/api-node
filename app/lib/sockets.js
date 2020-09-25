@@ -1,6 +1,6 @@
 const LeadService = require('../services/lead.service');
 const AgentService = require('../services/agent.service');
-const LeadRepository = require('../repository/LeadRepository');
+const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 const RecordsRepository = require('../repository/RecordsRepository');
 const models = require('../../database/models');

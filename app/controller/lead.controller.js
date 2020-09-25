@@ -3,22 +3,10 @@ const FormatService = require('../services/format.service');
 const LeadService = require('../services/lead.service');
 const NinjaQuoterService = require('../services/NinjaQuoterService');
 const MailService = require('../services/mail.service');
-const LeadRepository = require('../repository/LeadRepository');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
     return res.status(200).send(lead);
-}
-
-async asugnNewAgent(req, res){
-    let user_id = res.body.user_id,
-        lead_id = res.body.lead_id;
-
-    try {
-        const updatedLead = await LeadRepositor
-    } catch (error) {
-        throw error;
-    }
 }
 
 async function getLeads(req, res) {
@@ -27,7 +15,6 @@ async function getLeads(req, res) {
 
         return res.status(200).json({
             status: "success",
-            message: "All leads sending",
             leads
         });
     } catch (err) {
@@ -44,7 +31,6 @@ async function getRawLeads(req, res) {
         const rowLeads = await LeadService.getRawLeads();
         return res.status(200).json({
             status: "success",
-            message: "All empty leads sending",
             rowLeads
         });
     } catch (err) {
@@ -61,7 +47,6 @@ async function getLead(req, res) {
         const lead = await LeadService.getOne(req.params.lead_id);
         return res.status(200).json({
             status: "success",
-            message: "Lead sending",
             lead
         });
     } catch (err) {
@@ -91,22 +76,22 @@ async function getCompaniesListByLeadData(req, res) {
 
         const companies = await quotes.getCompaniesInfo();
 
-        try {
-            if ("email" in rawLead) {
-                    const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
-        
-                    const mail_options = {
-                        from: process.env.MAIL_SERVICE_USER_EMAIL,
-                        to: rawLead.email,
-                        subject: "Blueberry Insurance",
-                        html
-                    };
-        
-                    MailService.send(mail_options);
-            }
-        } catch (err) {
-            throw err;
-        }
+        // try {
+        //     if ("email" in rawLead) {
+        //         const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
+
+        //         const mail_options = {
+        //             from: process.env.MAIL_SERVICE_USER_EMAIL,
+        //             to: rawLead.email,
+        //             subject: "Blueberry Insurance",
+        //             html
+        //         };
+
+        //         MailService.send(mail_options);
+        //     }
+        // } catch (err) {
+        //     throw err;
+        // }
 
         return res.status(200).json(companies);
     } catch (err) {
@@ -200,7 +185,6 @@ async function getBlueberryLeads(req, res) {
         const leads = await LeadService.blueberryLeads();
         return res.status(200).json({
             status: "success",
-            message: "All leads sending",
             leads
         });
     } catch (err) {
@@ -217,7 +201,6 @@ async function getMediaAlphaLeads(req, res) {
         const leads = await LeadService.mediaAlphaLeads();
         return res.status(200).json({
             status: "success",
-            message: "All leads sending",
             leads
         });
     } catch (err) {
