@@ -76,6 +76,14 @@ class FormatService {
                 type_id: type.id,
             }
 
+            if ("state_id" in lead) {
+                formatedLead.state_id = lead.state_id;
+
+                if (formatedLead.state_id) {
+                    delete lead.state_id;
+                }
+            }
+
             if ("email" in lead) {
                 formatedLead.email = lead.email;
                 delete lead.email;
