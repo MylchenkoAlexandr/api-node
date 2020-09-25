@@ -32,6 +32,18 @@ module.exports = server => {
             }
         });
 
+        socket.on("join_blueberry_leads", () => {
+            console.log('user connected to blueberry_leads -> user:', users[socket.id].email);
+            socket.join("blueberry_leads");
+            socket.leave("media-alpha_leads");
+        });
+
+        socket.on("join_media-alpha_leads", () => {
+            console.log('user connected to media=alpha_leads -> user:', users[socket.id].email);
+            socket.join("media-alpha_leads");
+            socket.leave("blueberry_leads");
+        });
+
         socket.on("process-lead", async (lead) => {
             try {
                 // const account_banned = await AgentService.checkedBan(users[socket.id].email);
@@ -67,8 +79,9 @@ module.exports = server => {
                         uploadedLead = await LeadService.updateLead(exist, formatedLead, quoter);
 
                         if (uploadedLead) {
+                            console.log("uploadedLead", uploadedLead)
                             io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
-                            io.sockets.to("all_leads").to(uploadedLead.user_id).emit("UPDATE_LEADS", uploadedLead);
+                            io.sockets.to(uploadedLead.user_id).emit("UPDATE_LEADS", uploadedLead);
 
 
                             // if(uploadedLead.user_id != user.id){
@@ -76,9 +89,15 @@ module.exports = server => {
                             // }
 
                             if (emptyStatus) {
-                                io.sockets.to("all_leads").emit("CREATE_LEAD", uploadedLead);
+                                io.sockets.to("blueberry_leads").emit("CREATE_LEAD", uploadedLead);
                                 // io.sockets.emit("RAW_LEAD_DELETE", uploadedLead);
                                 // TODO Write emit for removing raw lead from table
+                            } else if (uploadedLead.source === 'blueberry') {
+                                io.sockets.to("blueberry_leads").emit("CREATE_LEAD", uploadedLead);
+
+                            } else if (uploadedLead.source === 'mediaalpha') {
+                                io.sockets.to("media-alpha_leads").emit("CREATE_LEAD", uploadedLead);
+
                             }
                         }
                     }
@@ -94,7 +113,13 @@ module.exports = server => {
                             //  else {
                             // io.sockets.to("all_leads").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
                             // }
-                            io.sockets.to("all_leads").emit("CREATE_LEAD", uploadedLead);
+                            if (uploadedLead.source === 'blueberry') {
+                                io.sockets.to("blueberry_leads").emit("CREATE_LEAD", uploadedLead);
+
+                            } else if (uploadedLead.source === 'mediaalpha') {
+                                io.sockets.to("media-alpha_leads").emit("CREATE_LEAD", uploadedLead);
+
+                            }
                         }
 
                         if (uploadedLead.empty == 1) {

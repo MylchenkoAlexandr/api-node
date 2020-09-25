@@ -7,8 +7,6 @@ const AgentRepository = {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
-            console.log("getAgentWithSmallestCountLeads -> data[0].id", data[0].id)
-
             if (data[0]) {
                 return data[0].id;
             } else {
@@ -25,9 +23,7 @@ const AgentRepository = {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
-            console.log("getRole -> data", data)
-
-            if (data) {
+            if (data[0]) {
                 return data[0].role
             }
         } catch (error) {
