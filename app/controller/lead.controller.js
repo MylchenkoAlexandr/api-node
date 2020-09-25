@@ -79,18 +79,18 @@ async function getCompaniesListByLeadData(req, res) {
 
         const companies = await quotes.getCompaniesInfo();
 
-        if ("email" in rawLead) {
-                const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
+        // if ("email" in rawLead) {
+        //         const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
     
-                const mail_options = {
-                    from: process.env.MAIL_SERVICE_USER_EMAIL,
-                    to: rawLead.email,
-                    subject: "Blueberry Insurance",
-                    html
-                };
+        //         const mail_options = {
+        //             from: process.env.MAIL_SERVICE_USER_EMAIL,
+        //             to: rawLead.email,
+        //             subject: "Blueberry Insurance",
+        //             html
+        //         };
     
-                MailService.send(mail_options);
-        }
+        //         MailService.send(mail_options);
+        // }
 
         return res.status(200).json(companies);
     } catch (err) {
