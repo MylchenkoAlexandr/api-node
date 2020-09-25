@@ -149,15 +149,10 @@ class AgentService {
     }
 
     async getAllSuitable(state_id) {
-        console.log("AgentService -> getAllSuitable -> state_id", state_id)
         try {
             const agents = await AgentRepository.getAgentByState(state_id);
 
-            console.log("AgentService -> getAllSuitable -> agents", agents);
-            
-            if (agents) {
-                return agents;
-            }
+            return agents;
         } catch (error) {
             throw error;
         }

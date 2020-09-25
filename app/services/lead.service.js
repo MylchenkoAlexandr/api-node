@@ -181,6 +181,7 @@ class LeadService {
     async getOne(lead_id) {
         try {
             const lead = await LeadRepository.getOne(lead_id);
+            
             return lead;
         } catch (error) {
             throw error;
