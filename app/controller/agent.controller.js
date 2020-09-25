@@ -102,10 +102,26 @@ async function getAgents(req, res) {
     }
 }
 
+async function getSuitableAgents(req, res) {
+    try {
+        console.log("getSuitableAgents -> req.body", req.body)
+        const agents = await AgentService.getAllSuitable(req.body.state_id);
+
+        res.status(200).json(agents);
+    } catch (err) {
+        res.status(400).json({
+            status: "error",
+            message: "Server error"
+        });
+        throw err;
+    }
+}
+
 module.exports = {
     getAgents,
     createAgent,
     updateAgent,
     deleteAgent,
+    getSuitableAgents,
     updateAgentPassword
 }

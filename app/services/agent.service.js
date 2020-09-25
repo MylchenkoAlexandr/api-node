@@ -1,6 +1,7 @@
 const models = require('../../database/models');
 const bcrypt = require('bcrypt');
 const StatesRepository = require('../repository/states.repository');
+const AgentRepository = require('../repository/agent.repository');
 class AgentService {
     async create(agent) {
         try {
@@ -140,6 +141,21 @@ class AgentService {
                     agent.dataValues.states = JSON.parse(agent.dataValues.states);
                 });
 
+                return agents;
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getAllSuitable(state_id) {
+        console.log("AgentService -> getAllSuitable -> state_id", state_id)
+        try {
+            const agents = await AgentRepository.getAgentByState(state_id);
+
+            console.log("AgentService -> getAllSuitable -> agents", agents);
+            
+            if (agents) {
                 return agents;
             }
         } catch (error) {
