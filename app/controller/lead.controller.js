@@ -9,6 +9,20 @@ async function test(req, res) {
     return res.status(200).send(lead);
 }
 
+async function asignNewAgent(req, res) {
+    let user_id = res.body.user_id,
+        lead_id = res.body.lead_id;
+
+    try {
+        const updatedLead = await LeadRepository.asignAgent(lead_id, user_id);
+        
+
+        client
+    } catch (error) {
+        throw error;
+    }
+}
+
 async function getLeads(req, res) {
     try {
         const leads = await LeadService.getAll(req.body.type, req.body.user_id);
@@ -217,6 +231,7 @@ module.exports = {
     getLead,
     getLeads,
     getRawLeads,
+    asignNewAgent,
     getCompaniesListByLeadData,
     uploadLeadFromMediaAlpha,
     uploadLeadFromUrl,
