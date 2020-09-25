@@ -11,7 +11,7 @@ const AgentRepository = {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
-            if (data) {
+            if (data[0]) {
                 return data[0].id;
             } else {
                 return null;
@@ -31,7 +31,7 @@ const AgentRepository = {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
-            if (data) {
+            if (data[0]) {
                 return data[0].role
             }
         } catch (error) {
