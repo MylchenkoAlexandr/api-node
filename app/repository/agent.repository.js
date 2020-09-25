@@ -40,16 +40,12 @@ const AgentRepository = {
     },
 
     async getAgentByState(state_id) {
-        console.log("getAgentByState -> state_id", state_id)
         try {
             const data = await db.sequelize.query("SELECT users.email, users.id FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = " + state_id, {
                 type: db.sequelize.QueryTypes.SELECT
             })
 
-            // if (data) {
-            //     console.log("getAgentByState -> data", data)
-            //     return data;
-            // }
+            return data;
         } catch (error) {
             throw error;
         }

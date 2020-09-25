@@ -48,17 +48,17 @@ const LeadRepository = {
 
             if (data) {
                 let lead = data[0];
-
+                
                 lead.property = JSON.parse(lead.property);
 
                 lead.price = JSON.parse(lead.price);
-
+                
                 lead = { ...lead, ...lead.property };
-
+                
                 lead.created = this.formatDate(lead.created, true);
-
+                
                 delete lead.property;
-
+                
                 return resolve(lead);
             }
         });
