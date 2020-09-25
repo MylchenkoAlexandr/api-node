@@ -10,12 +10,15 @@ async function test(req, res) {
     return res.status(200).send(lead);
 }
 
-async asugnNewAgent(req, res){
+async function asignNewAgent(req, res) {
     let user_id = res.body.user_id,
         lead_id = res.body.lead_id;
 
     try {
-        const updatedLead = await LeadRepositor
+        const updatedLead = await LeadRepository.asignAgent(lead_id, user_id);
+        
+
+        client
     } catch (error) {
         throw error;
     }
@@ -93,16 +96,16 @@ async function getCompaniesListByLeadData(req, res) {
 
         try {
             if ("email" in rawLead) {
-                    const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
-        
-                    const mail_options = {
-                        from: process.env.MAIL_SERVICE_USER_EMAIL,
-                        to: rawLead.email,
-                        subject: "Blueberry Insurance",
-                        html
-                    };
-        
-                    MailService.send(mail_options);
+                const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
+
+                const mail_options = {
+                    from: process.env.MAIL_SERVICE_USER_EMAIL,
+                    to: rawLead.email,
+                    subject: "Blueberry Insurance",
+                    html
+                };
+
+                MailService.send(mail_options);
             }
         } catch (err) {
             throw err;
