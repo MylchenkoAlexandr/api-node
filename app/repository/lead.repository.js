@@ -136,7 +136,6 @@ const LeadRepository = {
 
             return resolve(data);
         });
-        return null
     },
 
     // getLatest(latestId) {
