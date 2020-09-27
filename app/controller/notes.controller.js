@@ -4,11 +4,7 @@ async function getNotes(req, res) {
     try {
         const notes = await NotesService.getAll(req.body.lead_id);
 
-        return res.status(200).json({
-            status: 'success',
-            message: 'All notes',
-            notes
-        });
+        return res.status(200).json({ status: 'success', message: 'All notes', notes });
     } catch (err) {
         res.status(400).json({ status: 'error', message: 'Server Error!' });
         throw err;
@@ -37,7 +33,6 @@ async function deleteNote(req, res) {
         res.status(400).json({ status: 'error', message: 'Server Error!' });
         throw err;
     }
-
 }
 
 module.exports = {

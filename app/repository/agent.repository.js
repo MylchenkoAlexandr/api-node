@@ -39,6 +39,10 @@ const AgentRepository = {
         }
     },
 
+    /**
+     * Find an agent by state
+     * @param {number} state_id 
+     */
     async getAgentByState(state_id) {
         try {
             const data = await db.sequelize.query("SELECT users.email, users.id FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = " + state_id, {

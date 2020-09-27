@@ -172,80 +172,34 @@ class FormatService {
             }
 
             let medications = [];
+            const key_med = 'major_condition_';
 
             Object.keys(lead).forEach(key => {
-                if (key.includes("major_condition_")) {
 
-                    if (key == "major_condition_aids_hiv" && lead[key]) {
-                        medications.push("1");
-                        delete lead[key];
-                    } else if (key == "major_condition_alcohol_drug_abuse" && lead[key]) {
-                        medications.push("2");
-                        delete lead[key];
-                    } else if (key == "major_condition_alzheimers_dementia" && lead[key]) {
-                        medications.push("3");
-                        delete lead[key];
-                    } else if (key == "major_condition_asthma" && lead[key]) {
-                        medications.push("4");
-                        delete lead[key];
-                    } else if (key == "major_condition_cancer" && lead[key]) {
-                        medications.push("5");
-                        delete lead[key];
-                    } else if (key == "major_condition_clinical_depression" && lead[key]) {
-                        medications.push("6");
-                        delete lead[key];
-                    } else if (key == "major_condition_diabetes" && lead[key]) {
-                        medications.push("7");
-                        delete lead[key];
-                    } else if (key == "major_condition_emphysema" && lead[key]) {
-                        medications.push("8");
-                        delete lead[key];
-                    } else if (key == "major_condition_epilepsy" && lead[key]) {
-                        medications.push("9");
-                        delete lead[key];
-                    } else if (key == "major_condition_heart_attack" && lead[key]) {
-                        medications.push("10");
-                        delete lead[key];
-                    } else if (key == "major_condition_heart_disease" && lead[key]) {
-                        medications.push("11");
-                        delete lead[key];
-                    } else if (key == "major_condition_hepatitis_liver" && lead[key]) {
-                        medications.push("12");
-                        delete lead[key];
-                    } else if (key == "major_condition_high_blood_pressure" && lead[key]) {
-                        medications.push("13");
-                        delete lead[key];
-                    } else if (key == "major_condition_high_cholesterol" && lead[key]) {
-                        medications.push("14");
-                        delete lead[key];
-                    } else if (key == "major_condition_high_kidney_disease" && lead[key]) {
-                        medications.push("15");
-                        delete lead[key];
-                    } else if (key == "major_condition_mental_illness" && lead[key]) {
-                        medications.push("16");
-                        delete lead[key];
-                    } else if (key == "major_condition_multiple_sclerosis" && lead[key]) {
-                        medications.push("17");
-                        delete lead[key];
-                    } else if (key == "major_condition_pulmonary_disease" && lead[key]) {
-                        medications.push("18");
-                        delete lead[key];
-                    } else if (key == "major_condition_stroke" && lead[key]) {
-                        medications.push("19");
-                        delete lead[key];
-                    } else if (key == "major_condition_ulcers" && lead[key]) {
-                        medications.push("20");
-                        delete lead[key];
-                    } else if (key == "major_condition_vascular_disease" && lead[key]) {
-                        medications.push("21");
-                        delete lead[key];
-                    } else if (key == "major_condition_other" && lead[key]) {
-                        medications.push("22");
-                        delete lead[key];
-                    } else {
-                        delete lead[key];
-                    }
-                }
+                if (key == `${key_med}aids_hiv`) medications.push("1");
+                if (key == `${key_med}alcohol_drug_abuse`) medications.push("2");
+                if (key == `${key_med}alzheimers_dementia`) medications.push("3");
+                if (key == `${key_med}asthma`) medications.push("4");
+                if (key == `${key_med}cancer`) medications.push("5");
+                if (key == `${key_med}clinical_depression`) medications.push("6");
+                if (key == `${key_med}diabetes`) medications.push("7");
+                if (key == `${key_med}emphysema`) medications.push("8");
+                if (key == `${key_med}epilepsy`) medications.push("9");
+                if (key == `${key_med}heart_attack`) medications.push("10");
+                if (key == `${key_med}heart_disease`) medications.push("11");
+                if (key == `${key_med}hepatitis_liver`) medications.push("12");
+                if (key == `${key_med}high_blood_pressure`) medications.push("13");
+                if (key == `${key_med}high_cholesterol`) medications.push("14");
+                if (key == `${key_med}high_kidney_disease`) medications.push("15");
+                if (key == `${key_med}mental_illness`) medications.push("16");
+                if (key == `${key_med}multiple_sclerosis`) medications.push("17");
+                if (key == `${key_med}pulmonary_disease`) medications.push("18");
+                if (key == `${key_med}stroke`) medications.push("19");
+                if (key == `${key_med}ulcers`) medications.push("20");
+                if (key == `${key_med}vascular_disease`) medications.push("21");
+                if (key == `${key_med}other`) medications.push("22");
+
+                if (key.includes(key_med)) delete lead[key];
             });
 
             if (medications.length > 0) {

@@ -3,6 +3,10 @@ const bcrypt = require('bcrypt');
 const StatesRepository = require('../repository/states.repository');
 const AgentRepository = require('../repository/agent.repository');
 class AgentService {
+    /**
+     * The function for create agent
+     * @param {Object} agent 
+     */
     async create(agent) {
         try {
             const user_exist = await models.Users.findOne({
@@ -54,6 +58,10 @@ class AgentService {
         }
     }
 
+    /**
+     * The function for update agent
+     * @param {Object} agent 
+     */
     async update(agent) {
         try {
             const agent_candidate = await models.Users.findOne({
@@ -129,6 +137,9 @@ class AgentService {
         }
     }
 
+    /**
+     * The function for getting all agents
+     */
     async getAll() {
         try {
             const agents = await models.Users.findAll({
@@ -148,6 +159,10 @@ class AgentService {
         }
     }
 
+    /**
+     * The function for getting agent by state
+     * @param {number} state_id 
+     */
     async getAllSuitable(state_id) {
         try {
             const agents = await AgentRepository.getAgentByState(state_id);
@@ -158,6 +173,10 @@ class AgentService {
         }
     }
 
+    /**
+     * The function for find agent by email
+     * @param {string} email 
+     */
     async find(email) {
         try {
             const user = await models.Users.findOne({
@@ -170,6 +189,10 @@ class AgentService {
         }
     }
 
+    /**
+     * The function for deleting agent by id
+     * @param {number} agent_id 
+     */
     async delete(agent_id) {
         try {
             const agent_candidate = await models.Users.findOne({
@@ -196,6 +219,12 @@ class AgentService {
         }
     }
 
+    /**
+     * The function for update agent password
+     * @param {string} old_password 
+     * @param {string} new_password 
+     * @param {number} agent_id 
+     */
     async updatePassword({ old_password, new_password }, agent_id) {
         try {
             const agent_candidate = await models.Users.findOne({
@@ -237,6 +266,10 @@ class AgentService {
         }
     }
 
+    /**
+     * The function for checking banned agent
+     * @param {string} email 
+     */
     async checkedBan(email) {
         try {
             const agent_candidate = await models.Users.findOne({
@@ -249,6 +282,10 @@ class AgentService {
         }
     }
 
+    /**
+     * The function for checking admin role
+     * @param {string} email 
+     */
     async checkAdmin(email) {
         try {
             const agent_candidate = await models.Users.findOne({

@@ -252,7 +252,10 @@ class LeadService {
             throw err;
         }
     }
-
+    /**
+     * @param {number} lead_id 
+     * @param {number} user_id 
+     */
     async agentIsAssigned(lead_id, user_id) {
         try {
             const assign_user_id = await LeadRepository.getAssignUserID(lead_id);

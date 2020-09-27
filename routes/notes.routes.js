@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { getNotes, createNote, deleteNote } = require('../app/controller/notes.controller');
-const { authenticateToken } = require('../app/middleware/auth.middleware');
+const AuthMiddleware = require('../app/middleware/auth.middleware');
+const authenticateToken = AuthMiddleware.authenticateToken;
 
 router.post('/get', authenticateToken, getNotes);
 router.post('/create', authenticateToken, createNote);

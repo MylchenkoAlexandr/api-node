@@ -9,15 +9,9 @@ async function createAgent(req, res) {
 
         const response = await AgentService.create(agent);
 
-        res.status(response.code).json({
-            status: response.status,
-            message: response.message
-        });
+        return res.status(response.code).json({ status: response.status, message: response.message });
     } catch (error) {
-        res.status(400).json({
-            status: "error",
-            message: "Server error!"
-        });
+        res.status(400).json({ status: "error", message: "Server error!" });
         throw error;
     }
 }
@@ -35,15 +29,9 @@ async function updateAgent(req, res) {
 
         const response = await AgentService.update(agent);
 
-        res.status(response.code).json({
-            status: response.status,
-            message: response.message
-        });
+        return res.status(response.code).json({ status: response.status, message: response.message });
     } catch (error) {
-        res.status(400).json({
-            status: "error",
-            message: 'Server error'
-        });
+        res.status(400).json({ status: "error", message: 'Server error' });
         throw error;
     }
 }
@@ -52,16 +40,9 @@ async function deleteAgent(req, res) {
     try {
         const response = await AgentService.delete(req.params.agent_id);
 
-        res.status(response.code).json({
-            status: response.status,
-            message: response.message
-        });
-
+        return res.status(response.code).json({ status: response.status, message: response.message });
     } catch (error) {
-        res.status(400).json({
-            status: "error",
-            message: "Server error"
-        });
+        res.status(400).json({ status: "error", message: "Server error" });
         throw error;
     }
 }
@@ -75,15 +56,9 @@ async function updateAgentPassword(req, res) {
     try {
         const response = await AgentService.updatePassword(passwords, req.params.agent_id);
 
-        res.status(response.code).json({
-            status: response.status,
-            message: response.message
-        });
+        return res.status(response.code).json({ status: response.status, message: response.message });
     } catch (error) {
-        res.status(400).json({
-            status: 'error',
-            message: "Server error!"
-        });
+        res.status(400).json({ status: 'error', message: "Server error!" });
         throw error;
     }
 }
@@ -94,10 +69,7 @@ async function getAgents(req, res) {
 
         res.status(200).json(agents);
     } catch (error) {
-        res.status(400).json({
-            status: "error",
-            message: "Server error"
-        });
+        res.status(400).json({ status: "error", message: "Server error" });
         throw error;
     }
 }
@@ -108,10 +80,7 @@ async function getSuitableAgents(req, res) {
 
         res.status(200).json(agents);
     } catch (err) {
-        res.status(400).json({
-            status: "error",
-            message: "Server error"
-        });
+        res.status(400).json({ status: "error", message: "Server error" });
         throw err;
     }
 }

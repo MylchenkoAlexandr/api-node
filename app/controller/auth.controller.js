@@ -48,31 +48,25 @@ async function verify(req, res) {
     const account_banned = await AgentService.checkedBan(decoded.data);
 
     if (account_banned) {
-      return res.status(403).json({
-        status: 'error',
-        message: "Your account has been banned"
-      });
-    } else {
-      const candidate = await AgentService.find(decoded.data);
-
-      if (candidate) {
-
-        return res.status(200).json({
-          status: "success",
-          message: "Verify success",
-          user: {
-            id: candidate.id,
-            email: candidate.email,
-            fname: candidate.fname,
-            lname: candidate.lname,
-            states: JSON.parse(candidate.states),
-            role_id: candidate.role_id
-          }
-        });
-      }
+      return res.status(403).json({ status: 'error', message: "Your account has been banned" });
     }
+
+    const candidate = await AgentService.find(decoded.data);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Verify success",
+      user: {
+        id: candidate.id,
+        email: candidate.email,
+        fname: candidate.fname,
+        lname: candidate.lname,
+        states: JSON.parse(candidate.states),
+        role_id: candidate.role_id
+      }
+    });
   } catch (error) {
-    res.status(400).json({ status: 'failed', message: "Server error" });
+    res.status(400).json({ status: 'error', message: "Server error" });
     throw error;
   }
 }

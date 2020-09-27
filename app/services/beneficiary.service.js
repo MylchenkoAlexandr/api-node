@@ -4,7 +4,7 @@ const BeneficiaryRepository = require('../repository/beneficiary.repository');
 class BeneficiaryService {
 
     /**
-     * Function for create and update beneficiary for one lead  
+     * The function for create and update beneficiary for one lead  
      * @param {Object} beneficiary_options - The beneficiary which come in request
      * @param {string} beneficiary_options.name - The name of a beneficiary
      * @param {string} beneficiary_options.dob - The dob of a beneficiary
@@ -56,7 +56,7 @@ class BeneficiaryService {
     }
 
     /**
-     * Function for get beneficiary for the one lead
+     * The function for get beneficiary for the one lead
      * @param {number} lead_id
      */
     async getOne(lead_id) {

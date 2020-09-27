@@ -44,11 +44,10 @@ async function recordCallback(req, res) {
         client.emit('record-create', record);
 
         return res.sendStatus(200);
-    } catch (e) {
-        console.error(e);
+    } catch (err) {
+        res.status(400).json({ status: 'error', message: "Server Error!" });
+        throw err;
     }
-
-    return res.sendStatus(400);
 }
 
 module.exports = {

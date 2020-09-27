@@ -9,6 +9,8 @@ async function uploadCSV(req, res) {
     try {
         const rawLeads = await new Promise((resolve, reject) => {
             form.parse(req, (err, fields, files) => {
+                if (err) return reject(err);
+
                 const delimiter = fields.delimiter;
                 const result = csvToJson.fieldDelimiter(delimiter).formatValueByType().getJsonFromCsv(files["file"].path);
                 resolve(result);
@@ -22,18 +24,11 @@ async function uploadCSV(req, res) {
                 client.emit("process-lead", preparedRawLead);
             });
 
-            res.status(200).json({
-                status: "success",
-                message: "Success parsed CSV file into system"
-            });
+            res.status(200).json({ status: "success", message: "Success parsed CSV file into system" });
         }
     } catch (err) {
-        res.status(400).json({
-            status: "failed",
-            message: "Server error!"
-        });
-
-        throw new Error(err);
+        res.status(400).json({ status: "error", message: "Server error!" });
+        throw err;
     }
 }
 

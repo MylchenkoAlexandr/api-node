@@ -13,15 +13,9 @@ async function getLeads(req, res) {
     try {
         const leads = await LeadService.getAll(req.body.type, req.body.user_id);
 
-        return res.status(200).json({
-            status: "success",
-            leads
-        });
+        return res.status(200).json({ status: "success", leads });
     } catch (err) {
-        res.status(400).json({
-            status: 'error',
-            message: "Server Error!"
-        });
+        res.status(400).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 }
@@ -29,15 +23,9 @@ async function getLeads(req, res) {
 async function getRawLeads(req, res) {
     try {
         const rowLeads = await LeadService.getRawLeads();
-        return res.status(200).json({
-            status: "success",
-            rowLeads
-        });
+        return res.status(200).json({ status: "success", rowLeads });
     } catch (err) {
-        res.status(400).json({
-            status: 'error',
-            message: "Server Error!"
-        });
+        res.status(400).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 }
@@ -45,15 +33,9 @@ async function getRawLeads(req, res) {
 async function getLead(req, res) {
     try {
         const lead = await LeadService.getOne(req.body.lead_id);
-        return res.status(200).json({
-            status: "success",
-            lead
-        });
+        return res.status(200).json({ status: "success", lead });
     } catch (err) {
-        res.status(400).json({
-            status: 'error',
-            message: "Server Error!"
-        });
+        res.status(400).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 }
@@ -95,10 +77,7 @@ async function getCompaniesListByLeadData(req, res) {
 
         return res.status(200).json(companies);
     } catch (err) {
-        res.status(400).json({
-            status: 'error',
-            message: "Server Error!"
-        });
+        res.status(400).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 }
@@ -139,16 +118,10 @@ async function uploadLeadFromUrl(req, res) {
 
         client.emit("process-lead", rawLead);
 
-        return res.status(400).json({
-            status: 'success',
-            message: 'Lead Uploaded'
-        });
+        return res.status(400).json({ status: 'success', message: 'Lead Uploaded' });
     }
     catch (err) {
-        res.status(400).json({
-            status: 'error',
-            message: "Server Error!"
-        });
+        res.status(400).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 }
@@ -166,15 +139,9 @@ async function uploadLeadFromMediaAlpha(req, res) {
 
         client.emit("process-lead", preparedLead);
 
-        return res.status(200).json({
-            status: "success",
-            message: "Success Uploaded!"
-        });
+        return res.status(200).json({ status: "success", message: "Success Uploaded!" });
     } catch (err) {
-        res.status(400).json({
-            status: 'error',
-            message: "Server Error!"
-        });
+        res.status(400).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 
@@ -183,15 +150,9 @@ async function uploadLeadFromMediaAlpha(req, res) {
 async function getBlueberryLeads(req, res) {
     try {
         const leads = await LeadService.blueberryLeads();
-        return res.status(200).json({
-            status: "success",
-            leads
-        });
+        return res.status(200).json({ status: "success", leads });
     } catch (err) {
-        res.status(400).json({
-            status: 'error',
-            message: "Server Error!"
-        });
+        res.status(400).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 }
@@ -199,15 +160,9 @@ async function getBlueberryLeads(req, res) {
 async function getMediaAlphaLeads(req, res) {
     try {
         const leads = await LeadService.mediaAlphaLeads();
-        return res.status(200).json({
-            status: "success",
-            leads
-        });
+        return res.status(200).json({ status: "success", leads });
     } catch (err) {
-        res.status(400).json({
-            status: 'error',
-            message: "Server Error!"
-        });
+        res.status(400).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 }

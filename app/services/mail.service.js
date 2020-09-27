@@ -7,6 +7,7 @@ require('dotenv').config();
 
 class MailService {
     constructor() {
+        this.emails_path = __dirname + '/../../emails/';
         // Generate a url that asks permissions for Gmail scopes
         this.oauth2Client = new OAuth2(
             process.env.MAIL_SERVICE_CLIENT_ID,
@@ -30,6 +31,10 @@ class MailService {
         });
     }
 
+    /**
+     * The function for send email for client
+     * @param {object} mail_options
+     */
     async send(mail_options) {
         try {
             await this.transporter.verify();
@@ -39,6 +44,9 @@ class MailService {
         }
     }
 
+    /**
+     * The function for create accessToken on 2000 years
+     */
     async createToken() {
         try {
             const { tokens } = await this.oauth2Client.getToken(process.env.MAIL_SERVICE_AUTH_CODE);
@@ -48,6 +56,9 @@ class MailService {
         }
     }
 
+    /**
+     * The function for generate url which get authorization code for need to be create access token
+     */
     generateAuthUrl() {
         const GMAIL_SCOPES = [
             'https://mail.google.com/',
@@ -63,9 +74,14 @@ class MailService {
         console.log(auth_url);
     }
 
+    /**
+     * The function for generate html email template by ejs engine
+     * @param {string} filename 
+     * @param {object} companies 
+     */
     generateQuotesHtmlTemplate(filename, companies) {
         let html;
-        ejs.renderFile(__dirname + '/../../emails/' + filename, { companies }, (err, html_code) => {
+        ejs.renderFile(this.emails_path + filename, { companies }, (err, html_code) => {
             if (err) throw err;
             html = html_code;
         });

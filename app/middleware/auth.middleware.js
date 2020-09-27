@@ -1,17 +1,38 @@
 const jwt = require('jsonwebtoken');
 const AgentService = require('../services/agent.service');
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+class AuthMiddleware {
 
-  if (token == null) return res.sendStatus(401);
+  authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-  jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
+      try {
+        if (err) return res.send(403).json({ status: "error", message: "Not authorization user" });
+
+        const account_banned = await AgentService.checkedBan(decoded.data);
+
+        if (account_banned) {
+          return res.status(403).json({
+            status: 'error',
+            message: "Your account has been banned"
+          });
+        }
+
+        next();
+      } catch (error) {
+        throw error;
+      }
+    });
+  }
+
+  async checkBannedAccount(req, res, next) {
     try {
-      const account_banned = await AgentService.checkedBan(decoded.data);
+      const account_banned = await AgentService.checkedBan(req.body.email);
 
-      if (err) return res.sendStatus(403);
       if (account_banned) {
         return res.status(403).json({
           status: 'error',
@@ -21,59 +42,38 @@ const authenticateToken = (req, res, next) => {
 
       next();
     } catch (error) {
+      res.status(400).json({
+        status: 'error',
+        message: "Server error"
+      });
       throw error;
     }
-  });
-};
+  }
 
-const checkBannedAccount = async (req, res, next) => {
-  try {
-    const account_banned = await AgentService.checkedBan(req.body.email);
+  checkedAdminRole(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-    if (account_banned) {
-      return res.status(403).json({
-        status: 'error',
-        message: "Your account has been banned"
-      });
-    } else {
-      next();
-    }
-  } catch (error) {
-    res.status(400).json({
-      status: 'error',
-      message: "Server error"
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
+      try {
+        const admin_match = await AgentService.checkAdmin(decoded.data);
+
+        if (err) return res.sendStatus(403);
+        if (!admin_match) {
+          return res.status(401).json({
+            status: 'error',
+            message: "You have not permission"
+          });
+        }
+
+        next();
+      } catch (error) {
+        throw error;
+      }
     });
-    throw error;
   }
 }
 
-const checkedAdminRole = async (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (token == null) return res.sendStatus(401);
-
-  jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
-    try {
-      const admin_match = await AgentService.checkAdmin(decoded.data);
-
-      if (err) return res.sendStatus(403);
-      if (!admin_match) {
-        return res.status(401).json({
-          status: 'error',
-          message: "You have not permission"
-        });
-      }
-
-      next();
-    } catch (error) {
-      throw error;
-    }
-  });
-}
-
-module.exports = {
-  authenticateToken,
-  checkBannedAccount,
-  checkedAdminRole
-};
+module.exports = new AuthMiddleware;

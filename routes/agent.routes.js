@@ -1,5 +1,7 @@
 const router = require('express').Router();
-const { authenticateToken, checkedAdminRole } = require('../app/middleware/auth.middleware');
+const AuthMiddleware = require('../app/middleware/auth.middleware');
+const authenticateToken = AuthMiddleware.authenticateToken;
+const checkedAdminRole = AuthMiddleware.checkedAdminRole;
 const { getAgents, getSuitableAgents, createAgent, updateAgent, deleteAgent, updateAgentPassword } = require('../app/controller/agent.controller');
 
 router.get('/', authenticateToken, checkedAdminRole, getAgents);

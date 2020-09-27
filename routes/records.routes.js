@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { getAllRecords } = require('../app/controller/records.controller');
-const { authenticateToken } = require('../app/middleware/auth.middleware');
+const AuthMiddleware = require('../app/middleware/auth.middleware');
+const authenticateToken = AuthMiddleware.authenticateToken;
 
 router.get('/get/:lead_id', authenticateToken, getAllRecords);
 
