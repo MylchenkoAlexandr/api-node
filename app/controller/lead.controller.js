@@ -22,8 +22,8 @@ async function getLeads(req, res) {
 
 async function getRawLeads(req, res) {
     try {
-        const rowLeads = await LeadService.getRawLeads();
-        return res.status(200).json({ status: "success", rowLeads });
+        const rawLeads = await LeadService.getRawLeads();
+        return res.status(200).json({ status: "success", rawLeads });
     } catch (err) {
         res.status(400).json({ status: 'error', message: "Server Error!" });
         throw err;
@@ -77,14 +77,19 @@ async function uploadLeadFromUrl(req, res) {
         }
 
         rawLead = {
+            agent: null,
             type: urlData.type,
             source: "blueberry",
-            empty: 1,
+            empty: 1
         };
 
         if ("first_name" in urlData && "last_name" in urlData) {
             rawLead.fname = urlData.first_name;
             rawLead.lname = urlData.last_name;
+        }
+
+        if ("phone" in urlData) {
+            rawLead.phone = urlData.phone;
         }
 
         if ("email" in urlData) {
@@ -99,9 +104,11 @@ async function uploadLeadFromUrl(req, res) {
             rawLead.birth_date = urlData.dob;
         }
 
+        console.log("uploadLeadFromUrl -> rawLead", rawLead)
+
         client.emit("process-lead", rawLead);
 
-        return res.status(400).json({ status: 'success', message: 'Lead Uploaded' });
+        return res.status(200).json({ status: 'success', message: 'Lead Uploaded' });
     }
     catch (err) {
         res.status(400).json({ status: 'error', message: "Server Error!" });
