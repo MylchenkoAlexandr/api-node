@@ -1,6 +1,7 @@
 'use strict';
 
 const http = require('http');
+const path = require('path');
 const express = require('express');
 const db = require('./database/models');
 const app = express();
@@ -12,6 +13,7 @@ require('dotenv').config();
 //Variables application
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
+const public_dir = path.join(__dirname, 'public');
 
 //Configuration application
 app.use(cors());
@@ -20,6 +22,7 @@ app.use(express.json());
 app.use(helmet());
 
 // Routes application
+app.use(express.static(public_dir));
 app.use('/api/call', require('./routes/call.routes'));
 app.use('/api/records', require('./routes/records.routes'));
 app.use('/api/lead', require('./routes/lead.routes'));

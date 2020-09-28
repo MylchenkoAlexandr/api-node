@@ -58,23 +58,6 @@ async function getCompaniesListByLeadData(req, res) {
 
         const companies = await quotes.getCompaniesInfo();
 
-        // try {
-        //     if ("email" in rawLead) {
-        //         const html = MailService.generateQuotesHtmlTemplate('quote.ejs', companies);
-
-        //         const mail_options = {
-        //             from: process.env.MAIL_SERVICE_USER_EMAIL,
-        //             to: rawLead.email,
-        //             subject: "Blueberry Insurance",
-        //             html
-        //         };
-
-        //         MailService.send(mail_options);
-        //     }
-        // } catch (err) {
-        //     throw err;
-        // }
-
         return res.status(200).json(companies);
     } catch (err) {
         res.status(400).json({ status: 'error', message: "Server Error!" });

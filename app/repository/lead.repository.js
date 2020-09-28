@@ -216,6 +216,19 @@ const LeadRepository = {
         } catch (error) {
             throw error;
         }
+    },
+
+    async getEmailSended(email_client) {
+        try {
+            const data = await db.sequelize.query(`SELECT leads.email_sended FROM leads WHERE leads.email = "${email_client}"`, {
+                type: db.sequelize.QueryTypes.SELECT,
+                plain: true
+            });
+
+            return data.email_sended;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

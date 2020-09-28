@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
     state_id: DataTypes.BIGINT.UNSIGNED,
     empty: DataTypes.BOOLEAN,
     email: DataTypes.STRING,
+    email_sended: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
     phone: DataTypes.STRING,
     fullname: DataTypes.STRING,
     busy: DataTypes.BOOLEAN,

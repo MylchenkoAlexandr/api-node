@@ -252,6 +252,7 @@ class LeadService {
             throw err;
         }
     }
+
     /**
      * @param {number} lead_id 
      * @param {number} user_id 
@@ -268,6 +269,28 @@ class LeadService {
                 return true;
             }
             return false;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async checkLeadAtSendedEmail(email_client) {
+        try {
+            const email_sended = await LeadRepository.getEmailSended(email_client);
+
+            return email_sended;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateLeadAtSendedEmail(email_client, email_sended) {
+        try {
+            const lead = await models.Leads.findOne(
+                { where: { email: email_client } }
+            );
+
+            if (lead) await lead.update({ email_sended: email_sended });
         } catch (error) {
             throw error;
         }
