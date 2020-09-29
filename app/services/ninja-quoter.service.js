@@ -65,7 +65,11 @@ class NinjaQuoterService {
                 return comp.company_code in this.companies;
             });
 
-            return _.uniqBy(companiesFullData, 'company_code');
+            const uniq_companies = _.uniqBy(companiesFullData, 'company_code');
+
+            uniq_companies.sort((prev, next) => prev.premium_monthly - next.premium_monthly);
+            
+            return uniq_companies;
         } catch (error) {
             console.error(error)
         }

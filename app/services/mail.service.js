@@ -79,9 +79,9 @@ class MailService {
      * @param {string} filename 
      * @param {object} companies 
      */
-    generateQuotesHtmlTemplate(filename, companies) {
+    generateQuotesHtmlTemplate(filename, { coverage_amount, term, companies }) {
         let html;
-        ejs.renderFile(this.emails_path + filename, { companies }, (err, html_code) => {
+        ejs.renderFile(this.emails_path + filename, { coverage_amount, term, companies }, (err, html_code) => {
             if (err) throw err;
             html = html_code;
         });

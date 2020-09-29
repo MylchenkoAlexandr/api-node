@@ -14,7 +14,7 @@ async function sendMailToClient(req, res) {
 
         return res.status(200).json({ status: "success", message: "Mail send" });
     } catch (error) {
-        res.status(400).json({ status: "error", message: "Mail don't send" });
+        res.status(500).json({ status: "error", message: "Mail don't send" });
         throw error;
     }
 }
@@ -22,9 +22,13 @@ async function sendMailToClient(req, res) {
 async function sendEmailWithCompanies(req, res) {
 
     try {
-        const email_params = req.body;
-
-        if (email_params.companies && email_params.email) {
+        if (
+            ("companies" in req.body)
+            && ("email" in req.body)
+            && ("coverage_amount" in req.body)
+            && ("term") in req.body
+        ) {
+            const email_params = req.body;
             const email_sended = await LeadService.checkLeadAtSendedEmail(email_params.email);
 
             if (typeof email_params.companies == 'string') {
@@ -32,7 +36,7 @@ async function sendEmailWithCompanies(req, res) {
             }
 
             if (!email_sended) {
-                const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params.companies);
+                const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
 
                 const mail_options = {
                     from: process.env.MAIL_SERVICE_USER_EMAIL,
@@ -52,7 +56,7 @@ async function sendEmailWithCompanies(req, res) {
 
         return res.status(400).json({ status: 'error', message: 'Bad request' });
     } catch (err) {
-        res.status(400).json({ status: 'error', message: "Server Error!" });
+        res.status(500).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 }
@@ -67,7 +71,7 @@ async function createToken(req, res) {
         const tokens = await MailService.createToken();
         res.status(201).json({ status: 'success', message: "Token created", tokens });
     } catch (error) {
-        res.status(400).json({ status: "error", message: "Server error!" });
+        res.status(500).json({ status: "error", message: "Server error!" });
         throw error;
     }
 }

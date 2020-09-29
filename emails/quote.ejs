@@ -315,19 +315,27 @@
                                     </table>
 
                                     <!-- QUOTES STARTS -->
-                                    <% companies.forEach(function(company, index){ %>
-                                    <% if(index <= 2) { %>
+
                                     <table border="0" cellpadding="0" cellspacing="0"
                                         style="margin:0 auto;text-align:left;width:90%">
                                         <tbody>
                                             <tr>
                                                 <td style="margin:0;padding:0;padding-bottom:35px;padding-top:0px">
-                                                    <table border="0" cellpadding="0" cellspacing="0" style="width:100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0"
+                                                        style="width:100%">
                                                         <tbody>
                                                             <tr>
-                                                                <td style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:26px;font-weight:bold;line-height:34p;margin:0;padding:0;padding-bottom:10px">
-                                                                    <font face="Arial">Your quotes for $500,000 / 25
-                                                                        years</font>
+                                                                <td
+                                                                    style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:26px;font-weight:bold;line-height:34p;margin:0;padding:0;padding-bottom:10px">
+
+                                                                    <% if(term == 'fex') { %>
+                                                                    <font face="Arial">Your quotes for
+                                                                        $<%= coverage_amount %> / Final Expense</font>
+                                                                    <% } else { %>
+                                                                    <font face="Arial">Your quotes for
+                                                                        $<%= coverage_amount %> / <%= term %> years
+                                                                    </font>
+                                                                    <% } %>
                                                                 </td>
                                                             </tr>
                                                             <!-- <tr>
@@ -346,22 +354,28 @@
                                                                         style="width:100%">
                                                                         <tbody>
                                                                             <tr>
-                                                                                <td style="margin:0;padding:10px 20px 0;padding-bottom:10px">
+                                                                                <td
+                                                                                    style="margin:0;padding:10px 20px 0;padding-bottom:10px">
                                                                                     <table style="width:100%">
                                                                                         <tbody>
                                                                                             <tr>
-                                                                                                <th style="font-weight:normal;text-align:left;width:66%">
-                                                                                                    <table style="width:100%">
+                                                                                                <th
+                                                                                                    style="font-weight:normal;text-align:left;width:66%">
+                                                                                                    <table
+                                                                                                        style="width:100%">
                                                                                                         <tbody>
                                                                                                             <tr>
-                                                                                                                <td style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:16px;line-height:23px;margin:0;padding:0;text-align:center;width:33%">
-                                                                                                                    <font face="Arial">
+                                                                                                                <td
+                                                                                                                    style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:16px;line-height:23px;margin:0;padding:0;text-align:center;width:33%">
+                                                                                                                    <font
+                                                                                                                        face="Arial">
                                                                                                                         Quote
                                                                                                                     </font>
                                                                                                                 </td>
                                                                                                                 <td
                                                                                                                     style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:16px;line-height:23px;margin:0;padding:0;text-align:center;width:66%">
-                                                                                                                    <font face="Arial">
+                                                                                                                    <font
+                                                                                                                        face="Arial">
                                                                                                                         Insurer
                                                                                                                     </font>
                                                                                                                 </td>
@@ -369,14 +383,17 @@
                                                                                                         </tbody>
                                                                                                     </table>
                                                                                                 </th>
-                                                                                                <th style="font-weight:normal;min-width:160px;text-align:left;width:33%">
-                                                                                                    &nbsp; 
+                                                                                                <th
+                                                                                                    style="font-weight:normal;min-width:160px;text-align:left;width:33%">
+                                                                                                    &nbsp;
                                                                                                 </th>
                                                                                             </tr>
                                                                                         </tbody>
                                                                                     </table>
                                                                                 </td>
                                                                             </tr>
+                                                                            <% companies.forEach(function(company, index){ %>
+                                                                            <% if(index <= 2) { %>
                                                                             <tr>
                                                                                 <td
                                                                                     style="margin:0;padding:0;padding-bottom:20px">
@@ -401,8 +418,9 @@
                                                                                                                             <tr>
                                                                                                                                 <td
                                                                                                                                     style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:22px;font-weight:bold;line-height:29px;margin:0;padding:0;text-align:center">
-                                                                                                                                    <font face="Arial">
-                                                                                                                                        $74.75
+                                                                                                                                    <font
+                                                                                                                                        face="Arial">
+                                                                                                                                        $<%= company.premium_monthly %>
                                                                                                                                     </font>
                                                                                                                                 </td>
                                                                                                                             </tr>
@@ -431,8 +449,7 @@
                                                                                                                                     style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:18px;font-weight:bold;line-height:29px;margin:0;padding:0;text-align:center">
                                                                                                                                     <font
                                                                                                                                         face="Arial">
-                                                                                                                                        Pacific
-                                                                                                                                        Life
+                                                                                                                                        <%= company.company_name %>
                                                                                                                                     </font>
                                                                                                                                 </td>
                                                                                                                             </tr>
@@ -451,14 +468,14 @@
                                                                                                             <tr>
                                                                                                                 <td
                                                                                                                     style="margin:0;padding:0;text-align:center;vertical-align:top">
-                                                                                                                    <a href="http://links.policygenius.com/u/click?_t=3c9c36a43f93407bb05fb61e2d245389&amp;_m=6e96fde2f80a46fe8a0d749b0be66f2f&amp;_e=XLipX0gQgQPhBr5qROl2sxwD7MeH-2Ml-7tL1AsLAGVrttYVkPVWZ_VrafLoi23v-Y0Lks0XYm0tUvAWJbEvItRLqmAIklxd8GHqK8GR_aqDMQQ0oeMXQEFKR08G51HX7xrZXK6IqyjOFbCMhLt148aNHZBMKX8cZaspkFSkux6egh1rPkgslKDiQqkHSa3MTLrJitmEUrB1Ov08322TZPEbnUGbrO6RDynrGfO0yyFpXPTCoeThjEbvHVYSNOjNEyrtO98Ph6w9xu2xc2xRz-4etwSVJlsIPE6aheETGbkA7tKnj9GmZQg1UNfdFlqBlGYe2HJqNP5Rt1Ah9SdY3dPoCw_pyIghXX7X7fyqD-WewkZaV3uj6ipNpYR0fSvxMmVEir7yVQMoyvTCWvfY-93iW0XUOgDPGyxBveOuw9gzY_xIzUJcNiOVy6KYRmW6nHd517NDvZkMrtnmvbZsLnWiRvNgiR376OoYP4ZA0PfskiuZCeitmOifRF0WfwFCsczMuODqjod24Sb2GKmT_VtvOkgVqoI1iEJWAkD_k1pdlTEjDEk9ycvLJKQWyYysny3V1cP0H2NBM_XoAY5qKmxblmbuO7CJSgBQhze4sApzQwGi3wpdRegTp6GCe69BJJXX5zEe-Tjy5iYA4veYH7PTtqgU90ASdNgmQ5y9J1v9MVmFf5gg8OK5EfbWxCgQQ8BfqJ6ZwhziPN70kPqRYxnSrSSVNHPuR0Uub6YGG41EN9BEsqxwgmA3J3Qed9mTCeDKqXNeXQCfKLbHsZmn_TzCotXwbTh1ee0brxKIt5s%3D"
-                                                                                                                        style="background-color:#ff700a;border:2px solid #ff700a;color:#ffffff;display:inline-block;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:12px;font-weight:bold;letter-spacing:1px;line-height:50px;min-width:140px;padding:0 10px;text-align:center;text-decoration:none"
+                                                                                                                    <a 
+                                                                                                                        href="tel:+18339282583"
+                                                                                                                        style="background-color:#336699;border:2px solid #336699;color:#ffffff;display:inline-block;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:12px;font-weight:bold;letter-spacing:1px;line-height:50px;min-width:140px;padding:0 10px;text-align:center;text-decoration:none;cursor:pointer;"
                                                                                                                         rel="noreferrer"
-                                                                                                                        target="_blank"
-                                                                                                                        data-saferedirecturl="https://www.google.com/url?q=http://links.policygenius.com/u/click?_t%3D3c9c36a43f93407bb05fb61e2d245389%26_m%3D6e96fde2f80a46fe8a0d749b0be66f2f%26_e%3DXLipX0gQgQPhBr5qROl2sxwD7MeH-2Ml-7tL1AsLAGVrttYVkPVWZ_VrafLoi23v-Y0Lks0XYm0tUvAWJbEvItRLqmAIklxd8GHqK8GR_aqDMQQ0oeMXQEFKR08G51HX7xrZXK6IqyjOFbCMhLt148aNHZBMKX8cZaspkFSkux6egh1rPkgslKDiQqkHSa3MTLrJitmEUrB1Ov08322TZPEbnUGbrO6RDynrGfO0yyFpXPTCoeThjEbvHVYSNOjNEyrtO98Ph6w9xu2xc2xRz-4etwSVJlsIPE6aheETGbkA7tKnj9GmZQg1UNfdFlqBlGYe2HJqNP5Rt1Ah9SdY3dPoCw_pyIghXX7X7fyqD-WewkZaV3uj6ipNpYR0fSvxMmVEir7yVQMoyvTCWvfY-93iW0XUOgDPGyxBveOuw9gzY_xIzUJcNiOVy6KYRmW6nHd517NDvZkMrtnmvbZsLnWiRvNgiR376OoYP4ZA0PfskiuZCeitmOifRF0WfwFCsczMuODqjod24Sb2GKmT_VtvOkgVqoI1iEJWAkD_k1pdlTEjDEk9ycvLJKQWyYysny3V1cP0H2NBM_XoAY5qKmxblmbuO7CJSgBQhze4sApzQwGi3wpdRegTp6GCe69BJJXX5zEe-Tjy5iYA4veYH7PTtqgU90ASdNgmQ5y9J1v9MVmFf5gg8OK5EfbWxCgQQ8BfqJ6ZwhziPN70kPqRYxnSrSSVNHPuR0Uub6YGG41EN9BEsqxwgmA3J3Qed9mTCeDKqXNeXQCfKLbHsZmn_TzCotXwbTh1ee0brxKIt5s%253D&amp;source=gmail&amp;ust=1601472796101000&amp;usg=AFQjCNHZgHBPjuwy2yOg59d2lBdSBUdo7A">
+                                                                                                                        target="_blank">
                                                                                                                         <font
                                                                                                                             face="Arial">
-                                                                                                                            APPLY
+                                                                                                                            CALL
                                                                                                                             NOW
                                                                                                                         </font>
                                                                                                                     </a>
@@ -472,200 +489,8 @@
                                                                                     </table>
                                                                                 </td>
                                                                             </tr>
-                                                                            <tr>
-                                                                                <td
-                                                                                    style="margin:0;padding:0;padding-bottom:20px">
-                                                                                    <div>
-                                                                                        <table
-                                                                                            style="border:2px solid #d6d6d6;width:100%">
-                                                                                            <tbody>
-                                                                                                <tr>
-                                                                                                    <th
-                                                                                                        style="font-weight:normal;padding-left:20px;text-align:left;width:66%">
-                                                                                                        <table
-                                                                                                            style="width:100%">
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td
-                                                                                                                        style="margin:0;padding:10px 20px 10px 0;width:33%">
-                                                                                                                        <table
-                                                                                                                            cellpadding="0"
-                                                                                                                            cellspacing="0"
-                                                                                                                            border="0"
-                                                                                                                            style="width:100%">
-                                                                                                                            <tbody>
-                                                                                                                                <tr>
-                                                                                                                                    <td
-                                                                                                                                        style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:22px;font-weight:bold;line-height:29px;margin:0;padding:0;text-align:center">
-                                                                                                                                        <font
-                                                                                                                                            face="Arial">
-                                                                                                                                            $75.22
-                                                                                                                                        </font>
-                                                                                                                                    </td>
-                                                                                                                                </tr>
-                                                                                                                                <tr>
-                                                                                                                                    <td
-                                                                                                                                        style="color:#808080;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:12px;font-weight:bold;line-height:17px;margin:0;padding:0;padding-bottom:5px;padding-top:5px;text-align:center">
-                                                                                                                                        <font
-                                                                                                                                            face="Arial">
-                                                                                                                                            MONTHLY
-                                                                                                                                        </font>
-                                                                                                                                    </td>
-                                                                                                                                </tr>
-                                                                                                                            </tbody>
-                                                                                                                        </table>
-                                                                                                                    </td>
-                                                                                                                    <td
-                                                                                                                        style="margin:0;padding:10px 20px 10px 0;width:66%">
-                                                                                                                        <table
-                                                                                                                            cellpadding="0"
-                                                                                                                            cellspacing="0"
-                                                                                                                            border="0"
-                                                                                                                            style="width:100%">
-                                                                                                                            <tbody>
-                                                                                                                                <tr>
-                                                                                                                                    <td
-                                                                                                                                        style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:18px;font-weight:bold;line-height:29px;margin:0;padding:0;text-align:center">
-                                                                                                                                        <font
-                                                                                                                                            face="Arial">
-                                                                                                                                            Banner
-                                                                                                                                        </font>
-                                                                                                                                    </td>
-                                                                                                                                </tr>
-                                                                                                                            </tbody>
-                                                                                                                        </table>
-                                                                                                                    </td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </th>
-                                                                                                    <th
-                                                                                                        style="font-weight:normal;padding:0 20px 10px 0;text-align:left;width:33%">
-                                                                                                        <table
-                                                                                                            style="width:100%">
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td
-                                                                                                                        style="margin:0;padding:0;text-align:center;vertical-align:top">
-                                                                                                                        <a href="http://links.policygenius.com/u/click?_t=3c9c36a43f93407bb05fb61e2d245389&amp;_m=6e96fde2f80a46fe8a0d749b0be66f2f&amp;_e=XLipX0gQgQPhBr5qROl2sxwD7MeH-2Ml-7tL1AsLAGVrttYVkPVWZ_VrafLoi23v-Y0Lks0XYm0tUvAWJbEvItRLqmAIklxd8GHqK8GR_aqDMQQ0oeMXQEFKR08G51HX7xrZXK6IqyjOFbCMhLt148aNHZBMKX8cZaspkFSkux6egh1rPkgslKDiQqkHSa3MTLrJitmEUrB1Ov08322TZPEbnUGbrO6RDynrGfO0yyFpXPTCoeThjEbvHVYSNOjNEyrtO98Ph6w9xu2xc2xRz-4etwSVJlsIPE6aheETGbkA7tKnj9GmZQg1UNfdFlqBlGYe2HJqNP5Rt1Ah9SdY3dPoCw_pyIghXX7X7fyqD-WewkZaV3uj6ipNpYR0fSvxMmVEir7yVQMoyvTCWvfY-93iW0XUOgDPGyxBveOuw9gzY_xIzUJcNiOVy6KYRmW6nHd517NDvZkMrtnmvbZsLnWiRvNgiR376OoYP4ZA0PfskiuZCeitmOifRF0WfwFCsczMuODqjod24Sb2GKmT_VtvOkgVqoI1iEJWAkD_k1pdlTEjDEk9ycvLJKQWyYysny3V1cP0H2NBM_XoAY5qKgy76AEAkJ4xDa6aCC5pASDhT2LRu3c1uRH8ecU5C0WaFsGZJVNPxyLw6PWKawiIx5CjWZf4Mx3oQagr_q-WqQNvHlmcs4f3FCU-DBgn6Gdy80HV3on3_0rYaMcRSeu81lOv9OQ24ErxQ3SQPvF-IRn2l7so1TAEycgAXUUkB5Du3IyPff8SzFUx6WxQnCLWy5lTGlpd581GmaTGCq5JuF4%3D"
-                                                                                                                            style="background-color:#ff700a;border:2px solid #ff700a;color:#ffffff;display:inline-block;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:12px;font-weight:bold;letter-spacing:1px;line-height:50px;min-width:140px;padding:0 10px;text-align:center;text-decoration:none"
-                                                                                                                            rel="noreferrer"
-                                                                                                                            target="_blank"
-                                                                                                                            data-saferedirecturl="https://www.google.com/url?q=http://links.policygenius.com/u/click?_t%3D3c9c36a43f93407bb05fb61e2d245389%26_m%3D6e96fde2f80a46fe8a0d749b0be66f2f%26_e%3DXLipX0gQgQPhBr5qROl2sxwD7MeH-2Ml-7tL1AsLAGVrttYVkPVWZ_VrafLoi23v-Y0Lks0XYm0tUvAWJbEvItRLqmAIklxd8GHqK8GR_aqDMQQ0oeMXQEFKR08G51HX7xrZXK6IqyjOFbCMhLt148aNHZBMKX8cZaspkFSkux6egh1rPkgslKDiQqkHSa3MTLrJitmEUrB1Ov08322TZPEbnUGbrO6RDynrGfO0yyFpXPTCoeThjEbvHVYSNOjNEyrtO98Ph6w9xu2xc2xRz-4etwSVJlsIPE6aheETGbkA7tKnj9GmZQg1UNfdFlqBlGYe2HJqNP5Rt1Ah9SdY3dPoCw_pyIghXX7X7fyqD-WewkZaV3uj6ipNpYR0fSvxMmVEir7yVQMoyvTCWvfY-93iW0XUOgDPGyxBveOuw9gzY_xIzUJcNiOVy6KYRmW6nHd517NDvZkMrtnmvbZsLnWiRvNgiR376OoYP4ZA0PfskiuZCeitmOifRF0WfwFCsczMuODqjod24Sb2GKmT_VtvOkgVqoI1iEJWAkD_k1pdlTEjDEk9ycvLJKQWyYysny3V1cP0H2NBM_XoAY5qKgy76AEAkJ4xDa6aCC5pASDhT2LRu3c1uRH8ecU5C0WaFsGZJVNPxyLw6PWKawiIx5CjWZf4Mx3oQagr_q-WqQNvHlmcs4f3FCU-DBgn6Gdy80HV3on3_0rYaMcRSeu81lOv9OQ24ErxQ3SQPvF-IRn2l7so1TAEycgAXUUkB5Du3IyPff8SzFUx6WxQnCLWy5lTGlpd581GmaTGCq5JuF4%253D&amp;source=gmail&amp;ust=1601472796101000&amp;usg=AFQjCNF0BI3yrNvMnL7mA4HSAQQgLAA_BQ">
-                                                                                                                            <font
-                                                                                                                                face="Arial">
-                                                                                                                                APPLY
-                                                                                                                                NOW
-                                                                                                                            </font>
-                                                                                                                        </a>
-                                                                                                                    </td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </th>
-                                                                                                </tr>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    </div>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td
-                                                                                    style="margin:0;padding:0;padding-bottom:0!important">
-                                                                                    <div>
-                                                                                        <table
-                                                                                            style="border:2px solid #d6d6d6;width:100%">
-                                                                                            <tbody>
-                                                                                                <tr>
-                                                                                                    <th
-                                                                                                        style="font-weight:normal;padding-left:20px;text-align:left;width:66%">
-                                                                                                        <table
-                                                                                                            style="width:100%">
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td
-                                                                                                                        style="margin:0;padding:10px 20px 10px 0;width:33%">
-                                                                                                                        <table
-                                                                                                                            cellpadding="0"
-                                                                                                                            cellspacing="0"
-                                                                                                                            border="0"
-                                                                                                                            style="width:100%">
-                                                                                                                            <tbody>
-                                                                                                                                <tr>
-                                                                                                                                    <td
-                                                                                                                                        style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:22px;font-weight:bold;line-height:29px;margin:0;padding:0;text-align:center">
-                                                                                                                                        <font
-                                                                                                                                            face="Arial">
-                                                                                                                                            $76.03
-                                                                                                                                        </font>
-                                                                                                                                    </td>
-                                                                                                                                </tr>
-                                                                                                                                <tr>
-                                                                                                                                    <td
-                                                                                                                                        style="color:#808080;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:12px;font-weight:bold;line-height:17px;margin:0;padding:0;padding-bottom:5px;padding-top:5px;text-align:center">
-                                                                                                                                        <font
-                                                                                                                                            face="Arial">
-                                                                                                                                            MONTHLY
-                                                                                                                                        </font>
-                                                                                                                                    </td>
-                                                                                                                                </tr>
-                                                                                                                            </tbody>
-                                                                                                                        </table>
-                                                                                                                    </td>
-                                                                                                                    <td
-                                                                                                                        style="margin:0;padding:10px 20px 10px 0;width:66%">
-                                                                                                                        <table
-                                                                                                                            cellpadding="0"
-                                                                                                                            cellspacing="0"
-                                                                                                                            border="0"
-                                                                                                                            style="width:100%">
-                                                                                                                            <tbody>
-                                                                                                                                <tr>
-                                                                                                                                    <td
-                                                                                                                                        style="color:#2b2727;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:18px;font-weight:bold;line-height:29px;margin:0;padding:0;text-align:center">
-                                                                                                                                        <font
-                                                                                                                                            face="Arial">
-                                                                                                                                            AIG
-                                                                                                                                        </font>
-                                                                                                                                    </td>
-                                                                                                                                </tr>
-                                                                                                                            </tbody>
-                                                                                                                        </table>
-                                                                                                                    </td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </th>
-                                                                                                    <th
-                                                                                                        style="font-weight:normal;padding:0 20px 10px 0;text-align:left;width:33%">
-                                                                                                        <table
-                                                                                                            style="width:100%">
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td
-                                                                                                                        style="margin:0;padding:0;text-align:center;vertical-align:top">
-                                                                                                                        <a href="http://links.policygenius.com/u/click?_t=3c9c36a43f93407bb05fb61e2d245389&amp;_m=6e96fde2f80a46fe8a0d749b0be66f2f&amp;_e=XLipX0gQgQPhBr5qROl2sxwD7MeH-2Ml-7tL1AsLAGVrttYVkPVWZ_VrafLoi23v-Y0Lks0XYm0tUvAWJbEvItRLqmAIklxd8GHqK8GR_aqDMQQ0oeMXQEFKR08G51HX7xrZXK6IqyjOFbCMhLt148aNHZBMKX8cZaspkFSkux6egh1rPkgslKDiQqkHSa3MTLrJitmEUrB1Ov08322TZPEbnUGbrO6RDynrGfO0yyFpXPTCoeThjEbvHVYSNOjNEyrtO98Ph6w9xu2xc2xRz-4etwSVJlsIPE6aheETGbkA7tKnj9GmZQg1UNfdFlqBlGYe2HJqNP5Rt1Ah9SdY3dPoCw_pyIghXX7X7fyqD-WewkZaV3uj6ipNpYR0fSvxMmVEir7yVQMoyvTCWvfY-93iW0XUOgDPGyxBveOuw9gzY_xIzUJcNiOVy6KYRmW6nHd517NDvZkMrtnmvbZsLnWiRvNgiR376OoYP4ZA0PfskiuZCeitmOifRF0WfwFCsczMuODqjod24Sb2GKmT_VtvOkgVqoI1iEJWAkD_k1pdlTEjDEk9ycvLJKQWyYysny3V1cP0H2NBM_XoAY5qKk3FLalU6NV_WkWJ9WjJBhlTk_vjO_SY0giFFg5nrW1h6nl5swt4We3lb8Qn7rsqxuRct0iPfXy3clSj_MnejQoG7Jk-cMm1mgRo9VMP-3So5TKJ00n0Mq6218jhp1B2k1ACJoXXIi6bZta7mzT200bNDefkFrjdoON_NcFFwMsvQ3MTjk6yrol8nCpjOWpAjELwVeS4ZhUNjcpwVJm3tGQ%3D"
-                                                                                                                            style="background-color:#ff700a;border:2px solid #ff700a;color:#ffffff;display:inline-block;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:12px;font-weight:bold;letter-spacing:1px;line-height:50px;min-width:140px;padding:0 10px;text-align:center;text-decoration:none"
-                                                                                                                            rel="noreferrer"
-                                                                                                                            target="_blank"
-                                                                                                                            data-saferedirecturl="https://www.google.com/url?q=http://links.policygenius.com/u/click?_t%3D3c9c36a43f93407bb05fb61e2d245389%26_m%3D6e96fde2f80a46fe8a0d749b0be66f2f%26_e%3DXLipX0gQgQPhBr5qROl2sxwD7MeH-2Ml-7tL1AsLAGVrttYVkPVWZ_VrafLoi23v-Y0Lks0XYm0tUvAWJbEvItRLqmAIklxd8GHqK8GR_aqDMQQ0oeMXQEFKR08G51HX7xrZXK6IqyjOFbCMhLt148aNHZBMKX8cZaspkFSkux6egh1rPkgslKDiQqkHSa3MTLrJitmEUrB1Ov08322TZPEbnUGbrO6RDynrGfO0yyFpXPTCoeThjEbvHVYSNOjNEyrtO98Ph6w9xu2xc2xRz-4etwSVJlsIPE6aheETGbkA7tKnj9GmZQg1UNfdFlqBlGYe2HJqNP5Rt1Ah9SdY3dPoCw_pyIghXX7X7fyqD-WewkZaV3uj6ipNpYR0fSvxMmVEir7yVQMoyvTCWvfY-93iW0XUOgDPGyxBveOuw9gzY_xIzUJcNiOVy6KYRmW6nHd517NDvZkMrtnmvbZsLnWiRvNgiR376OoYP4ZA0PfskiuZCeitmOifRF0WfwFCsczMuODqjod24Sb2GKmT_VtvOkgVqoI1iEJWAkD_k1pdlTEjDEk9ycvLJKQWyYysny3V1cP0H2NBM_XoAY5qKk3FLalU6NV_WkWJ9WjJBhlTk_vjO_SY0giFFg5nrW1h6nl5swt4We3lb8Qn7rsqxuRct0iPfXy3clSj_MnejQoG7Jk-cMm1mgRo9VMP-3So5TKJ00n0Mq6218jhp1B2k1ACJoXXIi6bZta7mzT200bNDefkFrjdoON_NcFFwMsvQ3MTjk6yrol8nCpjOWpAjELwVeS4ZhUNjcpwVJm3tGQ%253D&amp;source=gmail&amp;ust=1601472796101000&amp;usg=AFQjCNH7qIc1xpd7KtYSyK1DXVZV89-FAA">
-                                                                                                                            <font
-                                                                                                                                face="Arial">
-                                                                                                                                APPLY
-                                                                                                                                NOW
-                                                                                                                            </font>
-                                                                                                                        </a>
-                                                                                                                    </td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </th>
-                                                                                                </tr>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    </div>
-                                                                                </td>
-                                                                            </tr>
+                                                                            <% } %>
+                                                                            <% }); %>
                                                                         </tbody>
                                                                     </table>
                                                                 </td>
@@ -676,26 +501,54 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <% } %>
-                                    <% }); %>
                                     <!-- QUOTES END -->
 
                                     <!-- CONTENT END -->
 
                                     <!-- FOOTER STARTS -->
-                                    <table cellspacing="0" cellpadding="0" border="0" style="width:100%">
+                                    <table border="0" cellpadding="0" cellspacing="0"
+                                        style="margin:0 auto;text-align:left;width:90%">
                                         <tbody>
                                             <tr>
-                                                <td
-                                                    style="border-bottom:5px solid #336699;margin:0;padding-top:10px;padding-bottom:10px;text-align:left">
-                                                    <table cellspacing="0" cellpadding="0" border="0"
-                                                        style="margin:0 auto;text-align:right;width:90%">
+                                                <td style="margin:0;padding:0;padding-bottom:40px;padding-top:20px">
+                                                    <table border="0" cellpadding="0" cellspacing="0"
+                                                        style="width:100%">
                                                         <tbody>
                                                             <tr>
-                                                                <td>
-                                                                    <img style="width:120px;height:50px;"
-                                                                        src="https://api.joinblueberry.com/images/logo.svg"
-                                                                        alt="Logo">
+                                                                <td style="margin:0;padding:0">
+                                                                    <table border="0" cellpadding="0" cellspacing="0"
+                                                                        style="width:100%">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td
+                                                                                    style="color:#808080;font-family:HelveticaNeue-Light,'Helvetica Neue Light',Arial,sans-serif;font-size:13px;line-height:21px;margin:0;padding:0;padding-right:20px;vertical-align:top">
+                                                                                    <font face="Arial">
+                                                                                        <span
+                                                                                            style="color:#336699;display:inline-block;font-size:13px;font-weight:bold;line-height:21px;padding-bottom:0px">
+                                                                                            Blueberry
+                                                                                        </span>
+                                                                                    </font>
+                                                                                    <br>
+                                                                                    <font face="Arial">
+                                                                                        <span>
+                                                                                            <span
+                                                                                                style="color:#808080;text-decoration:none"
+                                                                                                rel="noreferrer"
+                                                                                                target="_blank">
+                                                                                                Address:
+
+                                                                                                Blueberry Insurance
+                                                                                                358 Blackstone Dr.
+                                                                                                San Rafael, CA 94903
+                                                                                                USA
+                                                                                            </span>
+                                                                                        </span>
+                                                                                        <br>
+                                                                                    </font>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
