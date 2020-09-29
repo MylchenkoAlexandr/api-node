@@ -12,7 +12,11 @@ async function getNotes(req, res) {
 }
 
 async function createNote(req, res) {
-    const note_param = req.body;
+    const note_param = {
+        user_id: req.body.user_id,
+        lead_id: req.body.lead_id,
+        message: req.body.message
+    }
 
     try {
         const note = await NotesService.create(note_param);

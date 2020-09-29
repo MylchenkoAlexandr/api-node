@@ -5,10 +5,10 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-const app = require('../../app.js');
 const basename = path.basename(__filename);
-const appState = process.env.NODE_ENV;
+const appState = `${process.env.NODE_ENV}`;
 const config = require('../config/config.js')[appState];
+
 const db = {};
 
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
