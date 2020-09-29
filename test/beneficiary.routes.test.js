@@ -6,7 +6,7 @@ const db = require('../database/models');
 
 chai.use(chaiHttp);
 
-describe('Notes routes', () => {
+describe('Beneficiary routes', () => {
     let token = '';
 
     before(done => {
@@ -29,12 +29,18 @@ describe('Notes routes', () => {
 
     });
 
-    describe('POST /api/notes/get', () => {
+    describe('POST /api/beneficiary/save', () => {
         it('Should return 401 code if there is no token', done => {
             chai.request(app)
-                .post('/api/notes/get')
+                .post('/api/beneficiary/save')
                 .send({
-                    lead_id: 1
+                    lead_id: 1,
+                    name: 'John',
+                    dob: '12/07/1960',
+                    relative_id: 4,
+                    location_id: 1,
+                    grand_kids: null,
+                    work_status: "Retired"
                 })
                 .end((err, res) => {
                     if (err) done(err);
@@ -42,25 +48,49 @@ describe('Notes routes', () => {
                     done();
                 })
         });
-        it('Should return an array of all the notes with lead id', done => {
+        it('Should return a success status for save beneficiary', done => {
             chai.request(app)
-                .post('/api/notes/get')
+                .post('/api/beneficiary/save')
                 .set('Authorization', 'Bearer ' + token)
                 .send({
-                    lead_id: 1
+                    lead_id: 1,
+                    name: 'John',
+                    dob: '12/07/1960',
+                    relative_id: 4,
+                    location: "AL",
+                    grand_kids: null,
+                    work_status: "Retired"
                 })
                 .end((err, res) => {
                     if (err) done(err);
-                    expect(res).to.have.status(200);
                     expect(res).to.be.an('object');
-                    expect(res.body.notes).to.be.an('array');
+                    expect(res.body.status).to.deep.equals('success');
+                    done();
+                });
+        });
+        it('Should return a success status for save beneficiary', done => {
+            chai.request(app)
+                .post('/api/beneficiary/save')
+                .set('Authorization', 'Bearer ' + token)
+                .send({
+                    lead_id: 1,
+                    name: 'John',
+                    dob: '14/05/1960',
+                    relative_id: 4,
+                    location: "CA",
+                    grand_kids: null,
+                    work_status: "On Disability"
+                })
+                .end((err, res) => {
+                    if (err) done(err);
+                    expect(res).to.be.an('object');
                     expect(res.body.status).to.deep.equals('success');
                     done();
                 });
         });
         it('Should return error status and 400 code if there is no req values', done => {
             chai.request(app)
-                .post('/api/notes/get')
+                .post('/api/beneficiary/save')
                 .set('Authorization', 'Bearer ' + token)
                 .end((err, res) => {
                     if (err) done(err);
@@ -71,107 +101,37 @@ describe('Notes routes', () => {
                 });
         });
     });
-    describe('POST /api/notes/create', () => {
+    describe('GET /api/beneficiary/get/:lead_id', () => {
         it('Should return 401 code if there is no token', done => {
             chai.request(app)
-                .post('/api/notes/create')
-                .send({
-                    user_id: 1,
-                    lead_id: 1,
-                    message: 'The test note'
-                })
+                .get('/api/beneficiary/get/1')
                 .end((err, res) => {
                     if (err) done(err);
                     expect(res).to.have.status(401);
                     done();
                 })
         });
-        it('Should return an object of note', done => {
+        it('Should return an object of beneficiary', done => {
             chai.request(app)
-                .post('/api/notes/create')
+                .get('/api/beneficiary/get/1')
                 .set('Authorization', 'Bearer ' + token)
-                .send({
-                    user_id: 1,
-                    lead_id: 1,
-                    message: 'The test note'
-                })
-                .end((err, res) => {
-                    if (err) done(err);
-                    expect(res).to.have.status(201);
-                    expect(res).to.be.an('object');
-                    expect(res.body.note).to.be.an('object');
-                    expect(res.body.status).to.deep.equals('success');
-                    done();
-                });
-        });
-        it('Should return error status and 400 code if there is no req values', done => {
-            chai.request(app)
-                .post('/api/notes/create')
-                .set('Authorization', 'Bearer ' + token)
-                .end((err, res) => {
-                    if (err) done(err);
-                    expect(res).to.have.status(400);
-                    expect(res).to.be.an('object');
-                    expect(res.body.status).to.deep.equals('error');
-                    done();
-                });
-        });
-        it('Should return error status and 400 code if message is empty', done => {
-            chai.request(app)
-                .post('/api/notes/create')
-                .set('Authorization', 'Bearer ' + token)
-                .send({
-                    user_id: 1,
-                    lead_id: 1,
-                    message: ''
-                })
-                .end((err, res) => {
-                    if (err) done(err);
-                    expect(res).to.have.status(400);
-                    expect(res).to.be.an('object');
-                    expect(res.body.status).to.deep.equals('error');
-                    done();
-                });
-        });
-    });
-    describe('POST /api/notes/delete', () => {
-        it('Should return 401 code if there is no token', done => {
-            chai.request(app)
-                .post('/api/notes/delete')
-                .send({
-                    note_id: 1
-                })
-                .end((err, res) => {
-                    if (err) done(err);
-                    expect(res).to.have.status(401);
-                    done();
-                })
-        });
-        it('Should return an delete status by note', done => {
-            chai.request(app)
-                .post('/api/notes/delete')
-                .set('Authorization', 'Bearer ' + token)
-                .send({
-                    note_id: 1
-                })
                 .end((err, res) => {
                     if (err) done(err);
                     expect(res).to.have.status(200);
                     expect(res).to.be.an('object');
-                    expect(res.body.deleted).to.be.an('boolean');
+                    expect(res.body.beneficiary).to.be.an('object');
                     expect(res.body.status).to.deep.equals('success');
                     done();
                 });
         });
-        it('Should return error status and 400 code if there is no req values', done => {
+        it('Should return error status and 404 code if params wrong', done => {
             chai.request(app)
-                .post('/api/notes/delete')
+                .post('/api/beneficiary/get/asdasd123123')
                 .set('Authorization', 'Bearer ' + token)
                 .end((err, res) => {
                     if (err) done(err);
-                    expect(res).to.have.status(400);
+                    expect(res).to.have.status(404);
                     expect(res).to.be.an('object');
-                    expect(res.body.status).to.deep.equals('error');
                     done();
                 });
         });

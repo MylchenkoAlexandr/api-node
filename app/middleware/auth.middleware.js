@@ -31,16 +31,20 @@ class AuthMiddleware {
 
   async checkBannedAccount(req, res, next) {
     try {
-      const account_banned = await AgentService.checkedBan(req.body.email);
+      if ("email" in req.body) {
+        const account_banned = await AgentService.checkedBan(req.body.email);
 
-      if (account_banned) {
-        return res.status(403).json({
-          status: 'error',
-          message: "Your account has been banned"
-        });
+        if (account_banned) {
+          return res.status(403).json({
+            status: 'error',
+            message: "Your account has been banned"
+          });
+        }
+
+        return next();
       }
 
-      next();
+      return res.status(401).json({ status: 'error' });
     } catch (error) {
       res.status(400).json({
         status: 'error',

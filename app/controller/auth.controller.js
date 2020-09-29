@@ -4,27 +4,29 @@ const AgentService = require('../services/agent.service');
 
 async function login(req, res) {
   try {
-    const user = await AgentService.find(req.body.email);
+    if (("email" in req.body) && ("password" in req.body)) {
+      const user = await AgentService.find(req.body.email);
+      if (user) {
+        const password_mathes = await bcrypt.compare(req.body.password, user.password);
 
-    if (user) {
-      const password_mathes = await bcrypt.compare(req.body.password, user.password);
+        if (password_mathes) {
+          const acces_token = jwt.sign({ data: req.body.email }, process.env.SECRET_KEY, { expiresIn: "24h" });
 
-      if (password_mathes) {
-        const acces_token = jwt.sign({ data: req.body.email }, process.env.SECRET_KEY, { expiresIn: "24h" });
-
-        return res.status(200).json({
-          status: "success",
-          message: "Login success",
-          user: {
-            id: user.id,
-            email: user.email,
-            fname: user.fname,
-            lname: user.lname,
-            states: JSON.parse(user.states),
-            role_id: user.role_id
-          },
-          token: acces_token
-        });
+          return res.status(200).json({
+            status: "success",
+            message: "Login success",
+            user: {
+              id: user.id,
+              email: user.email,
+              fname: user.fname,
+              lname: user.lname,
+              states: JSON.parse(user.states),
+              role_id: user.role_id
+            },
+            token: acces_token
+          });
+        }
+        return res.status(401).json({ status: 'error', message: "Password or email incorrect" });
       }
     }
 
@@ -36,34 +38,38 @@ async function login(req, res) {
 
 };
 
-async function verify(req, res) {
-  const jwt_token = req.body.token;
+function verify(req, res) {
 
-  if (!jwt_token) {
-    return res.status(401).json({ status: 'error', message: "Token not found" });
+  if (!("token" in req.body)) {
+    return res.status(403).json({ status: 'error' });
   }
 
   try {
-    const decoded = jwt.verify(jwt_token, process.env.SECRET_KEY);
-    const account_banned = await AgentService.checkedBan(decoded.data);
+    const jwt_token = req.body.token;
 
-    if (account_banned) {
-      return res.status(403).json({ status: 'error', message: "Your account has been banned" });
-    }
+    jwt.verify(jwt_token, process.env.SECRET_KEY, async (err, decoded) => {
+      if (err) return res.status(403).json({ status: 'error' });
 
-    const candidate = await AgentService.find(decoded.data);
+      const account_banned = await AgentService.checkedBan(decoded.data);
+      if (account_banned) return res.status(403).json({ status: 'error', message: "Your account has been banned" });
 
-    return res.status(200).json({
-      status: "success",
-      message: "Verify success",
-      user: {
-        id: candidate.id,
-        email: candidate.email,
-        fname: candidate.fname,
-        lname: candidate.lname,
-        states: JSON.parse(candidate.states),
-        role_id: candidate.role_id
+      const candidate = await AgentService.find(decoded.data);
+      if (candidate) {
+        return res.status(200).json({
+          status: "success",
+          message: "Verify success",
+          user: {
+            id: candidate.id,
+            email: candidate.email,
+            fname: candidate.fname,
+            lname: candidate.lname,
+            states: JSON.parse(candidate.states),
+            role_id: candidate.role_id
+          }
+        });
       }
+
+      return res.status(403).json({ status: 'error' });
     });
   } catch (error) {
     res.status(400).json({ status: 'error', message: "Server error" });
