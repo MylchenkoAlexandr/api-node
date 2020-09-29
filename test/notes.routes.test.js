@@ -25,8 +25,6 @@ describe('Notes routes', () => {
                     });
             })
             .catch(err => done(err));
-
-
     });
 
     describe('POST /api/notes/get', () => {
@@ -92,7 +90,7 @@ describe('Notes routes', () => {
                 .set('Authorization', 'Bearer ' + token)
                 .send({
                     user_id: 1,
-                    lead_id: 1,
+                    lead_id: 4,
                     message: 'The test note'
                 })
                 .end((err, res) => {

@@ -12,7 +12,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
-          model: 'Leads',
+          model: 'leads',
           key: 'id'
         }
       },
@@ -24,7 +24,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
-          model: 'Relatives',
+          model: 'relatives',
           key: 'id'
         }
       },
@@ -32,7 +32,7 @@ module.exports = {
         allowNull: true,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
-          model: 'States',
+          model: 'states',
           key: 'id'
         }
       },

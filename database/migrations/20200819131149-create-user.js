@@ -12,7 +12,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
-          model: 'Roles',
+          model: 'roles',
           key: 'id',
         },
       },

@@ -220,7 +220,7 @@ class FormatService {
             formatedLead.property = {
                 ...lead
             }
-
+            
             return formatedLead;
         } catch (err) {
             throw err;

@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return Promise.all([
-      queryInterface.addColumn('Beneficiaries', 'dob', { 
+      queryInterface.addColumn('beneficiaries', 'dob', { 
         after: 'relative_id',
         type: Sequelize.STRING,
         allowNull: true
@@ -13,7 +13,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return Promise.all([
-      queryInterface.removeColumn('Beneficiaries', 'dob')
+      queryInterface.removeColumn('beneficiaries', 'dob')
     ]);
   }
 };

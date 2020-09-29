@@ -4,14 +4,14 @@ module.exports = {
     await queryInterface.createTable('users_states', {
       user_id: {
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'id',
         },
         type: Sequelize.BIGINT.UNSIGNED,
       },
       state_id: {
         references: {
-          model: 'States',
+          model: 'states',
           key: 'id',
         },
         type: Sequelize.BIGINT.UNSIGNED,
