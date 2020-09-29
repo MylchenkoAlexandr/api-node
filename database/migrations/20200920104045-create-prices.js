@@ -12,7 +12,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
-          model: 'Quoters',
+          model: 'quoters',
           key: 'id',
         },
       },
@@ -20,7 +20,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
-          model: 'Leads',
+          model: 'leads',
           key: 'id',
         },
       },

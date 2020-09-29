@@ -10,7 +10,7 @@ module.exports = {
       },
       user_id: {
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'id',
         },
         type: Sequelize.BIGINT.UNSIGNED
@@ -18,7 +18,7 @@ module.exports = {
       source_id: {
         allowNull: false,
         references: {
-          model: 'Sources',
+          model: 'sources',
           key: 'id',
         },
         type: Sequelize.BIGINT.UNSIGNED
@@ -26,7 +26,7 @@ module.exports = {
       status_id: {
         allowNull: false,
         references: {
-          model: 'Status',
+          model: 'status',
           key: 'id',
         },
         type: Sequelize.BIGINT.UNSIGNED
@@ -34,7 +34,7 @@ module.exports = {
       type_id: {
         allowNull: false,
         references: {
-          model: 'Types',
+          model: 'types',
           key: 'id',
         },
         type: Sequelize.BIGINT.UNSIGNED
@@ -42,7 +42,7 @@ module.exports = {
       state_id: {
         allowNull: false,
         references: {
-          model: 'States',
+          model: 'states',
           key: 'id',
         },
         type: Sequelize.BIGINT.UNSIGNED
@@ -64,7 +64,7 @@ module.exports = {
       },
       busy_agent_id: {
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'id',
         },
         type: Sequelize.BIGINT.UNSIGNED

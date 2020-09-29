@@ -4,11 +4,11 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(t => {
       return Promise.all([
-        queryInterface.addColumn('Records', 'user_id', {
+        queryInterface.addColumn('records', 'user_id', {
           type: Sequelize.DataTypes.BIGINT.UNSIGNED,
           after: "id",
           references: {
-            model: 'Users',
+            model: 'users',
             key: 'id'
           }
         }, { transaction: t }),
@@ -19,7 +19,7 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(t => {
       return Promise.all([
-        queryInterface.removeColumn('Records', 'user_id', { transaction: t }),
+        queryInterface.removeColumn('records', 'user_id', { transaction: t }),
       ]);
     });
   }

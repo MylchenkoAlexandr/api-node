@@ -37,10 +37,11 @@ class LeadService {
                     const priceFromQuoter = await guoter.getPrice();
 
                     await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
-
+                    
                     return LeadRepository.getOne(createdLead.id);
                 }
-
+    
+    
                 return LeadRepository.getRawLead(createdLead.id);
             }
         } catch (err) {

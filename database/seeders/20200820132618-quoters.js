@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert('Quoters', [{
+    return queryInterface.bulkInsert('quoters', [{
       name: 'ninjaQuoter',
       title: 'Ninja Quoter',
       createdAt: new Date(),
@@ -11,6 +11,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete('Quoters', null, {});
+    return queryInterface.bulkDelete('quoters', null, {});
   }
 };

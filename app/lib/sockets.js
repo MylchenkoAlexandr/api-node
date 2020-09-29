@@ -114,9 +114,9 @@ module.exports = server => {
                             io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
 
                             //  else {
-                            // io.sockets.to("all_leads").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
+                            // io.
+                            sockets.to("all_leads").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
                             // }
-                            
                             if (uploadedLead.source === 'blueberry') {
                                 io.sockets.to("blueberry_leads").emit("CREATE_LEAD", uploadedLead);
                             } else if (uploadedLead.source === 'mediaalpha') {

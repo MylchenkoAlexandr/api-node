@@ -25,8 +25,6 @@ describe('Notes', () => {
                     });
             })
             .catch(err => done(err));
-
-
     });
 
     describe('POST /api/notes/get', () => {
@@ -54,7 +52,7 @@ describe('Notes', () => {
                 .set('Authorization', 'Bearer ' + token)
                 .send({
                     user_id: 1,
-                    lead_id: 1,
+                    lead_id: 4,
                     message: 'The test note'
                 })
                 .end((err, res) => {

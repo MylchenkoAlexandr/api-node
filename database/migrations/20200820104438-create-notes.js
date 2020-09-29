@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Notes', {
+    await queryInterface.createTable('notes', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,7 +12,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'id'
         }
       },
@@ -20,7 +20,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
-          model: 'Leads',
+          model: 'leads',
           key: 'id'
         }
       },
@@ -38,6 +38,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Notes');
+    await queryInterface.dropTable('notes');
   }
 };
