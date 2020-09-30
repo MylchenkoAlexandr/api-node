@@ -18,8 +18,6 @@ module.exports = server => {
 
             const role = await AgentRepository.getRole(user.id);
 
-            console.log("role", role)
-
             if (role == 'agent') {
                 socket.join(user.id);
             }
