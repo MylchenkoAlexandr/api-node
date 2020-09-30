@@ -7,7 +7,7 @@ const AgentRepository = {
      */
     async getAgentWithSmallestCountLeads(state_id) {
         try {
-            const data = await db.sequelize.query("SELECT users.id, COUNT(leads.id) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id LEFT JOIN leads ON leads.user_id = users.id WHERE users_states.state_id = '" + state_id + "' GROUP BY users.id ORDER BY `count` ASC LIMIT 1", {
+            const data = await db.sequelize.query("SELECT users.id, COUNT(leads.id) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id LEFT JOIN leads ON leads.user_id = users.id WHERE users_states.state_id = '" + state_id + "' AND users.not_assign = 0 GROUP BY users.id ORDER BY `count` ASC LIMIT 1", {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
@@ -45,7 +45,7 @@ const AgentRepository = {
      */
     async getAgentByState(state_id) {
         try {
-            const data = await db.sequelize.query("SELECT users.email, users.id FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = " + state_id, {
+            const data = await db.sequelize.query("SELECT users.email, users.id FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = " + state_id + "AND users.not_assign = 0", {
                 type: db.sequelize.QueryTypes.SELECT
             })
 

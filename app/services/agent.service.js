@@ -23,7 +23,8 @@ class AgentService {
                     lname: agent.lname,
                     email: agent.email,
                     password: agent.password,
-                    states: agent.states
+                    states: agent.states,
+                    not_assign: agent.not_assign
                 });
 
                 if (createdAgent) {
@@ -77,7 +78,8 @@ class AgentService {
                         email: agent.email,
                         password: agent.new_password,
                         states: agent.states,
-                        banned: agent.banned
+                        banned: agent.banned,
+                        not_assign: agent.not_assign
                     });
                 } else {
                     await agent_candidate.update({
@@ -85,7 +87,8 @@ class AgentService {
                         lname: agent.lname,
                         email: agent.email,
                         states: agent.states,
-                        banned: agent.banned
+                        banned: agent.banned,
+                        not_assign: agent.not_assign
                     });
                 }
 

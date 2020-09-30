@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
       allowNull: false
     },
+    not_assign: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
   }, {
     sequelize,
     modelName: 'Users',
