@@ -237,13 +237,13 @@ class FormatService {
             state: lead.state,
             gender: lead.gender.toLowerCase(),
             smoker: Boolean(+lead.tobacco),
-            coverage: lead.coverage_amount
+            coverage: lead.coverage_amount,
         };
 
         const term = this.formatTerms(lead);
 
         formatedLead.term = term;
-        formatedLead.rate_class = formatedLead.term == 'fex' ? 'lb' : 's';
+        formatedLead.rate_class = lead.rate_class ? lead.rate_class : formatedLead.term == 'fex' ? 'lb' : 's';
 
         return formatedLead;
     }

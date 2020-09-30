@@ -18,16 +18,7 @@ module.exports = server => {
 
             const role = await AgentRepository.getRole(user.id);
 
-            console.log("role", role)
-
-            if (role == 'admin') {
-                //    if (user.states) {
-                //     for (let index = 0; index < user.states.length; index++) {
-                //         socket.join(user.states[index]);
-                //     }
-                // } else {
-                socket.join("all_leads");
-            } else if (role == 'agent') {
+            if (role == 'agent') {
                 socket.join(user.id);
             }
         });
@@ -91,6 +82,12 @@ module.exports = server => {
                             io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
                             io.sockets.to(uploadedLead.user_id).emit("UPDATE_LEADS", uploadedLead);
 
+                            if (uploadedLead.source === 'blueberry') {
+                                io.sockets.to("blueberry_leads").emit("UPDATE_LEADS", uploadedLead);
+                            } else if (uploadedLead.source === 'mediaalpha') {
+                                io.sockets.to("media-alpha_leads").emit("UPDATE_LEADS", uploadedLead);
+                            }
+
                             if (emptyStatus) {
                                 io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
 
@@ -110,13 +107,8 @@ module.exports = server => {
 
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
-
                             io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
 
-                            //  else {
-                            // io.
-                            sockets.to("all_leads").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
-                            // }
                             if (uploadedLead.source === 'blueberry') {
                                 io.sockets.to("blueberry_leads").emit("CREATE_LEAD", uploadedLead);
                             } else if (uploadedLead.source === 'mediaalpha') {
