@@ -5,7 +5,7 @@ async function getAllRecords(req, res) {
         const records = await RecordsService.getAll(req.params.lead_id);
         return res.status(200).json({ status: "success", message: "All records sending", records });
     } catch (error) {
-        res.status(400).json({ status: "error", message: "Server error!" });
+        res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
     }
 }

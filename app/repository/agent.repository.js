@@ -47,7 +47,7 @@ const AgentRepository = {
         try {
             const data = await db.sequelize.query("SELECT users.email, users.id FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = " + state_id, {
                 type: db.sequelize.QueryTypes.SELECT
-            })
+            });
 
             return data;
         } catch (error) {

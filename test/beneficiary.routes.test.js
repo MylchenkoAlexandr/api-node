@@ -101,10 +101,10 @@ describe('Beneficiary routes', () => {
                 });
         });
     });
-    describe('GET /api/beneficiary/get/:lead_id', () => {
+    describe('GET /api/beneficiary/:lead_id', () => {
         it('Should return 401 code if there is no token', done => {
             chai.request(app)
-                .get('/api/beneficiary/get/1')
+                .get('/api/beneficiary/1')
                 .end((err, res) => {
                     if (err) done(err);
                     expect(res).to.have.status(401);
@@ -113,7 +113,7 @@ describe('Beneficiary routes', () => {
         });
         it('Should return an object of beneficiary', done => {
             chai.request(app)
-                .get('/api/beneficiary/get/1')
+                .get('/api/beneficiary/1')
                 .set('Authorization', 'Bearer ' + token)
                 .end((err, res) => {
                     if (err) done(err);
@@ -126,7 +126,7 @@ describe('Beneficiary routes', () => {
         });
         it('Should return error status and 404 code if params wrong', done => {
             chai.request(app)
-                .post('/api/beneficiary/get/asdasd123123')
+                .post('/api/beneficiary/asdasd123123')
                 .set('Authorization', 'Bearer ' + token)
                 .end((err, res) => {
                     if (err) done(err);

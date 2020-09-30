@@ -11,7 +11,7 @@ async function test(req, res) {
 
 async function getLeads(req, res) {
     try {
-        const leads = await LeadService.getAll(req.body.type, req.body.user_id);
+        const leads = await LeadService.getAll(req.params.type, req.params.user_id);
 
         return res.status(200).json({ status: "success", leads });
     } catch (err) {
@@ -32,7 +32,7 @@ async function getRawLeads(req, res) {
 
 async function getLead(req, res) {
     try {
-        const lead = await LeadService.getOne(req.body.lead_id);
+        const lead = await LeadService.getOne(req.params.lead_id);
         return res.status(200).json({ status: "success", lead });
     } catch (err) {
         res.status(400).json({ status: 'error', message: "Server Error!" });

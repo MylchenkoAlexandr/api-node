@@ -48,7 +48,7 @@ class AgentService {
                 }
             } else {
                 return {
-                    code: 200,
+                    code: 409,
                     status: "error",
                     message: "Agent with current email already exist"
                 }
@@ -130,7 +130,7 @@ class AgentService {
 
                 return { code: 200, status: "success", message: 'Agent updated' };
             }
-            return { code: 200, status: "error", message: 'Agent not found' };
+            return { code: 409, status: "error", message: 'Agent not found' };
 
         } catch (error) {
             throw error;
@@ -207,12 +207,11 @@ class AgentService {
                     status: "success",
                     message: "Agent removed success!"
                 }
-            } else {
-                return {
-                    code: 200,
-                    status: "error",
-                    message: "Agent dont't removed"
-                }
+            }
+            return {
+                code: 409,
+                status: "error",
+                message: "Agent dont't removed"
             }
         } catch (error) {
             throw error;
@@ -248,16 +247,16 @@ class AgentService {
                     }
                 } else {
                     return {
-                        code: 200,
-                        status: 'failed',
+                        code: 409,
+                        status: 'error',
                         message: "Password don't mathes"
                     }
                 }
 
             } else {
                 return {
-                    code: 200,
-                    status: 'failed',
+                    code: 409,
+                    status: 'error',
                     message: "Agent not exist!"
                 }
             }

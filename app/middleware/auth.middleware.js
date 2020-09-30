@@ -11,7 +11,7 @@ class AuthMiddleware {
 
     jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
       try {
-        if (err) return res.send(403).json({ status: "error", message: "Not authorization user" });
+        if (err) return res.status(403).json({ status: "error", message: "Not authorization user" });
 
         const account_banned = await AgentService.checkedBan(decoded.data);
 
@@ -62,17 +62,15 @@ class AuthMiddleware {
 
     jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
       try {
-        const admin_match = await AgentService.checkAdmin(decoded.data);
-
         if (err) return res.sendStatus(403);
-        if (!admin_match) {
-          return res.status(401).json({
-            status: 'error',
-            message: "You have not permission"
-          });
-        }
 
-        next();
+        const admin_match = await AgentService.checkAdmin(decoded.data);
+        if (admin_match) return next();
+
+        return res.status(401).json({
+          status: 'error',
+          message: "You have not permission"
+        });
       } catch (error) {
         throw error;
       }

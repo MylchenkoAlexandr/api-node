@@ -7,8 +7,8 @@ const { getAgents, getSuitableAgents, createAgent, updateAgent, deleteAgent, upd
 router.get('/', authenticateToken, checkedAdminRole, getAgents);
 router.post('/suitable', authenticateToken, checkedAdminRole, getSuitableAgents);
 router.post('/create', authenticateToken, checkedAdminRole, createAgent);
-router.post('/update/:agent_id', authenticateToken, checkedAdminRole, updateAgent);
-router.delete('/delete/:agent_id', authenticateToken, checkedAdminRole, deleteAgent);
-router.post('/update-password/:agent_id', authenticateToken, updateAgentPassword);
+router.put('/:agent_id', authenticateToken, checkedAdminRole, updateAgent);
+router.delete('/:agent_id', authenticateToken, checkedAdminRole, deleteAgent);
+router.put('/password/:agent_id', authenticateToken, updateAgentPassword);
 
 module.exports = router;
