@@ -24,6 +24,10 @@ class AuthMiddleware {
 
         next();
       } catch (error) {
+        res.status(500).json({
+          status: 'error',
+          message: "Server Error"
+        });
         throw error;
       }
     });
@@ -46,9 +50,9 @@ class AuthMiddleware {
 
       return res.status(401).json({ status: 'error' });
     } catch (error) {
-      res.status(400).json({
+      res.status(500).json({
         status: 'error',
-        message: "Server error"
+        message: "Server Error"
       });
       throw error;
     }
@@ -72,6 +76,10 @@ class AuthMiddleware {
           message: "You have not permission"
         });
       } catch (error) {
+        res.status(500).json({
+          status: 'error',
+          message: "Server Error"
+        });
         throw error;
       }
     });

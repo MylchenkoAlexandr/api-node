@@ -20,7 +20,7 @@ async function createAgent(req, res) {
 
         return res.status(400).json({ status: 'error', message: 'Bad Request' });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Server error" });
+        res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
     }
 }
@@ -46,7 +46,7 @@ async function updateAgent(req, res) {
 
         return res.status(400).json({ status: 'error', message: 'Bad Request' });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Server error" });
+        res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
     }
 }
@@ -57,7 +57,7 @@ async function deleteAgent(req, res) {
 
         return res.status(response.code).json({ status: response.status, message: response.message });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Server error" });
+        res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
     }
 }

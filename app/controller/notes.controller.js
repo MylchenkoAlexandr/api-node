@@ -10,7 +10,7 @@ async function getNotes(req, res) {
 
         return res.status(400).json({ status: 'error' });
     } catch (err) {
-        res.status(400).json({ status: 'error', message: 'Server Error!' });
+        res.status(500).json({ status: 'error', message: 'Server Error!' });
         throw err;
     }
 }
@@ -31,7 +31,7 @@ async function createNote(req, res) {
 
         return res.status(400).json({ status: 'error' });
     } catch (err) {
-        res.status(400).json({ status: 'error', message: 'Server Error!' });
+        res.status(500).json({ status: 'error', message: 'Server Error' });
         throw err;
     }
 }
@@ -46,7 +46,7 @@ async function deleteNote(req, res) {
 
         return res.status(400).json({ status: 'error' });
     } catch (err) {
-        res.status(400).json({ status: 'error', message: 'Server Error!' });
+        res.status(500).json({ status: 'error', message: 'Server Error' });
         throw err;
     }
 }

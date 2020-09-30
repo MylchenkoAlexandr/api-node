@@ -14,7 +14,7 @@ async function sendMailToClient(req, res) {
 
         return res.status(200).json({ status: "success", message: "Mail send" });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Mail don't send" });
+        res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
     }
 }
@@ -56,7 +56,7 @@ async function sendEmailWithCompanies(req, res) {
 
         return res.status(400).json({ status: 'error', message: 'Bad request' });
     } catch (err) {
-        res.status(500).json({ status: 'error', message: "Server Error!" });
+        res.status(500).json({ status: 'error', message: "Server Error" });
         throw err;
     }
 }
@@ -71,7 +71,7 @@ async function createToken(req, res) {
         const tokens = await MailService.createToken();
         res.status(201).json({ status: 'success', message: "Token created", tokens });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Server error!" });
+        res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
     }
 }
