@@ -20,14 +20,7 @@ module.exports = server => {
 
             console.log("role", role)
 
-            if (role == 'admin') {
-                //    if (user.states) {
-                //     for (let index = 0; index < user.states.length; index++) {
-                //         socket.join(user.states[index]);
-                //     }
-                // } else {
-                socket.join("all_leads");
-            } else if (role == 'agent') {
+            if (role == 'agent') {
                 socket.join(user.id);
             }
         });
@@ -118,8 +111,6 @@ module.exports = server => {
                         if (uploadedLead.empty == 0) {
                             io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
 
-                            sockets.to("all_leads").to(uploadedLead.state).emit("CREATE_LEAD", uploadedLead);
-                            
                             if (uploadedLead.source === 'blueberry') {
                                 io.sockets.to("blueberry_leads").emit("CREATE_LEAD", uploadedLead);
                             } else if (uploadedLead.source === 'mediaalpha') {

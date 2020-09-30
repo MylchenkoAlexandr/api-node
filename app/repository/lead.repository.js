@@ -90,9 +90,7 @@ const LeadRepository = {
 
                 return lead;
             });
-
-            // console.log("getRawLead -> data", data)
-
+            
             return resolve(data);
         });
     },
