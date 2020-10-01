@@ -45,7 +45,7 @@ async function recordCallback(req, res) {
 
         return res.sendStatus(200);
     } catch (err) {
-        res.status(400).json({ status: 'error', message: "Server Error!" });
+        res.status(500).json({ status: 'error', message: "Server Error!" });
         throw err;
     }
 }

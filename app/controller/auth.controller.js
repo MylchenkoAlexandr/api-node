@@ -32,7 +32,7 @@ async function login(req, res) {
 
     return res.status(401).json({ status: 'error', message: "Password or email incorrect" });
   } catch (error) {
-    res.status(400).json({ status: 'error', message: "Server error" });
+    res.status(500).json({ status: 'error', message: "Server Error" });
     throw error;
   }
 
@@ -72,7 +72,7 @@ function verify(req, res) {
       return res.status(403).json({ status: 'error' });
     });
   } catch (error) {
-    res.status(400).json({ status: 'error', message: "Server error" });
+    res.status(500).json({ status: 'error', message: "Server Error" });
     throw error;
   }
 }

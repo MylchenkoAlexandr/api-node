@@ -29,7 +29,7 @@ async function saveBeneficiary(req, res) {
 
         return res.status(400).json({ status: "error", message: "Bad request" });
     } catch (error) {
-        res.status(400).json({ status: "error", message: "Server error" });
+        res.status(500).json({ status: "error", message: "Server error" });
         throw error;
     }
 }
@@ -40,7 +40,7 @@ async function getBeneficiary(req, res) {
 
         return res.status(response.code).json({ status: response.status, message: response.message, beneficiary: response.beneficiary });
     } catch (error) {
-        res.status(400).json({ status: "error", message: "Server error" });
+        res.status(500).json({ status: "error", message: "Server error" });
         throw error;
     }
 }

@@ -27,7 +27,7 @@ async function uploadCSV(req, res) {
             res.status(200).json({ status: "success", message: "Success parsed CSV file into system" });
         }
     } catch (err) {
-        res.status(400).json({ status: "error", message: "Server error!" });
+        res.status(500).json({ status: "error", message: "Server Error" });
         throw err;
     }
 }
