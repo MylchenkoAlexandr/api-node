@@ -18,7 +18,7 @@ async function uploadCSV(req, res) {
         });
 
         if (rawLeads) {
-            Object.keys(rawLeads).forEach(async index => {
+            Object.keys(rawLeads).forEach(index => {
                 let preparedRawLead = FormatService.formatRawLead(rawLeads[index], "blueberry", "life");
 
                 client.emit("process-lead", preparedRawLead);

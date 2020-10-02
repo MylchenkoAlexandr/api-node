@@ -262,11 +262,13 @@ class FormatService {
         if (rawLead.contact) {
             rawLead.contact = rawLead.contact.replace(/"/ig, '');
         }
+        
+        console.log(rawLead);
 
-        if (rawLead.email != 'NULL' || rawLead.email != 0) {
-            rawLead.email = rawLead.email.replace(/"/ig, '');
-        } else {
+        if (rawLead.email == 'NULL' || rawLead.email == 0) {
             delete rawLead.email
+        } else {
+            rawLead.email = rawLead.email.replace(/"/ig, '');
         }
 
         if (rawLead.birth_date != 0 && rawLead.birth_date != 'NULL') {
