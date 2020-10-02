@@ -164,6 +164,9 @@ class FormatService {
                 if (fullname) {
                     formatedLead.fullname = fullname;
                 }
+            } else {
+                formatedLead.fullname = lead.fullname;
+                delete lead.fullname;
             }
 
             if ("empty" in lead) {
