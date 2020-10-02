@@ -3,8 +3,8 @@ const { getNotes, createNote, deleteNote } = require('../app/controller/notes.co
 const AuthMiddleware = require('../app/middleware/auth.middleware');
 const authenticateToken = AuthMiddleware.authenticateToken;
 
-router.post('/get', authenticateToken, getNotes);
+router.get('/:lead_id', authenticateToken, getNotes);
 router.post('/create', authenticateToken, createNote);
-router.post('/delete', authenticateToken, deleteNote);
+router.delete('/:note_id', authenticateToken, deleteNote);
 
 module.exports = router;

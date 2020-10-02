@@ -299,6 +299,45 @@ class AgentService {
             throw error;
         }
     }
+
+    async uncompletedLead(email) {
+        try {
+            const lead_id = await AgentRepository.getUncompeletedLead(email);
+
+            return lead_id;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async startWorkWithLead(agent_id, lead_id) {
+        try {
+            const agent_candidate = await models.Users.findOne({
+                where: { id: agent_id }
+            });
+
+            await agent_candidate.update({
+                uncompleted_lead: lead_id
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async completedLead(agent_id) {
+        try {
+            const agent_candidate = await models.Users.findOne({
+                where: { id: agent_id }
+            });
+
+            await agent_candidate.update({
+                uncompleted_lead: null
+            });
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new AgentService;

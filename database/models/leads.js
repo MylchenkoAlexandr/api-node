@@ -36,6 +36,11 @@ module.exports = (sequelize, DataTypes) => {
           name: 'lead_id'
         }
       });
+      Leads.hasOne(models.Users, {
+        foreignKey: {
+          name: 'uncompleted_lead'
+        }
+      });
     }
   };
   Leads.init({

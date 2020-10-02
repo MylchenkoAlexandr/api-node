@@ -51,6 +51,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,
     },
+    uncompleted_lead: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      defaultValue: null,
+      allowNull: true
+    }
   }, {
     sequelize,
     modelName: 'Users',

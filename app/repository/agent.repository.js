@@ -53,6 +53,19 @@ const AgentRepository = {
         } catch (error) {
             throw error;
         }
+    },
+
+    async getUncompeletedLead(email) {
+        try {
+            const data = await db.sequelize.query(`SELECT users.uncompleted_lead as lead_id FROM users WHERE users.email = "${email}"`, {
+                type: db.sequelize.QueryTypes.SELECT,
+                plain: true
+            });
+
+            return data.lead_id;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

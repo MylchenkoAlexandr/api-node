@@ -108,11 +108,35 @@ async function getSuitableAgents(req, res) {
     }
 }
 
+async function completedLead(req, res) {
+    try {
+        await AgentService.completedLead(req.params.agent_id);
+
+        return res.status(200).json({ status: 'success', message: 'Lead completed' });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: "Server Error" });
+        throw err;
+    }
+}
+
+async function startWork(req, res) {
+    try {
+        await AgentService.startWorkWithLead(req.params.agent_id, req.params.lead_id);
+
+        return res.status(200).json({ status: 'success', message: 'Start work with lead' });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
 module.exports = {
     getAgents,
     createAgent,
     updateAgent,
     deleteAgent,
     getSuitableAgents,
-    updateAgentPassword
+    updateAgentPassword,
+    completedLead,
+    startWork
 }

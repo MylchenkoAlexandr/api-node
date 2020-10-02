@@ -1,4 +1,6 @@
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
+const jwt = require('jsonwebtoken');
+
 const FormatService = require('../services/format.service');
 const LeadService = require('../services/lead.service');
 const NinjaQuoterService = require('../services/ninja-quoter.service');

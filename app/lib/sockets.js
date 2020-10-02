@@ -24,13 +24,11 @@ module.exports = server => {
         });
 
         socket.on("join_blueberry_leads", () => {
-            console.log('user connected to blueberry_leads -> user:', users[socket.id].email);
             socket.join("blueberry_leads");
             socket.leave("media-alpha_leads");
         });
 
         socket.on("join_media-alpha_leads", () => {
-            console.log('user connected to media=alpha_leads -> user:', users[socket.id].email);
             socket.join("media-alpha_leads");
             socket.leave("blueberry_leads");
         });
@@ -151,51 +149,51 @@ module.exports = server => {
             }
         });
 
-        socket.on("busy-lead", lead_id => {
-            socket.join(lead_id, async () => {
-                try {
-                    const candidate = await models.Leads.findOne({
-                        where: { id: lead_id }
-                    });
+        // socket.on("busy-lead", lead_id => {
+        //     socket.join(lead_id, async () => {
+        //         try {
+        //             const candidate = await models.Leads.findOne({
+        //                 where: { id: lead_id }
+        //             });
 
-                    if (candidate) {
-                        await candidate.update({
-                            busy: 1,
-                            busy_agent_id: users[socket.id].id
-                        });
+        //             if (candidate) {
+        //                 await candidate.update({
+        //                     busy: 1,
+        //                     busy_agent_id: users[socket.id].id
+        //                 });
 
-                        const lead = await LeadRepository.getOne(candidate.id);
+        //                 const lead = await LeadRepository.getOne(candidate.id);
 
-                        io.sockets.emit("UPDATE_LEADS", lead);
-                    }
-                } catch (error) {
-                    throw error;
-                }
-            });
-        });
+        //                 io.sockets.emit("UPDATE_LEADS", lead);
+        //             }
+        //         } catch (error) {
+        //             throw error;
+        //         }
+        //     });
+        // });
 
-        socket.on("unbusy-lead", lead_id => {
-            socket.leave(lead_id, async () => {
-                try {
-                    const candidate = await models.Leads.findOne({
-                        where: { id: lead_id }
-                    });
+        // socket.on("unbusy-lead", lead_id => {
+        //     socket.leave(lead_id, async () => {
+        //         try {
+        //             const candidate = await models.Leads.findOne({
+        //                 where: { id: lead_id }
+        //             });
 
-                    if (candidate) {
-                        await candidate.update({
-                            busy: 0,
-                            busy_agent_id: null
-                        });
-                        const lead = await LeadRepository.getOne(candidate.id);
+        //             if (candidate) {
+        //                 await candidate.update({
+        //                     busy: 0,
+        //                     busy_agent_id: null
+        //                 });
+        //                 const lead = await LeadRepository.getOne(candidate.id);
 
-                        io.sockets.emit("UPDATE_LEADS", lead);
-                    }
+        //                 io.sockets.emit("UPDATE_LEADS", lead);
+        //             }
 
-                } catch (error) {
-                    throw new Error(error);
-                }
-            })
-        });
+        //         } catch (error) {
+        //             throw new Error(error);
+        //         }
+        //     })
+        // });
 
         socket.on("record-create", async ({ user_id, lead_id, url }) => {
             try {
