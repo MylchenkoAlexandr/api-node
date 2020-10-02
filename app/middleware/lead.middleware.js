@@ -38,11 +38,9 @@ class LeadMiddleware {
                 if (err) return res.status(403).json({ status: "error", message: "Not authorization user" });
 
                 const lead_id = await AgentService.uncompletedLead(decoded.data);
-                console.log("LeadMiddleware -> findUncompletedLead -> lead_id", lead_id)
-                console.log("LeadMiddleware -> findUncompletedLead ->  req.params.lead", req.params.lead_id)
-
-                console.log("LeadMiddleware -> findUncompletedLead -> lead_id == null", lead_id == null)
+                
                 if (lead_id == null || lead_id == req.params.lead_id) return next();
+                
                 return res.status(307).json({ status: 'warning', message: 'Please complete this lead, change status', lead_id });
             } catch (error) {
                 res.status(500).json({
