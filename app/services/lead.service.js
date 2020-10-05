@@ -142,6 +142,7 @@ class LeadService {
                 });
             }
 
+            console.log("foundExistLead -> exist", exist)
             return exist;
         } catch (err) {
             console.error(err)
