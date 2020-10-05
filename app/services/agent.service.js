@@ -1,7 +1,10 @@
 const models = require('../../database/models');
+const fs = require('fs');
+const path = require('path');
 const bcrypt = require('bcrypt');
 const StatesRepository = require('../repository/states.repository');
 const AgentRepository = require('../repository/agent.repository');
+const TransformationHelper = require('../helpers/transformation.helper');
 class AgentService {
     /**
      * The function for create agent
@@ -334,6 +337,24 @@ class AgentService {
                 uncompleted_lead: null
             });
 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async createCustomScript({ agent_id, type_id, html }) {
+        try {
+            let fulldate = TransformationHelper.date(Date.now());
+            let filename = `${fulldate}-${agent_id}-${type_id}.html`;
+            let script_path = path.normalize(path.join(__dirname, '..', '..', 'scripts', filename));
+
+            fs.writeFileSync(script_path, html);
+
+            await models.CustomScripts.create({
+                user_id: agent_id,
+                type_id,
+                filename
+            });
         } catch (error) {
             throw error;
         }

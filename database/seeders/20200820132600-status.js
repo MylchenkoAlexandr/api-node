@@ -28,8 +28,20 @@ module.exports = {
         updatedAt: new Date()
       },
       {
+        name: "notInterested",
+        title: "Not interested",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
         name: "doNotCall",
         title: "Do not call",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: "wrongPhoneNumber",
+        title: "Wrong Phone number",
         createdAt: new Date(),
         updatedAt: new Date()
       },

@@ -130,6 +130,30 @@ async function startWork(req, res) {
     }
 }
 
+async function createScript(req, res) {
+    try {
+        if (("agent_id" in req.body)
+            && ("type_id" in req.body)
+            && ("html" in req.body)
+        ) {
+            const script_options = {
+                agent_id: req.body.agent_id,
+                type_id: req.body.type_id,
+                html: req.body.html
+            }
+
+            await AgentService.createCustomScript(script_options);
+
+            return res.status(200).json({ status: 'success', message: 'Script created' });
+        }
+
+        return res.status(400).json({ status: 'error', message: 'Bad Request' });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
 module.exports = {
     getAgents,
     createAgent,
@@ -138,5 +162,6 @@ module.exports = {
     getSuitableAgents,
     updateAgentPassword,
     completedLead,
-    startWork
+    startWork,
+    createScript
 }
