@@ -1,4 +1,5 @@
 const AgentService = require('../services/agent.service');
+const CustomScriptsFacade = require('../facades/custom-scripts.facade');
 const bcrypt = require('bcrypt');
 
 async function createAgent(req, res) {
@@ -142,12 +143,39 @@ async function createScript(req, res) {
                 html: req.body.html
             }
 
-            await AgentService.createCustomScript(script_options);
-
-            return res.status(200).json({ status: 'success', message: 'Script created' });
+            const created = await CustomScriptsFacade.createCustomScript(script_options);
+            if (created) return res.status(201).json({ status: 'success', message: 'Script created' });
+            return res.status(400).json({ status: 'error', message: 'Maximum number of scripts' });
         }
 
         return res.status(400).json({ status: 'error', message: 'Bad Request' });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
+async function getAllScripts(req, res) {
+    try {
+        const script_options = {
+            agent_id: req.params.agent_id,
+            type_id: req.params.type_id,
+        };
+
+        const scripts = await CustomScriptsFacade.getHtmlForCustomScript(script_options);
+
+        return res.status(200).json({ status: 'success', scripts });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
+async function deleteScript(req, res) {
+    try {
+        await CustomScriptsFacade.deleteCustomScriptById(req.params.script_id);
+
+        return res.status(200).json({ status: 'success', message: 'Custom script deleted' });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Server Error' });
         throw error;
@@ -163,5 +191,7 @@ module.exports = {
     updateAgentPassword,
     completedLead,
     startWork,
-    createScript
+    createScript,
+    getAllScripts,
+    deleteScript
 }
