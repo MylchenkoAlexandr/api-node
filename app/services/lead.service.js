@@ -297,6 +297,36 @@ class LeadService {
             throw error;
         }
     }
+
+    async updateStatus(lead_id, statusName){
+        try {
+            const updatedLead = await models.Leads.findOne({
+                where: {
+                    id: lead_id
+                }
+            });
+
+            if(updatedLead){
+                const status = await models.Status.findOne({
+                    attributes: ['id'],
+                    where: {
+                        name: statusName
+                    }
+                });
+
+                if(status){
+                    await updatedLead.update({
+                        status_id: status.id
+                    });
+
+                    return await LeadRepository.getOne(updatedLead.id);
+                }
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new LeadService;
