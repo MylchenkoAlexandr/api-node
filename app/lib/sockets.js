@@ -149,6 +149,31 @@ module.exports = server => {
             }
         });
 
+        socket.on("update-status", async (lead_id, status) => {
+            try {
+                const updatedLead = await LeadService.updateStatus(lead_id, status);
+
+                io.sockets.to(updatedLead.id).emit("UPDATE_LEAD", updatedLead);
+                io.sockets.to(updatedLead.user_id).emit("UPDATE_LEADS", updatedLead);
+
+                for (user in users) {
+                    if (users[user].id != updatedLead.user_id) {
+                        io.sockets.to(users[user].id).emit("DELETE_LEAD", updatedLead.id);
+                    } else {
+                        io.sockets.to(updatedLead.user_id).emit("CREATE_LEAD", updatedLead);
+                    }
+                }
+
+                if (updatedLead.source === 'blueberry') {
+                    io.sockets.to("blueberry_leads").emit("UPDATE_LEADS", updatedLead);
+                } else if (updatedLead.source === 'mediaalpha') {
+                    io.sockets.to("media-alpha_leads").emit("UPDATE_LEADS", updatedLead);
+                }
+            } catch (err) {
+                throw err;
+            }
+        });
+
         socket.on("busy-lead", lead_id => {
             socket.join(lead_id, async () => {
                 try {
