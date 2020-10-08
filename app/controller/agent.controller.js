@@ -131,6 +131,22 @@ async function startWork(req, res) {
     }
 }
 
+async function getAllScripts(req, res) {
+    try {
+        const script_options = {
+            agent_id: req.params.agent_id,
+            type_id: req.params.type_id,
+        };
+
+        const scripts = await CustomScriptsFacade.getHtmlForCustomScript(script_options);
+
+        return res.status(200).json({ status: 'success', scripts });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
 async function createScript(req, res) {
     try {
         if (("agent_id" in req.body)
@@ -143,8 +159,8 @@ async function createScript(req, res) {
                 html: req.body.html
             }
 
-            const created = await CustomScriptsFacade.createCustomScript(script_options);
-            if (created) return res.status(201).json({ status: 'success', message: 'Script created' });
+            const script = await CustomScriptsFacade.createCustomScript(script_options);
+            if (script) return res.status(201).json({ status: 'success', message: 'Script created', script });
             return res.status(400).json({ status: 'error', message: 'Maximum number of scripts' });
         }
 
@@ -155,16 +171,19 @@ async function createScript(req, res) {
     }
 }
 
-async function getAllScripts(req, res) {
+async function updateScript(req, res) {
     try {
-        const script_options = {
-            agent_id: req.params.agent_id,
-            type_id: req.params.type_id,
-        };
+        if ("html" in req.body) {
+            const script_options = {
+                script_id: req.params.script_id,
+                html: req.body.html
+            };
 
-        const scripts = await CustomScriptsFacade.getHtmlForCustomScript(script_options);
+            await CustomScriptsFacade.updateCustomScript(script_options);
+            return res.status(200).json({ status: 'success', message: 'Custom script updated' });
+        }
 
-        return res.status(200).json({ status: 'success', scripts });
+        return res.status(400).json({ status: 'error', message: 'Bad Request' });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Server Error' });
         throw error;
@@ -193,5 +212,6 @@ module.exports = {
     startWork,
     createScript,
     getAllScripts,
-    deleteScript
+    deleteScript,
+    updateScript
 }

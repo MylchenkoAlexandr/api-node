@@ -6,9 +6,9 @@ class CustomScriptsFacade {
         try {
             let custom_scripts = await CustomScriptsService.getAll(agent_id, type_id);
             const amount_scripts = custom_scripts.length + 1;
-            const created = await CustomScriptsService.create(agent_id, type_id, html, amount_scripts);
+            const created_script = await CustomScriptsService.create(agent_id, type_id, html, amount_scripts);
 
-            return created;
+            return created_script;
         } catch (error) {
             throw error;
         }
@@ -34,9 +34,19 @@ class CustomScriptsFacade {
         }
     }
 
+    async updateCustomScript({ script_id, html }) {
+        try {
+            const script = await CustomScriptsService.getOne(script_id);
+            await CustomScriptsService.update(script, html)
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async deleteCustomScriptById(script_id) {
         try {
-            await CustomScriptsService.delete(script_id);
+            const script = await CustomScriptsService.getOne(script_id);
+            await CustomScriptsService.delete(script);
         } catch (error) {
             throw error;
         }

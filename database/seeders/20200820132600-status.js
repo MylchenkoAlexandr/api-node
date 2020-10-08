@@ -10,6 +10,12 @@ module.exports = {
         updatedAt: new Date()
       },
       {
+        name: "contactAttempt1",
+        title: "Contact attempt 1",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
         name: "contactAttempt2",
         title: "Contact attempt 2",
         createdAt: new Date(),
@@ -46,8 +52,26 @@ module.exports = {
         updatedAt: new Date()
       },
       {
+        name: "followUp",
+        title: "Follow up",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: "thinkingAboutIt",
+        title: "Thinking about it",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
         name: "emailed",
         title: "Emailed",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: "inApplication",
+        title: "In Application",
         createdAt: new Date(),
         updatedAt: new Date()
       },

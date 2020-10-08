@@ -7,6 +7,15 @@ class CustomScriptsService {
         this._path_url = path.normalize(path.join(__dirname, '..', '..', 'scripts'));
     }
 
+    async getOne(script_id) {
+        try {
+            const script = await models.CustomScripts.findOne({ where: { id: script_id } });
+            return script;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async getAll(agent_id, type_id) {
         try {
             const custom_scripts = await models.CustomScripts.findAll({ where: { user_id: agent_id, type_id } });
@@ -21,24 +30,41 @@ class CustomScriptsService {
             if (amount_scripts > 3) return false;
             let filename = `${Date.now()}-${agent_id}-${type_id}.html`;
             let script_path = path.join(this._path_url, filename);
-            
-            await models.CustomScripts.create({
+
+            const { dataValues: custom_script } = await models.CustomScripts.create({
                 user_id: agent_id,
                 type_id,
                 filename
             });
-            
+
             fs.writeFileSync(script_path, html);
 
-            return true;
+            delete custom_script.filename;
+            custom_script.html = html;
+
+            return custom_script;
         } catch (error) {
             throw error;
         }
     }
 
-    async delete(script_id) {
+    async delete(script) {
         try {
-            await models.CustomScripts.destroy({ where: { id: script_id } });
+            await script.destroy();
+            let script_path = path.join(this._path_url, script.filename);
+            fs.unlinkSync(script_path);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async update(script, html) {
+        try {
+            let script_path = path.join(this._path_url, script.filename);
+            await script.update({
+                updatedAt: new Date(),
+            });
+            fs.writeFileSync(script_path, html);
         } catch (error) {
             throw error;
         }
