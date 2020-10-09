@@ -9,39 +9,40 @@ class FormatService {
      * @param {object} lead
      */
     async formatLead(lead) {
-        if (lead.length <= 0) {
-            throw new Error('Lead object is empty!');
-        }
-
-        if (!("email" in lead) && !("phone" in lead)) {
-            throw new Error("Phone and Email is empty, lead is invalid");
-        }
-
-        const mandatoryFields = [
-            "source",
-            "type"
-        ];
-
-        // Try to find mandatory fields in lead
-        mandatoryFields.forEach(index => {
-            if (!(index in lead)) {
-                throw new Error('Missed mandatory field: ' + index);
-            }
-        });
-
-        /**
-         * !! Setting values you can find inside IF statements
-         * Fetching all usefull fields:
-         *  - status_id
-         *  - source_id
-         *  - type_id
-         *  - user_id
-         *  - state_id
-         *  - empty
-         *  - fullname
-         *  - medication
-         */
         try {
+            if (lead.length <= 0) {
+                throw new Error('Lead object is empty!');
+            }
+
+            if (!("email" in lead) && !("phone" in lead)) {
+                throw new Error("Phone and Email is empty, lead is invalid");
+            }
+
+            const mandatoryFields = [
+                "source",
+                "type"
+            ];
+
+            // Try to find mandatory fields in lead
+            mandatoryFields.forEach(index => {
+                if (!(index in lead)) {
+                    throw new Error('Missed mandatory field: ' + index);
+                }
+            });
+
+            /**
+             * !! Setting values you can find inside IF statements
+             * Fetching all usefull fields:
+             *  - status_id
+             *  - source_id
+             *  - type_id
+             *  - user_id
+             *  - state_id
+             *  - empty
+             *  - fullname
+             *  - medication
+             */
+
             let source, status, type, state, fullname;
 
             if ("type" in lead) {
@@ -223,7 +224,7 @@ class FormatService {
             formatedLead.property = {
                 ...lead
             }
-            
+
             return formatedLead;
         } catch (err) {
             throw err;
@@ -234,10 +235,10 @@ class FormatService {
      * Function for formating lead data for quoters
      * @param {object} lead 
      */
-    async formatLeadForQuote(lead) {
+    formatLeadForQuote(lead) {
         let formatedLead = {
             birthdate: lead.birth_date,
-            state: lead.state,
+            state: lead.state || zipcodes.lookup(lead.zip || lead.zipcode).state,
             gender: lead.gender.toLowerCase(),
             smoker: Boolean(+lead.tobacco),
             coverage: lead.coverage_amount,
@@ -265,7 +266,7 @@ class FormatService {
         if (rawLead.contact) {
             rawLead.contact = rawLead.contact.replace(/"/ig, '');
         }
-        
+
         console.log(rawLead);
 
         if (rawLead.email == 'NULL' || rawLead.email == 0) {

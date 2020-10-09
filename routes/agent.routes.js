@@ -15,9 +15,9 @@ router.delete('/:agent_id', authenticateToken, checkedAdminRole, deleteAgent);
 router.put('/password/:agent_id', authenticateToken, updateAgentPassword);
 router.patch('/:agent_id/completed_lead', authenticateToken, completedLead);
 router.patch('/:agent_id/start-work/:lead_id', authenticateToken, startWork)
-router.get('/scripts/:agent_id/:type_id', getAllScripts);
-router.post('/scripts/create', createScript);
-router.patch('/scripts/:script_id', updateScript);
-router.delete('/scripts/:script_id', deleteScript);
+router.get('/scripts/:agent_id/:type_id', authenticateToken, getAllScripts);
+router.post('/scripts/create', authenticateToken, createScript);
+router.patch('/scripts/:script_id', authenticateToken, updateScript);
+router.delete('/scripts/:script_id', authenticateToken, deleteScript);
 
 module.exports = router;

@@ -1,10 +1,10 @@
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
-const jwt = require('jsonwebtoken');
 
 const FormatService = require('../services/format.service');
 const LeadService = require('../services/lead.service');
 const NinjaQuoterService = require('../services/ninja-quoter.service');
-const MailService = require('../services/mail.service');
+
+const MailFacade = require('../facades/mail.facade');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
@@ -43,22 +43,41 @@ async function getLead(req, res) {
 }
 
 async function getCompaniesListByLeadData(req, res) {
-    const rawLead = JSON.parse(JSON.stringify(req.body));
-
-    rawLead.medications = rawLead['medications[]'];
-
-    if ("medications" in rawLead) {
-        delete rawLead['medications[]']
-    }
-
-    client.emit("process-lead", rawLead);
-
     try {
-        const formatedLeadForQuote = await FormatService.formatLeadForQuote(rawLead);
+        const rawLead = JSON.parse(JSON.stringify(req.body));
 
+        rawLead.medications = rawLead['medications[]'];
+
+        if ("medications" in rawLead) {
+            delete rawLead['medications[]']
+        }
+
+        client.emit("process-lead", rawLead);
+
+        const formatedLeadForQuote = FormatService.formatLeadForQuote(rawLead);
         const quotes = new NinjaQuoterService(formatedLeadForQuote);
-
         const companies = await quotes.getCompaniesInfo();
+
+        if (
+            ("email" in req.body)
+            && ("coverage_amount" in req.body)
+            && ("term") in req.body
+            && companies.length !== 0
+        ) {
+            try {
+                const mail = new MailFacade();
+                const email_params = {
+                    companies,
+                    email: rawLead.email,
+                    coverage_amount: rawLead.coverage_amount,
+                    term: rawLead.term,
+                }
+
+                mail.sendEmailWithCompanies(email_params);
+            } catch (error) {
+                console.error(error);
+            }
+        }
 
         return res.status(200).json(companies);
     } catch (err) {
@@ -130,6 +149,26 @@ async function uploadLeadFromMediaAlpha(req, res) {
         };
 
         client.emit("process-lead", preparedLead);
+
+        const formatedLeadForQuote = FormatService.formatLeadForQuote(preparedLead);
+        const quotes = new NinjaQuoterService(formatedLeadForQuote);
+        const companies = await quotes.getCompaniesInfo();
+
+        if (companies.length !== 0 && preparedLead.email.trim() !== '') {
+            try {
+                const mail = new MailFacade();
+                const email_params = {
+                    companies,
+                    email: preparedLead.email,
+                    coverage_amount: formatedLeadForQuote.coverage,
+                    term: formatedLeadForQuote.term,
+                }
+
+                mail.sendEmailWithCompanies(email_params);
+            } catch (error) {
+                console.error(error);
+            }
+        }
 
         return res.status(200).json({ status: "success", message: "Success Uploaded!" });
     } catch (err) {
