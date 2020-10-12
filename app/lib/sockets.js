@@ -158,8 +158,8 @@ module.exports = server => {
                 for (user in users) {
                     if (users[user].id != updatedLead.user_id) {
                         io.sockets.to(users[user].id).emit("DELETE_LEAD", updatedLead.id);
-                    } else if (users[user].id == uploadedLead.user_id) {
-                        io.sockets.to(users[user].id).emit("UPDATE_LEAD", uploadedLead);
+                    } else if (users[user].id == updatedLead.user_id) {
+                        io.sockets.to(users[user].id).emit("UPDATE_LEAD", updatedLead);
                     } else {
                         io.sockets.to(updatedLead.user_id).emit("CREATE_LEAD", updatedLead);
                     }

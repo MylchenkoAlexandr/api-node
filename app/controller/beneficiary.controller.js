@@ -1,4 +1,4 @@
-const BeneficiaryService = require('../services/beneficiary.service');
+const BeneficiaryFacade = require('../facades/beneficiary.facade');
 
 async function saveBeneficiary(req, res) {
 
@@ -22,7 +22,7 @@ async function saveBeneficiary(req, res) {
                 work_status: req.body.work_status
             };
 
-            const response = await BeneficiaryService.save(beneficiary_options);
+            const response = await BeneficiaryFacade.save(beneficiary_options);
 
             return res.status(response.code).json({ status: response.status, message: response.message });
         }
@@ -36,9 +36,9 @@ async function saveBeneficiary(req, res) {
 
 async function getBeneficiary(req, res) {
     try {
-        const response = await BeneficiaryService.getOne(req.params.lead_id);
+        const response = await BeneficiaryFacade.getOne(req.params.lead_id);
 
-        return res.status(response.code).json({ status: response.status, message: response.message, beneficiary: response.beneficiary });
+        return res.status(response.code).json({ status: response.status, beneficiary: response.beneficiary });
     } catch (error) {
         res.status(500).json({ status: "error", message: "Server error" });
         throw error;

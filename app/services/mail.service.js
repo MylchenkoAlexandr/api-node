@@ -3,6 +3,8 @@ const ejs = require('ejs');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
 
+const TransformationHelper = require('../helpers/transformation.helper');
+
 require('dotenv').config();
 
 class MailService {
@@ -81,6 +83,7 @@ class MailService {
      */
     generateQuotesHtmlTemplate(filename, { coverage_amount, term, companies }) {
         let html;
+        coverage_amount = TransformationHelper.numberWithCommas(coverage_amount);
         ejs.renderFile(this.emails_path + filename, { coverage_amount, term, companies }, (err, html_code) => {
             if (err) throw err;
             html = html_code;

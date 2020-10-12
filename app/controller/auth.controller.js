@@ -1,36 +1,14 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const AgentService = require('../services/agent.service');
+const AuthFacade = require('../facades/auth.facade');
 
 async function login(req, res) {
   try {
     if (("email" in req.body) && ("password" in req.body)) {
-      const user = await AgentService.find(req.body.email);
-      if (user) {
-        const password_mathes = await bcrypt.compare(req.body.password, user.password);
+      const response = await AuthFacade.login(req.body.email, req.body.password);
 
-        if (password_mathes) {
-          const acces_token = jwt.sign({ data: req.body.email }, process.env.SECRET_KEY, { expiresIn: "24h" });
-
-          return res.status(200).json({
-            status: "success",
-            message: "Login success",
-            user: {
-              id: user.id,
-              email: user.email,
-              fname: user.fname,
-              lname: user.lname,
-              states: JSON.parse(user.states),
-              role_id: user.role_id
-            },
-            token: acces_token
-          });
-        }
-        return res.status(401).json({ status: 'error', message: "Password or email incorrect" });
-      }
+      return res.status(response.code).json({ status: response.status, message: response.message, user: response.user, token: response.token });
     }
 
-    return res.status(401).json({ status: 'error', message: "Password or email incorrect" });
+    return res.status(400).json({ status: 'error', message: "Client Error" });
   } catch (error) {
     res.status(500).json({ status: 'error', message: "Server Error" });
     throw error;
@@ -38,39 +16,16 @@ async function login(req, res) {
 
 };
 
-function verify(req, res) {
-
-  if (!("token" in req.body)) {
-    return res.status(403).json({ status: 'error' });
-  }
-
+async function verify(req, res) {
   try {
-    const jwt_token = req.body.token;
+    if (("token" in req.body)) {
+      const jwt_token = req.body.token;
+      const response = await AuthFacade.verify(jwt_token);
 
-    jwt.verify(jwt_token, process.env.SECRET_KEY, async (err, decoded) => {
-      if (err) return res.status(403).json({ status: 'error' });
+      return res.status(response.code).json({ status: response.status, message: response.message, user: response.user });
+    }
 
-      const account_banned = await AgentService.checkedBan(decoded.data);
-      if (account_banned) return res.status(403).json({ status: 'error', message: "Your account has been banned" });
-
-      const candidate = await AgentService.find(decoded.data);
-      if (candidate) {
-        return res.status(200).json({
-          status: "success",
-          message: "Verify success",
-          user: {
-            id: candidate.id,
-            email: candidate.email,
-            fname: candidate.fname,
-            lname: candidate.lname,
-            states: JSON.parse(candidate.states),
-            role_id: candidate.role_id
-          }
-        });
-      }
-
-      return res.status(403).json({ status: 'error' });
-    });
+    return res.status(400).json({ status: 'error', message: 'Client Error' });
   } catch (error) {
     res.status(500).json({ status: 'error', message: "Server Error" });
     throw error;

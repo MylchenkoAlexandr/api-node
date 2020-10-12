@@ -25,9 +25,8 @@ class CustomScriptsService {
         }
     }
 
-    async create(agent_id, type_id, html, amount_scripts) {
+    async create(agent_id, type_id, html) {
         try {
-            if (amount_scripts > 3) return false;
             let filename = `${Date.now()}-${agent_id}-${type_id}.html`;
             let script_path = path.join(this._path_url, filename);
 

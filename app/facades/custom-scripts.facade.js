@@ -5,16 +5,18 @@ class CustomScriptsFacade {
     async createCustomScript({ agent_id, type_id, html }) {
         try {
             let custom_scripts = await CustomScriptsService.getAll(agent_id, type_id);
-            const amount_scripts = custom_scripts.length + 1;
-            const created_script = await CustomScriptsService.create(agent_id, type_id, html, amount_scripts);
 
-            return created_script;
+            const amount_scripts = custom_scripts.length + 1;
+            if (amount_scripts > 3) return { code: 400, status: 'error', message: 'Maximum number of scripts' };
+
+            const script = await CustomScriptsService.create(agent_id, type_id, html, amount_scripts);
+            return { code: 201, status: 'success', message: 'Script created', script };
         } catch (error) {
             throw error;
         }
     }
 
-    async getHtmlForCustomScript({ agent_id, type_id }) {
+    async getCustomScripts({ agent_id, type_id }) {
         try {
             let custom_scripts = await CustomScriptsService.getAll(agent_id, type_id);
             let scripts = [];
@@ -28,7 +30,7 @@ class CustomScriptsFacade {
                 scripts.push(script_obj);
             });
 
-            return scripts;
+            return { code: 200, status: 'success', scripts };
         } catch (error) {
             throw error;
         }
@@ -38,6 +40,8 @@ class CustomScriptsFacade {
         try {
             const script = await CustomScriptsService.getOne(script_id);
             await CustomScriptsService.update(script, html)
+
+            return { code: 200, status: 'success', message: 'Custom script updated' };
         } catch (error) {
             throw error;
         }
@@ -47,6 +51,8 @@ class CustomScriptsFacade {
         try {
             const script = await CustomScriptsService.getOne(script_id);
             await CustomScriptsService.delete(script);
+
+            return { code: 200, status: 'success', message: 'Custom script deleted' };
         } catch (error) {
             throw error;
         }

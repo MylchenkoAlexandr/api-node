@@ -19,17 +19,14 @@ class LeadMiddleware {
                 if (access) return next();
                 return res.status(400).json({ status: 'error', message: 'No permission' });
             } catch (error) {
-                res.status(500).json({
-                    status: 'error',
-                    message: "Server Error"
-                });
+                res.status(500).json({ status: 'error', message: "Server Error" });
                 throw error;
             }
         });
 
     }
 
-    async findUncompletedLead(req, res, next) {
+    findUncompletedLead(req, res, next) {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
 
@@ -38,15 +35,11 @@ class LeadMiddleware {
                 if (err) return res.status(403).json({ status: "error", message: "Not authorization user" });
 
                 const lead_id = await AgentService.uncompletedLead(decoded.data);
-                
                 if (lead_id == null || lead_id == req.params.lead_id) return next();
-                
+
                 return res.status(307).json({ status: 'warning', message: 'Please complete this lead, change status', lead_id });
             } catch (error) {
-                res.status(500).json({
-                    status: 'error',
-                    message: "Server Error"
-                });
+                res.status(500).json({ status: 'error', message: "Server Error" });
                 throw error;
             }
         });

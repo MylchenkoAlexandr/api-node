@@ -22,6 +22,10 @@ class TransformationHelper {
         const day = (date_now.getDate()).toString().length === 1 ? `0${date_now.getDate()}` : date_now.getDate();
         return `${year}${month}${day}`;
     }
+
+    numberWithCommas(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 }
 
 module.exports = new TransformationHelper;

@@ -16,6 +16,19 @@ class NotesService {
     }
 
     /**
+     * The function for get one notes for lead by note_id
+     * @param {number} note_id 
+     */
+    async getOne(note_id) {
+        try {
+            const note = await NotesRepository.getOne(note_id);
+            return note;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
      * The function for create note for lead
      * @param {number} user_id 
      * @param {number} lead_id 
@@ -23,17 +36,13 @@ class NotesService {
      */
     async create({ user_id, lead_id, message }) {
         try {
-            const createNote = await models.Notes.create({
+            const create_note = await models.Notes.create({
                 user_id,
                 lead_id,
                 message
             });
 
-            if (createNote) {
-                const note = await NotesRepository.getOne(createNote.id);
-
-                return note;
-            }
+            return create_note;
         } catch (error) {
             throw error;
         }
@@ -51,8 +60,6 @@ class NotesService {
                     id: note_id
                 }
             });
-
-            return true;
         } catch (error) {
             throw error;
         }

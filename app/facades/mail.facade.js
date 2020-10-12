@@ -11,11 +11,11 @@ class MailFacade {
                 if (typeof email_params.companies == 'string') {
                     email_params.companies = JSON.parse(email_params.companies);
                 }
-
+                
                 const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
 
                 const mail_options = {
-                    from: process.env.MAIL_SERVICE_USER_EMAIL,
+                    from: `❤️Blueberry <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
                     to: email_params.email,
                     subject: "Blueberry Insurance",
                     html
