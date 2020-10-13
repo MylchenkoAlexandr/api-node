@@ -71,6 +71,7 @@ async function getCompaniesListByLeadData(req, res) {
                     email: rawLead.email,
                     coverage_amount: rawLead.coverage_amount,
                     term: rawLead.term,
+                    contact: rawLead.contact
                 }
 
                 mail.sendEmailWithCompanies(email_params);
@@ -162,6 +163,7 @@ async function uploadLeadFromMediaAlpha(req, res) {
                     email: preparedLead.email,
                     coverage_amount: formatedLeadForQuote.coverage,
                     term: formatedLeadForQuote.term,
+                    contact: preparedLead.contact
                 }
 
                 mail.sendEmailWithCompanies(email_params);

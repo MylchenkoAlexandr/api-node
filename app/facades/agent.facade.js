@@ -2,6 +2,12 @@ const AgentService = require('../services/agent.service');
 const bcrypt = require('bcrypt');
 
 class AgentFacade {
+
+    /**
+     * The function for create agent
+     * @param {object} agent this object with agenet params
+     * @return {object} this object with response params
+     */
     async createAgent(agent) {
         try {
             const candidate = await AgentService.find(agent.email);
@@ -19,16 +25,22 @@ class AgentFacade {
         }
     }
 
-    async updateAgent(agent_options, agent_id) {
+    /**
+     * The function for update agent
+     * @param {object} agent_params this object with agenet params
+     * @param {number} agent_id
+     * @return {object} this object with response params
+     */
+    async updateAgent(agent_params, agent_id) {
         try {
             const candidate = await AgentService.findById(agent_id);
 
             if (candidate) {
-                const agent = agent_options;
+                const agent = agent_params;
 
                 agent.id = agent_id;
                 agent.states = JSON.stringify(agent.states);
-                if (agent_options.password != null && agent_options != '') agent_options.new_password = await bcrypt.hash(agent.password, 10);
+                if (agent_params.password != null && agent_params != '') agent_params.new_password = await bcrypt.hash(agent.password, 10);
                 delete agent.password;
 
                 await AgentService.update(candidate, agent);
@@ -41,6 +53,11 @@ class AgentFacade {
         }
     }
 
+    /**
+     * The function for delete agent
+     * @param {number} agent_id
+     * @return {object} this object with response params
+     */
     async deleteAgent(agent_id) {
         try {
             const candidate = await AgentService.findById(agent_id);
@@ -56,6 +73,12 @@ class AgentFacade {
         }
     }
 
+    /**
+     * The function for update agent password
+     * @param {object} passwords this object have params new password and old password
+     * @param {number} agent_id
+     * @return {object} this object with response params
+     */
     async updateAgentPassword(passwords, agent_id) {
 
         try {
@@ -80,6 +103,10 @@ class AgentFacade {
         }
     }
 
+    /**
+     * The function for get all agents
+     * @return {object} this object with response params
+     */
     async getAgents() {
         try {
             const agents = await AgentService.getAll();
@@ -90,6 +117,11 @@ class AgentFacade {
         }
     }
 
+    /**
+     * The function for get all agents that can quote a specific state
+     * @param {number} state_id
+     * @return {object} this object with response params
+     */
     async getSuitableAgents(state_id) {
         try {
             const agents = await AgentService.getAllSuitable(state_id);
@@ -100,6 +132,11 @@ class AgentFacade {
         }
     }
 
+    /**
+     * The function for completed lead for agent who has uncompleted lead
+     * @param {number} agent_id
+     * @return {object} this object with response params
+     */
     async completedLead(agent_id) {
         try {
             await AgentService.completedLead(agent_id);
@@ -110,6 +147,12 @@ class AgentFacade {
         }
     }
 
+    /**
+     * The function for assigning an uncompleted lead to an agent
+     * @param {number} agent_id
+     * @param {number} lead_id
+     * @return {object} this object with response params
+     */
     async startWork(agent_id, lead_id) {
         try {
             await AgentService.startWorkWithLead(agent_id, lead_id);

@@ -23,6 +23,9 @@ class TransformationHelper {
         return `${year}${month}${day}`;
     }
 
+    /*
+    * Formating number e.g 1000 on 1,000
+    */
     numberWithCommas(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }

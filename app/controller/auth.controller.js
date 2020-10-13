@@ -8,7 +8,7 @@ async function login(req, res) {
       return res.status(response.code).json({ status: response.status, message: response.message, user: response.user, token: response.token });
     }
 
-    return res.status(400).json({ status: 'error', message: "Client Error" });
+    return res.status(400).json({ status: 'error', message: 'Bad Request' });
   } catch (error) {
     res.status(500).json({ status: 'error', message: "Server Error" });
     throw error;
@@ -25,7 +25,7 @@ async function verify(req, res) {
       return res.status(response.code).json({ status: response.status, message: response.message, user: response.user });
     }
 
-    return res.status(400).json({ status: 'error', message: 'Client Error' });
+    return res.status(400).json({ status: 'error', message: 'Bad Request' });
   } catch (error) {
     res.status(500).json({ status: 'error', message: "Server Error" });
     throw error;

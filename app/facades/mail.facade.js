@@ -15,9 +15,9 @@ class MailFacade {
                 const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
 
                 const mail_options = {
-                    from: `❤️Blueberry <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                    from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
                     to: email_params.email,
-                    subject: "Blueberry Insurance",
+                    subject: `To: ${email_params.contact}, From: ❤️ @ Blueberry`,
                     html
                 };
 
