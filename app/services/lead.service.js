@@ -169,6 +169,7 @@ class LeadService {
             }
 
             if (leads) {
+                console.log("getAll -> leads", leads)
                 return leads;
             }
         } catch (error) {

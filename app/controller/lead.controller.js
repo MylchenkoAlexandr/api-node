@@ -14,7 +14,6 @@ async function test(req, res) {
 async function getLeads(req, res) {
     try {
         const leads = await LeadService.getAll(req.params.type, req.params.user_id);
-
         return res.status(200).json({ status: "success", leads });
     } catch (err) {
         res.status(500).json({ status: 'error', message: "Server Error!" });
@@ -101,7 +100,7 @@ async function uploadLeadFromUrl(req, res) {
         rawLead = {
             agent: null,
             type: urlData.type,
-            source: "blueberry",
+            source: "clickListing",
             empty: 1
         };
 
