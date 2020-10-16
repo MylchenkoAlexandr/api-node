@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const AuthMiddleware = require('../app/middleware/auth.middleware');
 const authenticateToken = AuthMiddleware.authenticateToken;
-const { saveBeneficiary, getBeneficiary } = require('../app/controller/beneficiary.controller');
+const { saveBeneficiary, getBeneficiaries } = require('../app/controller/beneficiary.controller');
 
-router.put('/save', authenticateToken, saveBeneficiary);
-router.get('/:lead_id', authenticateToken, getBeneficiary);
+router.put('/:beneficiary_number', authenticateToken, saveBeneficiary);
+router.get('/:lead_id', authenticateToken, getBeneficiaries);
 
 module.exports = router;

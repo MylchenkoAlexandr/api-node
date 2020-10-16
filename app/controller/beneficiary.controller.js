@@ -11,6 +11,7 @@ async function saveBeneficiary(req, res) {
             && ("location" in req.body)
             && ("grand_kids" in req.body)
             && ("work_status" in req.body)
+            && ("procent" in req.body)
         ) {
             const beneficiary_options = {
                 lead_id: req.body.lead_id,
@@ -19,10 +20,11 @@ async function saveBeneficiary(req, res) {
                 relative_id: req.body.relative_id,
                 location: req.body.location,
                 grand_kids: req.body.grand_kids,
-                work_status: req.body.work_status
+                work_status: req.body.work_status,
+                procent: req.body.procent
             };
 
-            const response = await BeneficiaryFacade.save(beneficiary_options);
+            const response = await BeneficiaryFacade.save(beneficiary_options, +req.params.beneficiary_number);
 
             return res.status(response.code).json({ status: response.status, message: response.message });
         }
@@ -34,11 +36,11 @@ async function saveBeneficiary(req, res) {
     }
 }
 
-async function getBeneficiary(req, res) {
+async function getBeneficiaries(req, res) {
     try {
-        const response = await BeneficiaryFacade.getOne(req.params.lead_id);
+        const response = await BeneficiaryFacade.getAll(req.params.lead_id);
 
-        return res.status(response.code).json({ status: response.status, beneficiary: response.beneficiary });
+        return res.status(response.code).json({ status: response.status, beneficiaries: response.beneficiaries });
     } catch (error) {
         res.status(500).json({ status: "error", message: "Server error" });
         throw error;
@@ -47,5 +49,5 @@ async function getBeneficiary(req, res) {
 
 module.exports = {
     saveBeneficiary,
-    getBeneficiary
+    getBeneficiaries
 }
