@@ -199,6 +199,36 @@ async function getMediaAlphaLeads(req, res) {
     }
 }
 
+async function getManualLeads(req, res) {
+    try {
+        const leads = await LeadService.manualLeads();
+        return res.status(200).json({ status: "success", leads });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: "Server Error" });
+        throw err;
+    }
+}
+
+async function getBulkLeads(req, res) {
+    try {
+        const leads = await LeadService.bulkLeads();
+        return res.status(200).json({ status: "success", leads });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: "Server Error" });
+        throw err;
+    }
+}
+
+async function getClickListingLeads(req, res) {
+    try {
+        const leads = await LeadService.clickListingLeads();
+        return res.status(200).json({ status: "success", leads });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: "Server Error" });
+        throw err;
+    }
+}
+
 module.exports = {
     test,
     getLead,
@@ -208,5 +238,8 @@ module.exports = {
     uploadLeadFromMediaAlpha,
     uploadLeadFromUrl,
     getBlueberryLeads,
-    getMediaAlphaLeads
+    getMediaAlphaLeads,
+    getManualLeads,
+    getBulkLeads,
+    getClickListingLeads
 }   

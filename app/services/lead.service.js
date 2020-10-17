@@ -215,6 +215,45 @@ class LeadService {
         }
     }
 
+     /** 
+     * Function for get all MediaAlpha leads
+    */
+   async manualLeads() {
+    try {
+        const leads = await LeadRepository.getLeadsBySource(3);
+
+        return leads;
+    } catch (error) {
+        throw error;
+    }
+}
+
+ /** 
+     * Function for get all MediaAlpha leads
+    */
+   async bulkLeads() {
+    try {
+        const leads = await LeadRepository.getLeadsBySource(4);
+
+        return leads;
+    } catch (error) {
+        throw error;
+    }
+}
+
+ /** 
+     * Function for get all MediaAlpha leads
+    */
+   async clickListingLeads() {
+    try {
+        const leads = await LeadRepository.getLeadsBySource(5);
+
+        return leads;
+    } catch (error) {
+        throw error;
+    }
+}
+
     /**
      * Assign agent
      * @param {number} lead_id 

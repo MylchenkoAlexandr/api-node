@@ -25,11 +25,41 @@ module.exports = server => {
         socket.on("join_blueberry_leads", () => {
             socket.join("blueberry_leads");
             socket.leave("media-alpha_leads");
+            socket.leave("manual_leads");
+            socket.leave("bulk_leads");
+            socket.leave("click-listing_leads");
         });
 
         socket.on("join_media-alpha_leads", () => {
             socket.join("media-alpha_leads");
             socket.leave("blueberry_leads");
+            socket.leave("manual_leads");
+            socket.leave("bulk_leads");
+            socket.leave("click-listing_leads");
+        });
+
+        socket.on("join_manual_leads", () => {
+            socket.join("manual_leads");
+            socket.leave("media-alpha_leads");
+            socket.leave("blueberry_leads");
+            socket.leave("bulk_leads");
+            socket.leave("click-listing_leads");
+        });
+
+        socket.on("join_bulk_leads", () => {
+            socket.join("bulk_leads");
+            socket.leave("blueberry_leads");
+            socket.leave("media-alpha_leads");
+            socket.leave("manual_leads");
+            socket.leave("click-listing_leads");
+        });
+
+        socket.on("join_click-listing_leads", () => {
+            socket.join("click-listing_leads");
+            socket.leave("blueberry_leads");
+            socket.leave("media-alpha_leads");
+            socket.leave("manual_leads");
+            socket.leave("bulk_leads");
         });
 
         socket.on("process-lead", async (lead) => {
@@ -85,6 +115,15 @@ module.exports = server => {
                             } else if (uploadedLead.source === 'mediaalpha') {
                                 io.sockets.to("media-alpha_leads").emit("UPDATE_LEADS", uploadedLead);
                             }
+                            else if (uploadedLead.source === 'manual') {
+                                io.sockets.to("manual_leads").emit("UPDATE_LEADS", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'bulk') {
+                                io.sockets.to("bulk_leads").emit("UPDATE_LEADS", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'clickListing') {
+                                io.sockets.to("click-listing_leads").emit("UPDATE_LEADS", uploadedLead);
+                            }
 
                             if (emptyStatus) {
                                 io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
@@ -110,6 +149,15 @@ module.exports = server => {
                                 io.sockets.to("blueberry_leads").emit("CREATE_LEAD", uploadedLead);
                             } else if (uploadedLead.source === 'mediaalpha') {
                                 io.sockets.to("media-alpha_leads").emit("CREATE_LEAD", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'manual') {
+                                io.sockets.to("manual_leads").emit("CREATE_LEAD", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'bulk') {
+                                io.sockets.to("bulk_leads").emit("CREATE_LEAD", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'clickListing') {
+                                io.sockets.to("click-listing_leads").emit("CREATE_LEAD", uploadedLead);
                             }
                         }
 
@@ -266,6 +314,6 @@ module.exports = server => {
         });
 
     });
-    
+
     return io;
 };

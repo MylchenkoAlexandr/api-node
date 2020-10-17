@@ -65,7 +65,7 @@ class FormatService {
                     where: {
                         name: lead.source
                     }
-                })
+                });
 
                 if (source.dataValues.id) {
                     delete lead.source;
