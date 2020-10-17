@@ -15,12 +15,14 @@ module.exports = (sequelize, DataTypes) => {
   };
   beneficiaries.init({
     lead_id: DataTypes.BIGINT.UNSIGNED,
+    number: DataTypes.INTEGER,
     name: DataTypes.STRING,
     relative_id: DataTypes.BIGINT.UNSIGNED,
     dob: DataTypes.STRING,
     location_id: DataTypes.BIGINT.UNSIGNED,
     grand_kids: DataTypes.INTEGER,
-    work_status: DataTypes.STRING
+    work_status: DataTypes.STRING,
+    procent: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Beneficiaries',
