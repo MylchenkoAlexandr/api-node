@@ -25,10 +25,13 @@ function voice(req, res) {
 
     voiceResponse.dial({
         record: 'record-from-answer-dual',
-        recordingStatusCallbackEvent: "completed",
-        recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
         callerId: process.env.TWILIO_NUMBER,
     }, req.body.number);
+
+    voiceResponse.record({
+        recordingStatusCallbackEvent: "completed",
+        transcribeCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
+    });
 
     return res.type('text/xml').send(voiceResponse.toString());
 }
@@ -38,9 +41,10 @@ async function recordCallback(req, res) {
         const record = {
             user_id: req.params.user_id,
             lead_id: req.params.lead_id,
-            url: req.body.RecordingUrl
+            url: req.body.RecordingUrl,
+            transcriptionText: req.body.TranscriptionText,
         };
-
+        
         client.emit('record-create', record);
 
         return res.sendStatus(200);

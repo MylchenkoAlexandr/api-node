@@ -11,6 +11,7 @@
   "author": "Dmytro <dmytro@fluidweb.io>",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/speech": "^4.1.3",
     "axios": "^0.19.2",
     "bcrypt": "^5.0.0",
     "convert-csv-to-json": "^1.0.0",

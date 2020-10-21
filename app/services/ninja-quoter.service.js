@@ -8,13 +8,15 @@ class NinjaQuoterService {
             mutual_omaha_express: 0,
             foresters_express: 0,
             sagicor_express_issue: 0,
-            american_general: 0
+            american_general: 0,
+            american_national: 0,
         };
 
         const preferedCompaniesFEX = {
             mutual_omaha: 0,
             royal_neighbors: 0,
             liberty_bankers: 0,
+            prosperity_life: 0,
         };
 
         this.companies = customerInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies;
@@ -68,7 +70,7 @@ class NinjaQuoterService {
             const uniq_companies = _.uniqBy(companiesFullData, 'company_code');
 
             uniq_companies.sort((prev, next) => prev.premium_monthly - next.premium_monthly);
-            
+
             return uniq_companies;
         } catch (error) {
             console.error(error)

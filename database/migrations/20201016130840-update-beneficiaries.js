@@ -8,9 +8,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       }),
-      queryInterface.addColumn('beneficiaries', 'procent', { 
+      queryInterface.addColumn('beneficiaries', 'percent', { 
         after: 'work_status',
         type: Sequelize.INTEGER,
+        defaultValue: 0,
         allowNull: false
       })
     ]);
@@ -19,7 +20,7 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     return Promise.all([
       queryInterface.removeColumn('beneficiaries', 'number'),
-      queryInterface.removeColumn('beneficiaries', 'procent'),
+      queryInterface.removeColumn('beneficiaries', 'percent'),
     ]);
   }
 };

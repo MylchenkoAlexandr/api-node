@@ -264,25 +264,26 @@ module.exports = server => {
                     }
 
                 } catch (error) {
-                    throw new Error(error);
+                    throw error;
                 }
             })
         });
 
-        socket.on("record-create", async ({ user_id, lead_id, url }) => {
+        socket.on("record-create", async ({ user_id, lead_id, url, transcriptionText }) => {
             try {
                 const new_record = await models.Records.create({
                     user_id: user_id,
                     lead_id: lead_id,
-                    url: url
-                })
+                    url: url,
+                    transcription_text: transcriptionText
+                });
 
                 if (new_record) {
                     const one_record = await RecordsRepository.getOne(new_record.id);
                     socket.to(lead_id).emit("RECORD_ADD", one_record);
                 }
             } catch (error) {
-                throw new Error(error);
+                throw error;
             }
         });
 

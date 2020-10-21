@@ -22,7 +22,11 @@ module.exports = (sequelize, DataTypes) => {
     location_id: DataTypes.BIGINT.UNSIGNED,
     grand_kids: DataTypes.INTEGER,
     work_status: DataTypes.STRING,
-    procent: DataTypes.INTEGER
+    percent: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    }
   }, {
     sequelize,
     modelName: 'Beneficiaries',
