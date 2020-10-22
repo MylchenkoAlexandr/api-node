@@ -1,7 +1,4 @@
 const models = require('../../database/models');
-const NinjaQuoterService = require('./ninja-quoter.service');
-const FormatService = require('./format.service');
-const PriceService = require('./price.service');
 const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 
@@ -9,9 +6,8 @@ class LeadService {
     /**
      * Create new lead
      * @param {object} lead
-     * @param {string} quoter
      */
-    async createLead(lead, quoter) {
+    async createLead(lead) {
         try {
             let { dataValues: createdLead } = await models.Leads.create({
                 user_id: lead.user_id,
@@ -26,24 +22,7 @@ class LeadService {
                 property: JSON.stringify(lead.property)
             });
 
-            if (createdLead) {
-                if (createdLead.empty == 0) {
-                    const leadProperty = lead.property;
-
-                    const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
-
-                    let guoter = new NinjaQuoterService(formatedLeadForQuote);
-
-                    const priceFromQuoter = await guoter.getPrice();
-
-                    await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
-
-                    return LeadRepository.getOne(createdLead.id);
-                }
-
-
-                return LeadRepository.getRawLead(createdLead.id);
-            }
+            return createdLead;
         } catch (err) {
             throw err;
         }
@@ -53,9 +32,8 @@ class LeadService {
      * Update exist lead record
      * @param {object} exist
      * @param {object} lead
-     * @param {string} quoter
      */
-    async updateLead(exist, lead, quoter) {
+    async updateLead(exist, lead) {
         try {
             let { dataValues: updatedLead } = await exist.update({
                 user_id: lead.user_id,
@@ -70,23 +48,7 @@ class LeadService {
                 property: JSON.stringify(lead.property)
             });
 
-            if (updatedLead) {
-                if (updatedLead.empty == 0) {
-                    const leadProperty = JSON.parse(updatedLead.property);
-
-                    const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
-
-                    let guoter = new NinjaQuoterService(formatedLeadForQuote);
-
-                    const priceFromQuoter = await guoter.getPrice();
-
-                    await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
-
-                    return LeadRepository.getOne(updatedLead.id);
-                }
-
-                return LeadRepository.getRawLead(updatedLead.id);
-            }
+            return updatedLead;
         } catch (err) {
             throw err;
         }
@@ -138,26 +100,15 @@ class LeadService {
     /** 
      * Function for get all leads
      * @param {string} type
-     * @param {string} states
+     * @param {number
+     * } user_id
     */
     async getAll(type, user_id) {
         try {
-            let leads;
-
             const role = await AgentRepository.getRole(user_id);
 
-            if (role) {
-                if (role == 'admin') {
-                    leads = await LeadRepository.getAll(type);
-                } else if (role == 'agent') {
-                    leads = await LeadRepository.getByUserId(type, user_id);
-                }
-            }
-
-            if (leads) {
-                console.log("getAll -> leads", leads)
-                return leads;
-            }
+            if (role == 'admin') return await LeadRepository.getAll(type);
+            else if (role == 'agent') return await LeadRepository.getByUserId(type, user_id);
         } catch (error) {
             throw error;
         }
@@ -190,69 +141,26 @@ class LeadService {
     }
 
     /** 
-     * Function for get all blueberry leads
+     * Function for get one empty lead
     */
-    async blueberryLeads() {
+    async getRawLead(lead_id) {
         try {
-            const leads = await LeadRepository.getLeadsBySource(1);
-
-            return leads;
+            return await LeadRepository.getRawLead(lead_id);
         } catch (error) {
             throw error;
         }
     }
 
     /** 
-     * Function for get all MediaAlpha leads
+     * Function for get all blueberry leads
     */
-    async mediaAlphaLeads() {
+    async getLeadsBySource(source) {
         try {
-            const leads = await LeadRepository.getLeadsBySource(2);
-
-            return leads;
+            return await LeadRepository.getLeadsBySource(source);
         } catch (error) {
             throw error;
         }
     }
-
-     /** 
-     * Function for get all MediaAlpha leads
-    */
-   async manualLeads() {
-    try {
-        const leads = await LeadRepository.getLeadsBySource(3);
-
-        return leads;
-    } catch (error) {
-        throw error;
-    }
-}
-
- /** 
-     * Function for get all MediaAlpha leads
-    */
-   async bulkLeads() {
-    try {
-        const leads = await LeadRepository.getLeadsBySource(4);
-
-        return leads;
-    } catch (error) {
-        throw error;
-    }
-}
-
- /** 
-     * Function for get all MediaAlpha leads
-    */
-   async clickListingLeads() {
-    try {
-        const leads = await LeadRepository.getLeadsBySource(5);
-
-        return leads;
-    } catch (error) {
-        throw error;
-    }
-}
 
     /**
      * Assign agent
