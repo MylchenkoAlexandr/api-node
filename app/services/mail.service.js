@@ -4,6 +4,7 @@ const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
 
 const TransformationHelper = require('../helpers/transformation.helper');
+const MailRepository = require('../repository/mail.repository');
 
 require('dotenv').config();
 
@@ -33,14 +34,27 @@ class MailService {
         });
     }
 
+    /** 
+     * @param {number} lead_id
+    */
+    async getAll(lead_id) {
+        try {
+            return await MailRepository.getAll(lead_id);
+        } catch (error) {
+            throw error;
+        }
+    }
+
     /**
      * The function for send email for client
      * @param {object} mail_options
      */
-    async send(mail_options) {
+    async send(email_options, email_params) {
         try {
             await this.transporter.verify();
-            await this.transporter.sendMail(mail_options);
+            await this.transporter.sendMail(email_options);
+            const savedEmail = await MailRepository.create(email_params);
+            return await MailRepository.getOne(savedEmail.id);
         } catch (error) {
             throw error;
         }

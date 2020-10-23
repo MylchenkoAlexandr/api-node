@@ -18,7 +18,7 @@ class BeneficiaryService {
                 location_id: state.id,
                 grand_kids: beneficiary_options.grand_kids,
                 work_status: beneficiary_options.work_status,
-                procent: beneficiary_options.procent
+                percent: beneficiary_options.percent
             });
         } catch (error) {
             throw error;
@@ -39,7 +39,7 @@ class BeneficiaryService {
                 location_id: state.id,
                 grand_kids: beneficiary_options.grand_kids,
                 work_status: beneficiary_options.work_status,
-                procent: beneficiary_options.procent
+                percent: beneficiary_options.percent
             });
         } catch (error) {
             throw error;
@@ -53,8 +53,6 @@ class BeneficiaryService {
     async getOne(lead_id, beneficiary_number) {
         try {
             const beneficiary = await models.Beneficiaries.findOne({ where: { lead_id: lead_id, number: beneficiary_number } });
-            console.log("BeneficiaryService -> getOne -> beneficiary", beneficiary)
-
             return beneficiary;
         } catch (error) {
             throw error;
@@ -65,6 +63,22 @@ class BeneficiaryService {
         try {
             const beneficiaries = await BeneficiaryRepository.getAll(lead_id);
             return beneficiaries;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getAvailablePercent(lead_id, beneficiary_number = null) {
+        try {
+            let availablePercent = 100;
+            let percents = [];
+
+            if (beneficiary_number) percents = await BeneficiaryRepository.getAllPercentsByLeadExceptBeneficiaryNumber(lead_id, beneficiary_number);
+            else percents = await BeneficiaryRepository.getAllPercentsByLeadId(lead_id);
+
+            percents.forEach(item => availablePercent -= item.percent);
+
+            return availablePercent;
         } catch (error) {
             throw error;
         }

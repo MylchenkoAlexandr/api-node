@@ -15,18 +15,28 @@ class TransformationHelper {
         }
     }
 
-    date(date) {
-        const date_now = new Date(date);
-        const year = date_now.getFullYear();
-        const month = (date_now.getMonth() + 1).toString().length === 1 ? `0${date_now.getMonth() + 1}` : date_now.getMonth() + 1;
-        const day = (date_now.getDate()).toString().length === 1 ? `0${date_now.getDate()}` : date_now.getDate();
-        return `${year}${month}${day}`;
+    /**
+     * Date formatting with american standart
+     * @param {Date} date 
+     * @param {Date} time 
+     */
+    formatDate(date, time = null) {
+        let newDate = new Date(date);
+        const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
+        const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
+        const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+        const timeF = new Intl.DateTimeFormat('en', { hour: 'numeric', minute: 'numeric', second: 'numeric', }).format(newDate);
+
+        if (time) return `${mm}/${dd}/${yy} ${timeF}`;
+
+        return mm + '/' + dd + '/' + yy;
     }
 
     /*
     * Formating number e.g 1000 on 1,000
     */
     numberWithCommas(number) {
+        if (typeof number == 'string') return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 }

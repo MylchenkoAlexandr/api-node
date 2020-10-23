@@ -4,6 +4,7 @@ const AgentRepository = require('../repository/agent.repository');
 const RecordsRepository = require('../repository/records.repository');
 const models = require('../../database/models');
 const FormatService = require('../services/format.service')
+const LeadFacade = require('../facades/lead.facade');
 
 module.exports = server => {
     const io = require("socket.io")(server);
@@ -64,15 +65,6 @@ module.exports = server => {
 
         socket.on("process-lead", async (lead) => {
             try {
-                // const account_banned = await AgentService.checkedBan(users[socket.id].email);
-
-                // if (account_banned) {
-                //     socket.emit("BANNED", {
-                //         status: 'error',
-                //         message: "Your account has been banned"
-                //     });
-                // } else {
-
                 let quoter = "ninjaQuoter";
 
                 if (lead.type) {
@@ -84,9 +76,7 @@ module.exports = server => {
                 }
 
                 const formatedLead = await FormatService.formatLead(lead);
-
                 let exist = await LeadService.foundExistLead(formatedLead);
-
                 let uploadedLead;
 
                 if (exist) {
@@ -94,7 +84,7 @@ module.exports = server => {
                     if (exist.empty == 0 && formatedLead.empty == 1) {
                         console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);
                     } else {
-                        uploadedLead = await LeadService.updateLead(exist, formatedLead, quoter);
+                        uploadedLead = await LeadFacade.updateLead(exist, formatedLead, quoter);
 
                         if (uploadedLead) {
                             for (user in users) {
@@ -139,7 +129,7 @@ module.exports = server => {
                         }
                     }
                 } else {
-                    uploadedLead = await LeadService.createLead(formatedLead, quoter);
+                    uploadedLead = await LeadFacade.createLead(formatedLead, quoter);
 
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
@@ -264,25 +254,26 @@ module.exports = server => {
                     }
 
                 } catch (error) {
-                    throw new Error(error);
+                    throw error;
                 }
             })
         });
 
-        socket.on("record-create", async ({ user_id, lead_id, url }) => {
+        socket.on("record-create", async ({ user_id, lead_id, url, transcriptionText }) => {
             try {
                 const new_record = await models.Records.create({
                     user_id: user_id,
                     lead_id: lead_id,
-                    url: url
-                })
+                    url: url,
+                    transcription_text: transcriptionText
+                });
 
                 if (new_record) {
                     const one_record = await RecordsRepository.getOne(new_record.id);
                     socket.to(lead_id).emit("RECORD_ADD", one_record);
                 }
             } catch (error) {
-                throw new Error(error);
+                throw error;
             }
         });
 
