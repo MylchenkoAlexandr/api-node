@@ -2,16 +2,44 @@ const MailService = require('../services/mail.service');
 
 async function sendMailToClient(req, res) {
     try {
-        const mail_options = {
-            from: req.body.email_agent,
-            to: req.body.email,
-            subject: "Blueberry Insurance",
-            text: req.body.text
-        };
+        if (("emailClient" in req.body) && ("fullnameClient" in req.body) && ("text" in req.body) && req.body.text.trim() != '') {
+            const email_options = {
+                from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                to: req.body.emailClient,
+                subject: `To: ${req.body.fullnameClient}, From: ❤️ @ Blueberry`,
+                text: req.body.text
+            };
 
-        await MailService.send(mail_options);
+            const email_params = {
+                lead_id: req.params.lead_id,
+                user_id: req.params.user_id,
+                text: req.body.text
+            }
 
-        return res.status(200).json({ status: "success", message: "Mail send" });
+            const email = await MailService.send(email_options, email_params);
+            return res.status(200).json({ status: "success", message: "Mail send", email });
+        }
+
+        return res.status(400).json({ status: "error", message: "Bad request" });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: "Server Error" });
+        throw error;
+    }
+}
+
+async function getAllMailsByLead(req, res) {
+    try {
+        const emails = await MailService.getAll(req.params.lead_id);
+        return res.status(200).json({ status: "success", emails });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: "Server Error" });
+        throw error;
+    }
+}
+
+async function getMails(req, res) {
+    try {
+
     } catch (error) {
         res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
@@ -36,4 +64,5 @@ async function createToken(req, res) {
 module.exports = {
     sendMailToClient,
     createToken,
+    getAllMailsByLead
 };
