@@ -2,16 +2,17 @@ const models = require('../../database/models');
 const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const url = require('url');
 const UserService = require('../services/user.service');
+const ClientCapability = require('twilio').jwt.ClientCapability;
 class TwilioService {
     outboundCall() {
         try {
             client.calls.create({
                 asyncAmd: "true",
                 machineDetection: 'Enable',
-                asyncAmdStatusCallback: 'https://d8de2eece5ab.ngrok.io/api/twilio/amd',
+                asyncAmdStatusCallback: 'http://c099c9b2e5b3.ngrok.io/api/twilio/amd',
                 url: 'http://demo.twilio.com/docs/classic.mp3',
                 from: process.env.TWILIO_NUMBER,
-                to: "+13108769581"
+                to: "+12064658983"
             }).then(async call => {
                 let conference = await models.conferences.findOne({
                     where: {
@@ -35,7 +36,7 @@ class TwilioService {
     async AMD(call, host) {
         try {
             if (call.AnsweredBy == "human") {
-                const workerId = await UserService.findSuitableWorker("guide");
+                const workerId = 3;
 
                 const callbackUrl = this.connectConferenceUrl(host, workerId, call.CallSid);
 
@@ -61,13 +62,15 @@ class TwilioService {
             from: process.env.TWILIO_NUMBER,
             to: `client:${agentId}`,
             url: callbackUrl
+        }).then(call => {
+            console.log(call);
         }).catch(err => {
             console.log(err)
         });
     }
 
     connectConferenceUrl(host, agentId, conferenceId) {
-        const pathName = `/conference/${conferenceId}/connect/${agentId}`;
+        const pathName = `/twilio/conference/${conferenceId}/connect/${agentId}`;
 
         return url.format({
             protocol: 'https',
@@ -75,6 +78,17 @@ class TwilioService {
             pathname: pathName
         });
     };
+
+    capabilityGenerator(agentId){
+        let capability = new ClientCapability({
+            accountSid: process.env.TWILIO_ACCOUNT_SID,
+            authToken: process.env.TWILIO_AUTH_TOKEN
+        });
+
+        capability.addScope(new ClientCapability.IncomingClientScope(agentId));
+
+        return capability.toJwt();
+    }
 }
 
 module.exports = new TwilioService;
