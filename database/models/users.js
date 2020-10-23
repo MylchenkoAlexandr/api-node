@@ -21,6 +21,14 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       primaryKey: true,
     },
+    active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
+    in_call: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
     role_id: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,

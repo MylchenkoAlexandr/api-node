@@ -264,7 +264,6 @@ module.exports = server => {
                 delete users[socket.id];
             }
         });
-
     });
 
     return io;
