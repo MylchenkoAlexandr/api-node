@@ -9,10 +9,10 @@ class TwilioService {
             client.calls.create({
                 asyncAmd: "true",
                 machineDetection: 'Enable',
-                asyncAmdStatusCallback: 'http://c099c9b2e5b3.ngrok.io/api/twilio/amd',
+                asyncAmdStatusCallback: 'http://eecab9c87518.ngrok.io/api/twilio/amd',
                 url: 'http://demo.twilio.com/docs/classic.mp3',
                 from: process.env.TWILIO_NUMBER,
-                to: "+12064658983"
+                to: "+13108769581"
             }).then(async call => {
                 let conference = await models.conferences.findOne({
                     where: {
@@ -42,6 +42,13 @@ class TwilioService {
 
                 this.addWorkersToConference(workerId, callbackUrl);
 
+                client.calls(call.CallSid).update({
+                    method: 'POST',
+                    url: callbackUrl
+                }).catch(err => {
+                    console.log(err)
+                });
+
                 await models.conferences.update({
                     caller_id: workerId
                 }, {
@@ -57,20 +64,22 @@ class TwilioService {
         }
     }
 
+    handleCallToAnotherWorker() {
+
+    }
+
     addWorkersToConference(agentId, callbackUrl) {
         client.calls.create({
             from: process.env.TWILIO_NUMBER,
             to: `client:${agentId}`,
             url: callbackUrl
-        }).then(call => {
-            console.log(call);
         }).catch(err => {
             console.log(err)
         });
     }
 
     connectConferenceUrl(host, agentId, conferenceId) {
-        const pathName = `/twilio/conference/${conferenceId}/connect/${agentId}`;
+        const pathName = `/api/twilio/conference/${conferenceId}/connect/${agentId}`;
 
         return url.format({
             protocol: 'https',
@@ -79,7 +88,7 @@ class TwilioService {
         });
     };
 
-    capabilityGenerator(agentId){
+    capabilityGenerator(agentId) {
         let capability = new ClientCapability({
             accountSid: process.env.TWILIO_ACCOUNT_SID,
             authToken: process.env.TWILIO_AUTH_TOKEN
@@ -87,7 +96,9 @@ class TwilioService {
 
         capability.addScope(new ClientCapability.IncomingClientScope(agentId));
 
-        return capability.toJwt();
+        const token = capability.toJwt();
+
+        return token;
     }
 }
 

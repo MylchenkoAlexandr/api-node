@@ -1,4 +1,5 @@
 const TwilioService = require('../services/twilio.service');
+const twilioGeneratorService = require("../services/twilio-generator.service");
 
 class TwilioController {
     outboundCall(req, res) {
@@ -10,13 +11,22 @@ class TwilioController {
         await TwilioService.AMD(req.body, req.get('host'));
         return res.sendStatus(200);
     }
-    
-    token(req, res){
-        let token = TwilioService.capabilityGenerator(req.body.workerId);
-        
-        return res.status(200).json({
-            token: token
-        });
+
+    token(req, res) {
+        let token = TwilioService.capabilityGenerator(req.params.workerId);
+
+        res.set('Content-Type', 'application/jwt');
+        return res.send(token);
+    }
+
+    connectToConference(req, res) {
+        res.type('text/xml');
+        res.send(twilioGeneratorService.connectConferenceTwiml({
+            conferenceId: req.params.conferenceId,
+            waitUrl: "http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical",
+            startConferenceOnEnter: true,
+            endConferenceOnExit: true
+        }).toString());
     }
 }
 
