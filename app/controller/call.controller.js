@@ -30,6 +30,7 @@ function voice(req, res) {
 
     voiceResponse.record({
         recordingStatusCallbackEvent: "completed",
+        maxLength: 7200,
         transcribeCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
     });
 
