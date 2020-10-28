@@ -53,7 +53,7 @@ class MailService {
         try {
             await this.transporter.verify();
             await this.transporter.sendMail(email_options);
-            const savedEmail = await MailRepository.create(email_params);
+            const { dataValues: savedEmail } = await MailRepository.create(email_params);
             return await MailRepository.getOne(savedEmail.id);
         } catch (error) {
             throw error;

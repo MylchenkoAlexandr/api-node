@@ -7,99 +7,111 @@ const PriceService = require('../services/price.service');
 class LeadFacade {
 
     async createLead(formatedLead, quoter) {
-        const createdLead = await LeadService.createLead(formatedLead);
+        try {
+            const createdLead = await LeadService.createLead(formatedLead);
 
-        if (createdLead.empty == 0) {
-            const leadProperty = JSON.parse(createdLead.property);
-            const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
-            const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
-            const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
-            const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
-            const priceFromQuoter = ninjaQuoterService.getPrice(companies);
-            await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
+            if (createdLead.empty == 0) {
+                const leadProperty = JSON.parse(createdLead.property);
+                const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
+                const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
+                const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
+                const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
+                const priceFromQuoter = ninjaQuoterService.getPrice(companies);
+                await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
 
-            if (companiesInfo.length !== 0) {
-                const email_sended = await LeadService.checkLeadAtSendedEmail(createdLead.email);
+                if (companiesInfo.length !== 0) {
+                    const email_sended = await LeadService.checkLeadAtSendedEmail(createdLead.email);
 
-                if (!email_sended) {
-                    const email_params = {
-                        companies: companiesInfo,
-                        email: createdLead.email,
-                        coverage_amount: leadProperty.coverage_amount,
-                        term: leadProperty.term,
-                        fullname: createdLead.fullname
+                    if (!email_sended) {
+                        try {
+                            const email_params = {
+                                companies: companiesInfo,
+                                email: createdLead.email,
+                                coverage_amount: leadProperty.coverage_amount,
+                                term: leadProperty.term,
+                                fullname: createdLead.fullname
+                            }
+
+                            if (typeof email_params.companiesInfo == 'string') {
+                                email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
+                            }
+
+                            const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
+
+                            const mail_options = {
+                                from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                                to: email_params.email,
+                                subject: `To: ${email_params.fullname}, From: ❤️ @ Blueberry`,
+                                html
+                            };
+
+                            await MailService.send(mail_options);
+                            await LeadService.updateLeadAtSendedEmail(email_params.email, true);
+                        } catch (error) {
+                            throw error;
+                        }
                     }
-
-                    if (typeof email_params.companiesInfo == 'string') {
-                        email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
-                    }
-
-                    const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
-
-                    const mail_options = {
-                        from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
-                        to: email_params.email,
-                        subject: `To: ${email_params.fullname}, From: ❤️ @ Blueberry`,
-                        html
-                    };
-
-                    await MailService.send(mail_options);
-                    await LeadService.updateLeadAtSendedEmail(email_params.email, true);
                 }
+
+                return await LeadService.getOne(createdLead.id);
             }
 
-            return await LeadService.getOne(createdLead.id);
+            return await LeadService.getRawLead(createdLead.id);
+        } catch (error) {
+            throw error;
         }
-
-        return await LeadService.getRawLead(createdLead.id);
     }
 
     async updateLead(exist, formatedLead, quoter) {
-        const updatedLead = await LeadService.updateLead(exist, formatedLead);
+        try {
+            const updatedLead = await LeadService.updateLead(exist, formatedLead);
 
-        if (updatedLead.empty == 0) {
-            const leadProperty = JSON.parse(updatedLead.property);
-            const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
-            const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
-            const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
-            const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
-            const priceFromQuoter = ninjaQuoterService.getPrice(companies);
-            await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
+            if (updatedLead.empty == 0) {
+                const leadProperty = JSON.parse(updatedLead.property);
+                const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
+                const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
+                const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
+                const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
+                const priceFromQuoter = ninjaQuoterService.getPrice(companies);
+                await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
 
-            if (companiesInfo.length !== 0) {
-                const email_sended = await LeadService.checkLeadAtSendedEmail(updatedLead.email);
+                if (companiesInfo.length !== 0) {
+                    const email_sended = await LeadService.checkLeadAtSendedEmail(updatedLead.email);
 
-                if (!email_sended) {
-                    const email_params = {
-                        companies: companiesInfo,
-                        email: updatedLead.email,
-                        coverage_amount: leadProperty.coverage_amount,
-                        term: leadProperty.term,
-                        fullname: updatedLead.fullname
+                    if (!email_sended) {
+                        const email_params = {
+                            companies: companiesInfo,
+                            email: updatedLead.email,
+                            coverage_amount: leadProperty.coverage_amount,
+                            term: leadProperty.term,
+                            fullname: updatedLead.fullname
+                        }
+
+                        if (typeof email_params.companiesInfo == 'string') {
+                            email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
+                        }
+
+                        const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
+
+                        const mail_options = {
+                            from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                            to: email_params.email,
+                            subject: `To: ${email_params.fullname}, From: ❤️ @ Blueberry`,
+                            html
+                        };
+
+                        await MailService.send(mail_options);
+                        await LeadService.updateLeadAtSendedEmail(email_params.email, true);
                     }
-
-                    if (typeof email_params.companiesInfo == 'string') {
-                        email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
-                    }
-
-                    const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
-
-                    const mail_options = {
-                        from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
-                        to: email_params.email,
-                        subject: `To: ${email_params.fullname}, From: ❤️ @ Blueberry`,
-                        html
-                    };
-
-                    await MailService.send(mail_options);
-                    await LeadService.updateLeadAtSendedEmail(email_params.email, true);
                 }
+
+                return await LeadService.getOne(updatedLead.id);
             }
 
-            return await LeadService.getOne(updatedLead.id);
+            return await LeadService.getRawLead(updatedLead.id);
+        } catch (error) {
+            throw error;
         }
-
-        return await LeadService.getRawLead(updatedLead.id);
     }
 
     async getAllLeads(type, user_id) {

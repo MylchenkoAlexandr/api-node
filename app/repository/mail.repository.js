@@ -29,8 +29,8 @@ const MailRepository = {
     async create(email_params) {
         try {
             return await db.Emails.create({
-                lead_id: email_params.lead_id,
-                user_id: email_params.user_id,
+                lead_id: +email_params.lead_id,
+                user_id: +email_params.user_id,
                 text: email_params.text
             });
         } catch (error) {

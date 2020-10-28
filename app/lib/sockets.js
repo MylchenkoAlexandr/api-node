@@ -259,13 +259,12 @@ module.exports = server => {
             })
         });
 
-        socket.on("record-create", async ({ user_id, lead_id, url, transcriptionText }) => {
+        socket.on("record-create", async ({ user_id, lead_id, url }) => {
             try {
                 const new_record = await models.Records.create({
                     user_id: user_id,
                     lead_id: lead_id,
-                    url: url,
-                    transcription_text: transcriptionText
+                    url: url
                 });
 
                 if (new_record) {

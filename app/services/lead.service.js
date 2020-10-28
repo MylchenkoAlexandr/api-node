@@ -100,8 +100,7 @@ class LeadService {
     /** 
      * Function for get all leads
      * @param {string} type
-     * @param {number
-     * } user_id
+     * @param {number} user_id
     */
     async getAll(type, user_id) {
         try {
@@ -212,9 +211,7 @@ class LeadService {
 
     async checkLeadAtSendedEmail(email_client) {
         try {
-            const email_sended = await LeadRepository.getEmailSended(email_client);
-
-            return email_sended;
+            return await LeadRepository.getEmailSended(email_client);
         } catch (error) {
             throw error;
         }
