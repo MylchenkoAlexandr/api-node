@@ -45,7 +45,7 @@ class LeadFacade {
                                 html
                             };
 
-                            await MailService.send(mail_options);
+                            await MailService.sendNewsletter(mail_options);
                             await LeadService.updateLeadAtSendedEmail(email_params.email, true);
                         } catch (error) {
                             throw error;
@@ -100,7 +100,7 @@ class LeadFacade {
                             html
                         };
 
-                        await MailService.send(mail_options);
+                        await MailService.sendNewsletter(mail_options);
                         await LeadService.updateLeadAtSendedEmail(email_params.email, true);
                     }
                 }
