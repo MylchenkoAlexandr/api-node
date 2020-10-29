@@ -10,11 +10,11 @@ class AutoDiallerService {
                     asyncAmd: "true",
                     machineDetection: 'Enable',
                     asyncAmdStatusCallback: process.env.CALLBACK_TWILIO + '/api/twilio/amd',
-                    // url: 'http://demo.twilio.com/docs/classic.mp3',
-                    twiml: '<Response><Say>Hello it`s Blueberry. Please call this number: 11111111111</Say></Response>',
+                    url: 'http://demo.twilio.com/docs/classic.mp3',
                     from: process.env.TWILIO_NUMBER,
                     // TODO change to varible customerPhone
-                    to: "+13108769581"
+                    to: "+380632796212"
+                    // to: "+13108769581"
                 })
                 .then(async call => {
                     await models.conferences.create({
@@ -28,16 +28,22 @@ class AutoDiallerService {
         }
     }
 
-    async machineDetection(call, host) {
+    async machineDetection(call) {
         try {
             if (call.AnsweredBy == "human") {
                 const workerId = 3;
 
                 const callSid = call.CallSid;
 
-                const callbackUrl = TwilioService.generateConnectConferenceUrl(host, workerId, callSid);
-                
-                console.log("AutoDiallerService -> machineDetection -> callbackUrl", callbackUrl);
+                const callbackUrl = TwilioService.generateConnectConferenceUrl(workerId, callSid);
+
+                await models.conferences.update({
+                    caller_id: workerId
+                }, {
+                    where: {
+                        conferenceId: callSid
+                    }
+                });
 
                 TwilioService.updateCallUrl(callSid, callbackUrl);
 
@@ -48,19 +54,19 @@ class AutoDiallerService {
         }
     }
 
-    async addAgentToCall(host) {
+    async addAgentToCall() {
         try {
             const workerId = 1;
 
-            // const existCall = await models.conferences.findOne({
-            //     where: {
-            //         caller_id: 3
-            //     }
-            // });
+            const existCall = await models.conferences.findOne({
+                where: {
+                    caller_id: 3
+                }
+            });
 
-            const callSid = "CA9c55dc4dd58ffb01cadccf9d79767eac";
+            const callSid = existCall.conferenceId;
 
-            const callbackUrl = TwilioService.generateConnectConferenceUrl(host, workerId, callSid);
+            const callbackUrl = TwilioService.generateConnectConferenceUrl(workerId, callSid);
 
             TwilioService.updateCallUrl(callSid, callbackUrl);
 

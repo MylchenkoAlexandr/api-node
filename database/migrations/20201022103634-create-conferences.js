@@ -8,6 +8,18 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      active: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: 1,
+      },
+      lead_id: {
+        type: Sequelize.BIGINT.UNSIGNED,
+        allowNull: true,
+        references: {
+          model: 'leads',
+          key: 'id',
+        },
+      },
       caller_id: {
         type: Sequelize.BIGINT.UNSIGNED,
         allowNull: true,

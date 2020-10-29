@@ -14,6 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   conferences.init({
+    active: DataTypes.BOOLEAN,
+    lead_id: DataTypes.BIGINT.UNSIGNED,
     caller_id: DataTypes.BIGINT.UNSIGNED,
     conferenceId: DataTypes.STRING,
   }, {

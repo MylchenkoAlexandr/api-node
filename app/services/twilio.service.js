@@ -23,15 +23,8 @@ class TwilioService {
         });
     }
 
-    generateConnectConferenceUrl(host, agentId, conferenceId) {
-        const pathName = `https://eecab9c87518.ngrok.io/api/twilio/conference/${conferenceId}/connect/${agentId}`;
-
-        return pathName;
-        // return url.format({
-        //     protocol: 'https',
-        //     host: host,
-        //     pathname: pathName
-        // });
+    generateConnectConferenceUrl(agentId, conferenceId) {
+        return `${process.env.CALLBACK_TWILIO}/api/twilio/conference/${conferenceId}/connect/${agentId}`;
     };
 
     genereteCapabilityToken(agentId) {

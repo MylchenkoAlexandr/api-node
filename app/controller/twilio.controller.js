@@ -9,12 +9,12 @@ class TwilioController {
     }
 
     async AMD(req, res) {
-        await AutoDiallerService.machineDetection(req.body, req.get('host'));
+        await AutoDiallerService.machineDetection(req.body);
         return res.sendStatus(200);
     }
 
     async addWorkerToTheCall(req, res) {
-        await AutoDiallerService.addAgentToCall(req.get('host'));
+        await AutoDiallerService.addAgentToCall();
         return res.sendStatus(200);
     }
 
