@@ -55,8 +55,8 @@ async function recordCallback(req, res) {
 async function transcriptionCallback(req, res) {
     try {
         let transcriptionRequestBody = JSON.parse(req.body.AddOns);
-        const transcriptionUrl = transcriptionRequestBody.results[process.env.ADDONS_VOICEBASE_NAME].payload[0].url;
-        const recordingUrl = transcriptionRequestBody.results[process.env.ADDONS_VOICEBASE_NAME].links.recording;
+        const transcriptionUrl = transcriptionRequestBody.results[process.env.TWILIO_ADDONS_VOICEBASE_NAME].payload[0].url;
+        const recordingUrl = transcriptionRequestBody.results[process.env.TWILIO_ADDONS_VOICEBASE_NAME].links.recording;
         const result = await axios.get(transcriptionUrl, {
             auth: {
                 username: process.env.TWILIO_ACCOUNT_SID,
