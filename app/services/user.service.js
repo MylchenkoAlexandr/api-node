@@ -2,7 +2,7 @@ const models = require('../../database/models');
 
 
 class UserService {
-    async active(user_id, active) {
+    async active(user_id, status) {
         const user = await models.users.findOne({
             where: {
                 id: user_id
@@ -10,10 +10,22 @@ class UserService {
         });
 
         await user.update({
-            active: active
+            active: status
         });
     }
 
+    async inCall(user_id, status) {
+        const user = await models.users.findOne({
+            where: {
+                id: user_id
+            }
+        });
+
+        await user.update({
+            in_call: status
+        });
+    }
+ 
     async findSuitableWorker(roleName) {
         const role = await models.roles.findOne({
             attributes: ['id'],
