@@ -1,6 +1,7 @@
 const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const models = require('../../database/models');
 const TwilioService = require('./twilio.service');
+const UserService = require('../services/user.service');
 
 class AutoDiallerService {
     outboundCall(customerPhone, lead_id) {
@@ -19,7 +20,6 @@ class AutoDiallerService {
                 .then(async call => {
                     await models.conferences.create({
                         conferenceId: call.sid
-                        // TODO Add lead_id to this table
                     });
                 })
                 .catch(err => console.error(err));
@@ -31,7 +31,7 @@ class AutoDiallerService {
     async machineDetection(call) {
         try {
             if (call.AnsweredBy == "human") {
-                const workerId = 3;
+                const workerId = await UserService.findSuitableWorker("guide");
 
                 const callSid = call.CallSid;
 
@@ -54,14 +54,15 @@ class AutoDiallerService {
         }
     }
 
-    async addAgentToCall() {
+    async addAgentToCall(guide_id) {
         try {
-            const workerId = 1;
+            const workerId = await UserService.findSuitableWorker("agent");
 
             const existCall = await models.conferences.findOne({
                 where: {
-                    caller_id: 3
-                }
+                    caller_id: guide_id
+                },
+                order: [['createdAt', 'DESC']],
             });
 
             const callSid = existCall.conferenceId;

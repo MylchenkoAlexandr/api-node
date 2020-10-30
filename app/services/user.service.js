@@ -1,49 +1,21 @@
 const models = require('../../database/models');
-
+const UserRepository = require('../repository/user.repository');
 
 class UserService {
-    async active(user_id, status) {
-        const user = await models.users.findOne({
-            where: {
-                id: user_id
-            }
-        });
+    async statusHandler (user_id, field, status) {
+        const updated = await UserRepository.statusHandler(user_id, field, status);
 
-        await user.update({
-            active: status
-        });
-    }
-
-    async inCall(user_id, status) {
-        const user = await models.users.findOne({
-            where: {
-                id: user_id
-            }
-        });
-
-        await user.update({
-            in_call: status
-        });
+        return updated;
     }
  
+    /**
+     * 
+     * @return users.id int
+     */
     async findSuitableWorker(roleName) {
-        const role = await models.roles.findOne({
-            attributes: ['id'],
-            where: {
-                name: roleName
-            }
-        });
+        const userId = await UserRepository.findSuitableWorker(roleName);
 
-        const users = models.users.findOne({
-            attributes: ['id'],
-            where: {
-                role_id: role.id,
-                active: 1,
-                in_call: 0
-            }
-        });
-
-        return users.id;
+        return userId;
     }
 }
 

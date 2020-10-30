@@ -14,7 +14,7 @@ class TwilioController {
     }
 
     async addWorkerToTheCall(req, res) {
-        await AutoDiallerService.addAgentToCall();
+        await AutoDiallerService.addAgentToCall(req.body.guide_id);
         return res.sendStatus(200);
     }
 
