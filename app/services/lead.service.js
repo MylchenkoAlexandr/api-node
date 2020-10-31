@@ -1,4 +1,5 @@
 const models = require('../../database/models');
+const zipcodes = require('zipcodes');
 const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 
@@ -120,6 +121,8 @@ class LeadService {
     async getOne(lead_id) {
         try {
             const lead = await LeadRepository.getOne(lead_id);
+            const location = zipcodes.lookup(lead.zipcode);
+            if (location) lead.city = location.city;
 
             return lead;
         } catch (error) {
