@@ -9,8 +9,8 @@ class AgentService {
      */
     async create(agent) {
         try {
-            const createdAgent = await models.Users.create({
-                role_id: 2,
+            const {dataValues: createdAgent} = await models.Users.create({
+                role_id: agent.role_id,
                 fname: agent.fname,
                 lname: agent.lname,
                 email: agent.email,
@@ -19,7 +19,7 @@ class AgentService {
                 not_assign: agent.not_assign
             });
 
-            if (createdAgent) {
+            if (createdAgent && createdAgent.role_id == 2) {
                 let states = JSON.parse(agent.states)
 
                 states.map(async (state) => {
