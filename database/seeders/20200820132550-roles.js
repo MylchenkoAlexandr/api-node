@@ -13,6 +13,11 @@ module.exports = {
         title: 'Agent',
         createdAt: new Date(),
         updatedAt: new Date()
+      }, {
+        name: 'guide',
+        title: 'Guide',
+        createdAt: new Date(),
+        updatedAt: new Date()
       }]);
   },
 

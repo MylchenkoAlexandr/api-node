@@ -3,7 +3,9 @@ const CustomScriptsFacade = require('../facades/custom-scripts.facade');
 
 async function createAgent(req, res) {
     try {
-        if (("fname" in req.body)
+        if (("role_id" in req.body)
+            && req.body.role_id != 1
+            && ("fname" in req.body)
             && ("lname" in req.body)
             && ("email" in req.body)
             && ("password" in req.body)
