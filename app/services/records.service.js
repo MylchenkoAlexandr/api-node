@@ -4,25 +4,36 @@ const models = require('../../database/models/index');
 class RecordsService {
 
     /**
-     * Function for get all records with lead
+     * Get all records for lead
      * @param {number} lead_id
     */
     async getAll(lead_id) {
         try {
-            const records = await RecordsRepository.getAll(lead_id);
-            return records;
+            return await RecordsRepository.getAll(lead_id);
         } catch (error) {
             throw error;
         }
     }
 
     /**
-     * @param {*} req 
-     * @param {*} res 
-     */
+     * Get one record
+     * @param {number} record_id
+    */
+    async getOne(record_id) {
+        try {
+            return await RecordsRepository.getOne(record_id);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Create record
+     * @param {object} record
+    */
     async createRecord(record) {
         try {
-            await models.Records.create({
+            return await models.Records.create({
                 lead_id: record.leadId,
                 datetime: record.datatime,
                 call_sid: record.callSid,
@@ -33,7 +44,20 @@ class RecordsService {
         }
     }
 
-
+    /**
+     * Save the transcription text for certain record url
+     * @param {string} recordingUrl
+     * @param {string} transcriptionText
+    */
+    async saveTranscriptionText(recordingUrl, transcriptionText) {
+        try {
+            return await models.Records.update({
+                transcription_text: transcriptionText
+            }, { where: { url: recordingUrl } });
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new RecordsService;

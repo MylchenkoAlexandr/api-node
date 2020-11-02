@@ -1,4 +1,5 @@
 const models = require('../../database/models');
+const zipcodes = require('zipcodes');
 const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 
@@ -100,8 +101,7 @@ class LeadService {
     /** 
      * Function for get all leads
      * @param {string} type
-     * @param {number
-     * } user_id
+     * @param {number} user_id
     */
     async getAll(type, user_id) {
         try {
@@ -121,6 +121,8 @@ class LeadService {
     async getOne(lead_id) {
         try {
             const lead = await LeadRepository.getOne(lead_id);
+            const location = zipcodes.lookup(lead.zipcode);
+            if (location) lead.city = location.city;
 
             return lead;
         } catch (error) {
@@ -212,9 +214,7 @@ class LeadService {
 
     async checkLeadAtSendedEmail(email_client) {
         try {
-            const email_sended = await LeadRepository.getEmailSended(email_client);
-
-            return email_sended;
+            return await LeadRepository.getEmailSended(email_client);
         } catch (error) {
             throw error;
         }
