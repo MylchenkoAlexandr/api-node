@@ -15,6 +15,10 @@ class TransformationHelper {
         }
     }
 
+    formatPhoneForCall(phone) {
+        return "+1" + phone.replace(/\D/g, "");
+    }
+
     date(date) {
         const date_now = new Date(date);
         const year = date_now.getFullYear();

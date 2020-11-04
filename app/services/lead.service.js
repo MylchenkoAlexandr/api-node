@@ -4,6 +4,8 @@ const FormatService = require('./format.service');
 const PriceService = require('./price.service');
 const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
+const AutoDiallerService = require('../services/autodialler.service');
+const TransformationHelper = require('../helpers/transformation.helper');
 
 class LeadService {
     /**
@@ -27,6 +29,12 @@ class LeadService {
             });
 
             if (createdLead) {
+                if ("phone" in createdLead) {
+                    const phone = TransformationHelper.formatPhoneForCall(createdLead.phone);
+                    // For testing '+380632796212' 
+                    AutoDiallerService.outboundCall(phone, createdLead.id);                
+                }
+
                 if (createdLead.empty == 0) {
                     const leadProperty = lead.property;
 
@@ -40,7 +48,6 @@ class LeadService {
 
                     return LeadRepository.getOne(createdLead.id);
                 }
-
 
                 return LeadRepository.getRawLead(createdLead.id);
             }

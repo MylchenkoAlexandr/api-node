@@ -13,12 +13,11 @@ class AutoDiallerService {
                     asyncAmdStatusCallback: process.env.CALLBACK_TWILIO + '/api/twilio/amd',
                     url: 'http://demo.twilio.com/docs/classic.mp3',
                     from: process.env.TWILIO_NUMBER,
-                    // TODO change to varible customerPhone
-                    // to: "+380632796212"
-                    to: "+13108769581"
+                    to: customerPhone
                 })
                 .then(async call => {
                     await models.conferences.create({
+                        lead_id: lead_id,
                         conferenceId: call.sid
                     });
                 })
