@@ -65,7 +65,7 @@ class FormatService {
                     where: {
                         name: lead.source
                     }
-                })
+                });
 
                 if (source.dataValues.id) {
                     delete lead.source;
@@ -101,7 +101,10 @@ class FormatService {
             }
 
             if (!("state" in lead) && "zipcode" in lead) {
-                lead.state = zipcodes.lookup(lead.zip || lead.zipcode).state;
+                const parseZipCode = zipcodes.lookup(lead.zip || lead.zipcode);
+                if ("state" in parseZipCode) {
+                    lead.state = parseZipCode.state;
+                }
             }
 
             if ("state" in lead) {

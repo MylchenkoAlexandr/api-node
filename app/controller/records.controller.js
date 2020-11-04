@@ -10,6 +10,17 @@ async function getAllRecords(req, res) {
     }
 }
 
+async function getOneRecord(req, res) {
+    try {
+        const record = await RecordsService.getOne(req.params.record_id);
+        return res.status(200).json({ status: "success", message: "Record already", record });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: "Server Error" });
+        throw error;
+    }
+}
+
 module.exports = {
-    getAllRecords
+    getAllRecords,
+    getOneRecord
 }

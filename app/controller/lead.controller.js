@@ -1,10 +1,6 @@
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
-
 const FormatService = require('../services/format.service');
-const LeadService = require('../services/lead.service');
-const NinjaQuoterService = require('../services/ninja-quoter.service');
-
-const MailFacade = require('../facades/mail.facade');
+const LeadFacade = require('../facades/lead.facade');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
@@ -13,9 +9,8 @@ async function test(req, res) {
 
 async function getLeads(req, res) {
     try {
-        const leads = await LeadService.getAll(req.params.type, req.params.user_id);
-
-        return res.status(200).json({ status: "success", leads });
+        const response = await LeadFacade.getAllLeads(req.params.type, req.params.user_id);
+        return res.status(response.code).json({ status: response.status, leads: response.leads });
     } catch (err) {
         res.status(500).json({ status: 'error', message: "Server Error!" });
         throw err;
@@ -24,8 +19,8 @@ async function getLeads(req, res) {
 
 async function getRawLeads(req, res) {
     try {
-        const rawLeads = await LeadService.getRawLeads();
-        return res.status(200).json({ status: "success", rawLeads });
+        const response = await LeadFacade.getRawLeads();
+        return res.status(response.code).json({ status: response.status, rawLeads: response.leads });
     } catch (err) {
         res.status(500).json({ status: 'error', message: "Server Error" });
         throw err;
@@ -34,8 +29,8 @@ async function getRawLeads(req, res) {
 
 async function getLead(req, res) {
     try {
-        const lead = await LeadService.getOne(req.params.lead_id);
-        return res.status(200).json({ status: "success", lead });
+        const response = await LeadFacade.getOneLead(req.params.lead_id);
+        return res.status(response.code).json({ status: response.status, lead: response.lead });
     } catch (err) {
         res.status(500).json({ status: 'error', message: "Server Error" });
         throw err;
@@ -54,31 +49,7 @@ async function getCompaniesListByLeadData(req, res) {
 
         client.emit("process-lead", rawLead);
 
-        const formatedLeadForQuote = FormatService.formatLeadForQuote(rawLead);
-        const quotes = new NinjaQuoterService(formatedLeadForQuote);
-        const companies = await quotes.getCompaniesInfo();
-
-        if (
-            ("email" in req.body)
-            && ("coverage_amount" in req.body)
-            && ("term") in req.body
-            && companies.length !== 0
-        ) {
-            try {
-                const mail = new MailFacade();
-                const email_params = {
-                    companies,
-                    email: rawLead.email,
-                    coverage_amount: rawLead.coverage_amount,
-                    term: rawLead.term,
-                    contact: rawLead.contact
-                }
-
-                mail.sendEmailWithCompanies(email_params);
-            } catch (error) {
-                console.error(error);
-            }
-        }
+        const companies = await LeadFacade.getCompaniesList(rawLead);
 
         return res.status(200).json(companies);
     } catch (err) {
@@ -101,7 +72,7 @@ async function uploadLeadFromUrl(req, res) {
         rawLead = {
             agent: null,
             type: urlData.type,
-            source: "blueberry",
+            source: "clickListing",
             empty: 1
         };
 
@@ -126,8 +97,6 @@ async function uploadLeadFromUrl(req, res) {
             rawLead.birth_date = urlData.dob;
         }
 
-        console.log("uploadLeadFromUrl -> rawLead", rawLead)
-
         client.emit("process-lead", rawLead);
 
         return res.status(200).json({ status: 'success', message: 'Lead Uploaded' });
@@ -151,27 +120,6 @@ async function uploadLeadFromMediaAlpha(req, res) {
 
         client.emit("process-lead", preparedLead);
 
-        const formatedLeadForQuote = FormatService.formatLeadForQuote(preparedLead);
-        const quotes = new NinjaQuoterService(formatedLeadForQuote);
-        const companies = await quotes.getCompaniesInfo();
-
-        if (companies.length !== 0 && preparedLead.email.trim() !== '') {
-            try {
-                const mail = new MailFacade();
-                const email_params = {
-                    companies,
-                    email: preparedLead.email,
-                    coverage_amount: formatedLeadForQuote.coverage,
-                    term: formatedLeadForQuote.term,
-                    contact: preparedLead.contact
-                }
-
-                mail.sendEmailWithCompanies(email_params);
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
         return res.status(200).json({ status: "success", message: "Success Uploaded!" });
     } catch (err) {
         res.status(500).json({ status: 'error', message: "Server Error" });
@@ -180,23 +128,12 @@ async function uploadLeadFromMediaAlpha(req, res) {
 
 }
 
-async function getBlueberryLeads(req, res) {
+async function getLeadsBySource(req, res) {
     try {
-        const leads = await LeadService.blueberryLeads();
-        return res.status(200).json({ status: "success", leads });
-    } catch (err) {
-        res.status(500).json({ status: 'error', message: "Server Error" });
-        throw err;
-    }
-}
-
-async function getMediaAlphaLeads(req, res) {
-    try {
-        const leads = await LeadService.mediaAlphaLeads();
-        return res.status(200).json({ status: "success", leads });
-    } catch (err) {
-        res.status(500).json({ status: 'error', message: "Server Error" });
-        throw err;
+        const response = await LeadFacade.getLeadsBySource(req.params.source);
+        return res.status(response.code).json({ status: response.status, leads: response.leads });
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -208,6 +145,5 @@ module.exports = {
     getCompaniesListByLeadData,
     uploadLeadFromMediaAlpha,
     uploadLeadFromUrl,
-    getBlueberryLeads,
-    getMediaAlphaLeads
+    getLeadsBySource
 }   

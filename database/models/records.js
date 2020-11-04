@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     user_id: DataTypes.BIGINT.UNSIGNED,
     lead_id: DataTypes.BIGINT.UNSIGNED,
     url: DataTypes.TEXT,
-    sid: DataTypes.STRING,
+    transcription_text: DataTypes.TEXT,
   }, {
     sequelize,
     modelName: 'Records',

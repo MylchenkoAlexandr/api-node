@@ -2,13 +2,16 @@ const db = require('../../database/models');
 
 const StatesRepository = {
     async getOne(stateName) {
-        const data = await db.sequelize.query(`SELECT states.id FROM states WHERE states.name = '${stateName}'`, {
-            type: db.sequelize.QueryTypes.SELECT,
-        }).catch(e => {
-            throw e;
-        });
+        try {
+            const data = await db.sequelize.query(`SELECT states.id FROM states WHERE states.name = '${stateName}'`, {
+                type: db.sequelize.QueryTypes.SELECT,
+                plain: true
+            });
 
-        return data[0];
+            return data;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

@@ -4,6 +4,7 @@ const AgentRepository = require('../repository/agent.repository');
 const RecordsRepository = require('../repository/records.repository');
 const models = require('../../database/models');
 const FormatService = require('../services/format.service')
+const LeadFacade = require('../facades/lead.facade');
 
 module.exports = server => {
     const io = require("socket.io")(server);
@@ -25,24 +26,45 @@ module.exports = server => {
         socket.on("join_blueberry_leads", () => {
             socket.join("blueberry_leads");
             socket.leave("media-alpha_leads");
+            socket.leave("manual_leads");
+            socket.leave("bulk_leads");
+            socket.leave("click-listing_leads");
         });
 
         socket.on("join_media-alpha_leads", () => {
             socket.join("media-alpha_leads");
             socket.leave("blueberry_leads");
+            socket.leave("manual_leads");
+            socket.leave("bulk_leads");
+            socket.leave("click-listing_leads");
+        });
+
+        socket.on("join_manual_leads", () => {
+            socket.join("manual_leads");
+            socket.leave("media-alpha_leads");
+            socket.leave("blueberry_leads");
+            socket.leave("bulk_leads");
+            socket.leave("click-listing_leads");
+        });
+
+        socket.on("join_bulk_leads", () => {
+            socket.join("bulk_leads");
+            socket.leave("blueberry_leads");
+            socket.leave("media-alpha_leads");
+            socket.leave("manual_leads");
+            socket.leave("click-listing_leads");
+        });
+
+        socket.on("join_click-listing_leads", () => {
+            socket.join("click-listing_leads");
+            socket.leave("blueberry_leads");
+            socket.leave("media-alpha_leads");
+            socket.leave("manual_leads");
+            socket.leave("bulk_leads");
         });
 
         socket.on("process-lead", async (lead) => {
             try {
-                // const account_banned = await AgentService.checkedBan(users[socket.id].email);
-
-                // if (account_banned) {
-                //     socket.emit("BANNED", {
-                //         status: 'error',
-                //         message: "Your account has been banned"
-                //     });
-                // } else {
-
                 let quoter = "ninjaQuoter";
 
                 if (lead.type) {
@@ -54,9 +76,7 @@ module.exports = server => {
                 }
 
                 const formatedLead = await FormatService.formatLead(lead);
-
                 let exist = await LeadService.foundExistLead(formatedLead);
-
                 let uploadedLead;
 
                 if (exist) {
@@ -64,7 +84,7 @@ module.exports = server => {
                     if (exist.empty == 0 && formatedLead.empty == 1) {
                         console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);
                     } else {
-                        uploadedLead = await LeadService.updateLead(exist, formatedLead, quoter);
+                        uploadedLead = await LeadFacade.updateLead(exist, formatedLead, quoter);
 
                         if (uploadedLead) {
                             for (user in users) {
@@ -85,6 +105,15 @@ module.exports = server => {
                             } else if (uploadedLead.source === 'mediaalpha') {
                                 io.sockets.to("media-alpha_leads").emit("UPDATE_LEADS", uploadedLead);
                             }
+                            else if (uploadedLead.source === 'manual') {
+                                io.sockets.to("manual_leads").emit("UPDATE_LEADS", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'bulk') {
+                                io.sockets.to("bulk_leads").emit("UPDATE_LEADS", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'clickListing') {
+                                io.sockets.to("click-listing_leads").emit("UPDATE_LEADS", uploadedLead);
+                            }
 
                             if (emptyStatus) {
                                 io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
@@ -100,7 +129,7 @@ module.exports = server => {
                         }
                     }
                 } else {
-                    uploadedLead = await LeadService.createLead(formatedLead, quoter);
+                    uploadedLead = await LeadFacade.createLead(formatedLead, quoter);
 
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
@@ -110,6 +139,15 @@ module.exports = server => {
                                 io.sockets.to("blueberry_leads").emit("CREATE_LEAD", uploadedLead);
                             } else if (uploadedLead.source === 'mediaalpha') {
                                 io.sockets.to("media-alpha_leads").emit("CREATE_LEAD", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'manual') {
+                                io.sockets.to("manual_leads").emit("CREATE_LEAD", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'bulk') {
+                                io.sockets.to("bulk_leads").emit("CREATE_LEAD", uploadedLead);
+                            }
+                            else if (uploadedLead.source === 'clickListing') {
+                                io.sockets.to("click-listing_leads").emit("CREATE_LEAD", uploadedLead);
                             }
                         }
 
@@ -216,7 +254,7 @@ module.exports = server => {
                     }
 
                 } catch (error) {
-                    throw new Error(error);
+                    throw error;
                 }
             })
         });
@@ -227,14 +265,14 @@ module.exports = server => {
                     user_id: user_id,
                     lead_id: lead_id,
                     url: url
-                })
+                });
 
                 if (new_record) {
                     const one_record = await RecordsRepository.getOne(new_record.id);
                     socket.to(lead_id).emit("RECORD_ADD", one_record);
                 }
             } catch (error) {
-                throw new Error(error);
+                throw error;
             }
         });
 
