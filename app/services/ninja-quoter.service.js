@@ -14,27 +14,16 @@ class NinjaQuoterService {
 
         const preferedCompaniesFEX = {
             mutual_omaha: 0,
+            foresters: 0,
             royal_neighbors: 0,
             liberty_bankers: 0,
             prosperity_life: 0,
-            foresters: 0
+            americo: 0
         };
 
         this.companies = customerInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies;
         this.customerQuoteFilds = customerInfo;
     }
-
-    /**
-     * Return list filtered companies
-     */
-    // async fetchQuotes() {
-    //     try {
-    //         const companies = await this.fetchCompanyListFromNinjaQuoter();
-    //         return companies;
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
 
     /**
      * Return Price 
@@ -80,7 +69,6 @@ class NinjaQuoterService {
                     password: ''
                 }
             });
-
             return response.data.results;
         } catch (error) {
             throw error;

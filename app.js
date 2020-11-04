@@ -31,6 +31,9 @@ app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/agents', require('./routes/agent.routes'));
 app.use('/api/notes', require('./routes/notes.routes'));
 app.use('/api/beneficiaries', require('./routes/beneficiary.routes'));
+app.use('/api/twilio', require('./routes/twilio.routes'));
+app.use('/api/user', require('./routes/user.routes'));
+
 app.use('*', (req, res) => {
     res.sendStatus(404);
 });

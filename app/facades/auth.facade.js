@@ -25,7 +25,8 @@ class AuthFacade {
                             fname: user.fname,
                             lname: user.lname,
                             states: JSON.parse(user.states),
-                            role_id: user.role_id
+                            role_id: user.role_id,
+                            uncompleted_lead: user.uncompleted_lead
                         },
                         token: acces_token
                     }
@@ -58,7 +59,8 @@ class AuthFacade {
                         fname: candidate.fname,
                         lname: candidate.lname,
                         states: JSON.parse(candidate.states),
-                        role_id: candidate.role_id
+                        role_id: candidate.role_id,
+                        uncompleted_lead: candidate.uncompleted_lead
                     }
                 };
             }
