@@ -67,7 +67,7 @@ module.exports = server => {
             try {
                 let quoter = "ninjaQuoter";
 
-                if (lead.type) {
+                if ("type" in lead) {
                     switch (lead.type) {
                         case "life":
                             quoter = "ninjaQuoter";
@@ -75,8 +75,22 @@ module.exports = server => {
                     }
                 }
 
-                const formatedLead = await FormatService.formatLead(lead);
-                let exist = await LeadService.foundExistLead(formatedLead);
+                let exist;
+                let lead_id = lead.id;
+                
+                let formatedLead = await FormatService.formatLead(lead);
+
+                if (lead_id) {
+                    exist = await models.Leads.findOne({
+                        where: {
+                            id: lead_id
+                        }
+                    });
+                } else {
+                    exist = await LeadService.foundExistLead(formatedLead);
+    
+                }
+
                 let uploadedLead;
 
                 if (exist) {

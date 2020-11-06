@@ -13,8 +13,11 @@ class LeadMiddleware {
             try {
                 if (err) return res.status(403).json({ status: "error", message: "Not authorization user" });
 
-                const { id: user_id } = await AgentService.find(decoded.data);
-                const access = await LeadService.agentIsAssigned(req.params.lead_id, user_id);
+                const user = await AgentService.find(decoded.data);
+                
+                if(user.role_id == 3) return next()
+
+                const access = await LeadService.agentIsAssigned(req.params.lead_id, user.id);
 
                 if (access) return next();
                 return res.status(400).json({ status: 'error', message: 'No permission' });

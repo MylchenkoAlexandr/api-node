@@ -2,6 +2,7 @@ const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWI
 const models = require('../../database/models');
 const TwilioService = require('./twilio.service');
 const UserService = require('../services/user.service');
+const ConferenceRepository = require('../repository/conference.repository');
 
 class AutoDiallerService {
     outboundCall(customerPhone, lead_id) {
@@ -37,7 +38,7 @@ class AutoDiallerService {
                 const callbackUrl = TwilioService.generateConnectConferenceUrl(workerId, callSid);
 
                 await models.conferences.update({
-                    caller_id: workerId
+                    guide_id: workerId
                 }, {
                     where: {
                         conferenceId: callSid
@@ -59,9 +60,13 @@ class AutoDiallerService {
 
             const existCall = await models.conferences.findOne({
                 where: {
-                    caller_id: guide_id
+                    guide_id: guide_id
                 },
                 order: [['createdAt', 'DESC']],
+            });
+
+            await existCall.update({
+                agent_id: workerId
             });
 
             const callSid = existCall.conferenceId;
@@ -71,6 +76,15 @@ class AutoDiallerService {
             TwilioService.updateCallUrl(callSid, callbackUrl);
 
             TwilioService.addWorkersToConference(workerId, callbackUrl);
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async getLeadIdFromCall(field, id) {
+        try {
+            const leadId = await ConferenceRepository.getLeadIdFromCall(field, id);
+            return leadId;
         } catch (err) {
             throw err;
         }

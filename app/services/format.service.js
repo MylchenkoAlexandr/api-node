@@ -213,6 +213,10 @@ class FormatService {
                 lead.medications = medications;
             }
 
+            if ("id" in lead) {        
+                delete lead.id;                
+            }
+
             if ("type" in lead || "coverage_type" in lead) {
                 lead.term = this.formatTerms(lead);
                 if ("coverage_type" in lead) {
@@ -269,8 +273,6 @@ class FormatService {
         if (rawLead.contact) {
             rawLead.contact = rawLead.contact.replace(/"/ig, '');
         }
-
-        console.log(rawLead);
 
         if (rawLead.email == 'NULL' || rawLead.email == 0) {
             delete rawLead.email
