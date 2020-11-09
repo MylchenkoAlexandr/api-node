@@ -5,6 +5,7 @@ const MailService = require('../services/mail.service');
 const PriceService = require('../services/price.service');
 const AutoDiallerService = require('../services/autodialler.service');
 const TransformationHelper = require('../helpers/transformation.helper');
+const LeadRepository = require('../repository/lead.repository');
 
 class LeadFacade {
 
@@ -119,6 +120,15 @@ class LeadFacade {
             return await LeadService.getRawLead(updatedLead.id);
         } catch (error) {
             throw error;
+        }
+    }
+
+    async getAll(){
+        try {
+            const leads = await LeadService.all();
+            return { code: 200, status: 'success', leads };
+        } catch (error) {
+            
         }
     }
 

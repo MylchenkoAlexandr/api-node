@@ -7,6 +7,16 @@ async function test(req, res) {
     return res.status(200).send(lead);
 }
 
+async function getAll(req, res) {
+    try {
+        const response = await LeadFacade.getAll();
+        return res.status(response.code).json({ status: response.status, leads: response.leads });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: "Server Error!" });
+        throw err;
+    }
+}
+
 async function getLeads(req, res) {
     try {
         const response = await LeadFacade.getAllLeads(req.params.type, req.params.user_id);
@@ -140,6 +150,7 @@ async function getLeadsBySource(req, res) {
 module.exports = {
     test,
     getLead,
+    getAll,
     getLeads,
     getRawLeads,
     getCompaniesListByLeadData,

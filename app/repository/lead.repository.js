@@ -2,6 +2,20 @@ const db = require('../../database/models');
 const TransformationHelper = require('../helpers/transformation.helper');
 
 const LeadRepository = {
+    async All() {
+        try {
+            let data = await db.sequelize.query(`SELECT * FROM leads ORDER BY leads.id DESC;`, {
+                type: db.sequelize.QueryTypes.SELECT,
+            }).catch((e) => {
+                console.error(e);
+            });
+            
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     async getAll(type, states) {
         try {
             let statesQuery = '';
@@ -42,7 +56,6 @@ const LeadRepository = {
     },
 
     async getOne(id) {
-
         try {
             let lead = await db.sequelize.query("SELECT leads.id, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.updatedAt AS updated, sources.title AS source_title, sources.name AS source FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
                 type: db.sequelize.QueryTypes.SELECT,
