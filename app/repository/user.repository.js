@@ -1,5 +1,5 @@
 const db = require('../../database/models');
-
+const _ = require('lodash');
 class UserRepository {
     async statusHandler(user_id, field, status) {
         try {
@@ -20,8 +20,8 @@ class UserRepository {
         }).catch(e => {
             throw e;
         });
-        
-        return data[0].id;
+
+        return _.isEmpty(data) ? false : data[0].id;
     }
 }
 

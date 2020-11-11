@@ -6,18 +6,22 @@ const PriceService = require('../services/price.service');
 const AutoDiallerService = require('../services/autodialler.service');
 const TransformationHelper = require('../helpers/transformation.helper');
 const LeadRepository = require('../repository/lead.repository');
+const UserRepository = require('../repository/user.repository');
 
 class LeadFacade {
-
     async createLead(formatedLead, quoter) {
         try {
             const createdLead = await LeadService.createLead(formatedLead);
 
             if (createdLead.empty == 0) {
                 if ("phone" in createdLead) {
-                    const phone = TransformationHelper.formatPhoneForCall(createdLead.phone);
-                    // For testing '+380632796212' 
-                    AutoDiallerService.outboundCall(phone, createdLead.id);
+                    let guides = await UserRepository.findSuitableWorker("guide");
+                
+                    if (guides) {
+                        const phone = TransformationHelper.formatPhoneForCall(createdLead.phone);
+
+                        await AutoDiallerService.outboundCall(phone, createdLead.id);
+                    }
                 }
 
                 const leadProperty = JSON.parse(createdLead.property);
@@ -123,12 +127,12 @@ class LeadFacade {
         }
     }
 
-    async getAll(){
+    async getAll() {
         try {
             const leads = await LeadService.all();
             return { code: 200, status: 'success', leads };
         } catch (error) {
-            
+
         }
     }
 

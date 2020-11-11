@@ -3,26 +3,32 @@ const models = require('../../database/models');
 const TwilioService = require('./twilio.service');
 const UserService = require('../services/user.service');
 const ConferenceRepository = require('../repository/conference.repository');
+const UserRepository = require('../repository/user.repository');
+const _ = require('lodash');
 
 class AutoDiallerService {
-    outboundCall(customerPhone, lead_id) {
+    async outboundCall(customerPhone, lead_id) {
         try {
-            client.calls
-                .create({
-                    asyncAmd: "true",
-                    machineDetection: 'Enable',
-                    asyncAmdStatusCallback: process.env.CALLBACK_TWILIO + '/api/twilio/amd',
-                    url: 'http://demo.twilio.com/docs/classic.mp3',
-                    from: process.env.TWILIO_NUMBER,
-                    to: customerPhone
-                })
-                .then(async call => {
-                    await models.conferences.create({
-                        lead_id: lead_id,
-                        conferenceId: call.sid
-                    });
-                })
-                .catch(err => console.error(err));
+            const guides = await UserRepository.findSuitableWorker("guide");
+
+            if (!_.isEmpty(guides)) {
+                client.calls
+                    .create({
+                        asyncAmd: "true",
+                        machineDetection: 'Enable',
+                        asyncAmdStatusCallback: process.env.CALLBACK_TWILIO + '/api/twilio/amd',
+                        url: 'http://demo.twilio.com/docs/classic.mp3',
+                        from: process.env.TWILIO_NUMBER,
+                        to: customerPhone
+                    })
+                    .then(async call => {
+                        await models.conferences.create({
+                            lead_id: lead_id,
+                            conferenceId: call.sid
+                        });
+                    })
+                    .catch(err => console.error(err));
+            }
         } catch (err) {
             throw err;
         }
