@@ -11,7 +11,7 @@ class AutoDiallerService {
         try {
             const guides = await UserRepository.findSuitableWorker("guide");
 
-            if (!_.isEmpty(guides)) {
+            if (guides) {
                 client.calls
                     .create({
                         asyncAmd: "true",
@@ -39,21 +39,24 @@ class AutoDiallerService {
             if (call.AnsweredBy == "human") {
                 const workerId = await UserService.findSuitableWorker("guide");
 
-                const callSid = call.CallSid;
+                if (workerId) {
+                    const callSid = call.CallSid;
 
-                const callbackUrl = TwilioService.generateConnectConferenceUrl(workerId, callSid);
+                    const callbackUrl = TwilioService.generateConnectConferenceUrl(workerId, callSid);
 
-                await models.conferences.update({
-                    guide_id: workerId
-                }, {
-                    where: {
-                        conferenceId: callSid
-                    }
-                });
+                    await models.conferences.update({
+                        guide_id: workerId
+                    }, {
+                        where: {
+                            conferenceId: callSid
+                        }
+                    });
 
-                TwilioService.updateCallUrl(callSid, callbackUrl);
+                    TwilioService.updateCallUrl(callSid, callbackUrl);
 
-                TwilioService.addWorkersToConference(workerId, callbackUrl);
+                    TwilioService.addWorkersToConference(workerId, callbackUrl);
+
+                }
             }
         } catch (err) {
             throw err;
@@ -64,24 +67,26 @@ class AutoDiallerService {
         try {
             const workerId = await UserService.findSuitableWorker("agent");
 
-            const existCall = await models.conferences.findOne({
-                where: {
-                    guide_id: guide_id
-                },
-                order: [['createdAt', 'DESC']],
-            });
+            if (workerId) {
+                const existCall = await models.conferences.findOne({
+                    where: {
+                        guide_id: guide_id
+                    },
+                    order: [['createdAt', 'DESC']],
+                });
 
-            await existCall.update({
-                agent_id: workerId
-            });
+                await existCall.update({
+                    agent_id: workerId
+                });
 
-            const callSid = existCall.conferenceId;
+                const callSid = existCall.conferenceId;
 
-            const callbackUrl = TwilioService.generateConnectConferenceUrl(workerId, callSid);
+                const callbackUrl = TwilioService.generateConnectConferenceUrl(workerId, callSid);
 
-            TwilioService.updateCallUrl(callSid, callbackUrl);
+                TwilioService.updateCallUrl(callSid, callbackUrl);
 
-            TwilioService.addWorkersToConference(workerId, callbackUrl);
+                TwilioService.addWorkersToConference(workerId, callbackUrl);
+            }
         } catch (err) {
             throw err;
         }
