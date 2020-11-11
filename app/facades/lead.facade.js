@@ -20,7 +20,7 @@ class LeadFacade {
                     if (guides) {
                         const phone = TransformationHelper.formatPhoneForCall(createdLead.phone);
 
-                        await AutoDiallerService.outboundCall(phone, createdLead.id);
+                        // await AutoDiallerService.outboundCall(phone, createdLead.id);
                     }
                 }
 
