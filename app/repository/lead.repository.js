@@ -4,10 +4,15 @@ const TransformationHelper = require('../helpers/transformation.helper');
 const LeadRepository = {
     async All() {
         try {
-            let data = await db.sequelize.query(`SELECT *, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.phone IS NOT NULL ORDER BY leads.id DESC;`, {
+            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.phone IS NOT NULL ORDER BY leads.id DESC;`, {
                 type: db.sequelize.QueryTypes.SELECT,
             }).catch((e) => {
                 console.error(e);
+            });
+
+            data = data.map(lead => {
+                lead.updatedAt = TransformationHelper.formatDate(lead.updatedAt, true);
+                return lead;
             });
             
             return data;
