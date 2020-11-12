@@ -5,6 +5,7 @@ const UserService = require('../services/user.service');
 const ConferenceRepository = require('../repository/conference.repository');
 const UserRepository = require('../repository/user.repository');
 const _ = require('lodash');
+const clientSocker = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 class AutoDiallerService {
     async outboundCall(customerPhone, lead_id) {
@@ -65,19 +66,28 @@ class AutoDiallerService {
 
     async addAgentToCall(guide_id) {
         try {
-            const workerId = await UserService.findSuitableWorker("agent");
+            const existCall = await models.conferences.findOne({
+                where: {
+                    guide_id: guide_id
+                },
+                order: [['createdAt', 'DESC']],
+            });
+
+            const lead = await models.Leads.findOne({
+                attributes: ['state_id'],
+                where: {
+                    id: existCall.lead_id
+                }
+            })
+
+            const workerId = await UserService.findSuitableWorker("agent", lead.state_id);
 
             if (workerId) {
-                const existCall = await models.conferences.findOne({
-                    where: {
-                        guide_id: guide_id
-                    },
-                    order: [['createdAt', 'DESC']],
-                });
-
                 await existCall.update({
                     agent_id: workerId
                 });
+
+                clientSocker.emit("assign-agent", existCall.lead_id, workerId);
 
                 const callSid = existCall.conferenceId;
 

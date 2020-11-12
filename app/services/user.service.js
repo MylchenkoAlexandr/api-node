@@ -12,8 +12,8 @@ class UserService {
      * 
      * @return users.id int
      */
-    async findSuitableWorker(roleName) {
-        const userId = await UserRepository.findSuitableWorker(roleName);
+    async findSuitableWorker(roleName, state_id) {
+        const userId = await UserRepository.findSuitableWorker(roleName, state_id);
 
         return userId;
     }

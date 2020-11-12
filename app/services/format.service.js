@@ -2,6 +2,7 @@ const models = require('../../database/models');
 const zipcodes = require('zipcodes');
 const TransformationHelper = require('../helpers/transformation.helper');
 const AgentRepository = require('../repository/agent.repository');
+const SettingsService = require('../services/settings.service');
 
 class FormatService {
     /**
@@ -125,12 +126,20 @@ class FormatService {
 
                 delete lead.agent;
             } else if ("state_id" in formatedLead) {
-                if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
-                    const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
-                    if (suitableAgent) {
-                        formatedLead.user_id = suitableAgent;
+                let agent = null
+
+                const settings = SettingsService.get();
+
+                if (settings.assigment) {
+                    if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
+                        const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
+                        if (suitableAgent) {
+                            agent = suitableAgent;
+                        }
                     }
                 }
+
+                formatedLead.user_id = agent;
             }
 
             if ("status" in lead) {
@@ -213,8 +222,8 @@ class FormatService {
                 lead.medications = medications;
             }
 
-            if ("id" in lead) {        
-                delete lead.id;                
+            if ("id" in lead) {
+                delete lead.id;
             }
 
             if ("type" in lead || "coverage_type" in lead) {
