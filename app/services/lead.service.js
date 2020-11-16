@@ -99,6 +99,17 @@ class LeadService {
     }
 
     /**
+     * Get all leads for guide user
+     */
+    async getGuideLeads() {
+        try {
+            return await LeadRepository.getGuideLeads();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
      * Get all leads skipping any params
      */
     async all(){
