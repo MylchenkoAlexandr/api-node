@@ -16,8 +16,9 @@ class AutoDiallerService {
                 client.calls
                     .create({
                         asyncAmd: "true",
-                        machineDetection: 'Enable',
-                        asyncAmdStatusCallback: process.env.CALLBACK_TWILIO + '/api/twilio/amd',
+                        statusCallback: process.env.CALLBACK_TWILIO + '/api/twilio/answered',
+                        statusCallbackEvent: ['answered'],
+                        statusCallbackMethod: 'POST',
                         url: 'http://demo.twilio.com/docs/classic.mp3',
                         from: process.env.TWILIO_NUMBER,
                         to: customerPhone
@@ -35,29 +36,28 @@ class AutoDiallerService {
         }
     }
 
-    async machineDetection(call) {
+
+
+    async answeredCallBack(call) {
         try {
-            if (call.AnsweredBy == "human") {
-                const workerId = await UserService.findSuitableWorker("guide");
+            const workerId = await UserService.findSuitableWorker("guide");
 
-                if (workerId) {
-                    const callSid = call.CallSid;
+            if (workerId) {
+                const callSid = call.CallSid;
 
-                    const callbackUrl = TwilioService.generateConnectConferenceUrl(workerId, callSid);
+                const callbackUrl = TwilioService.generateConnectConferenceUrl(workerId, callSid);
 
-                    await models.conferences.update({
-                        guide_id: workerId
-                    }, {
-                        where: {
-                            conferenceId: callSid
-                        }
-                    });
+                await models.conferences.update({
+                    guide_id: workerId
+                }, {
+                    where: {
+                        conferenceId: callSid
+                    }
+                });
 
-                    TwilioService.updateCallUrl(callSid, callbackUrl);
+                TwilioService.updateCallUrl(callSid, callbackUrl);
 
-                    TwilioService.addWorkersToConference(workerId, callbackUrl);
-
-                }
+                TwilioService.addWorkersToConference(workerId, callbackUrl);
             }
         } catch (err) {
             throw err;
