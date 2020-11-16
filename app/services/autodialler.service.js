@@ -36,8 +36,6 @@ class AutoDiallerService {
         }
     }
 
-
-
     async answeredCallBack(call) {
         try {
             const workerId = await UserService.findSuitableWorker("guide");
