@@ -11,8 +11,13 @@ class TwilioController {
         return res.sendStatus(200);
     }
 
-    async AMD(req, res) {
-        await AutoDiallerService.machineDetection(req.body);
+    // async AMD(req, res) {
+    //     await AutoDiallerService.machineDetection(req.body);
+    //     return res.sendStatus(200);
+    // }
+
+    async answeredCallBack(req, res) {
+        await AutoDiallerService.answeredCallBack(req.body);
         return res.sendStatus(200);
     }
 
@@ -40,13 +45,13 @@ class TwilioController {
         try {
             if (!_.isEmpty(req.body.leads)) {
                 let guides = await UserRepository.findSuitableWorker("guide");
-                
+
                 if (!guides) {
                     return res.status(202).json({ status: 'error', message: "No agents online" });
                 }
 
                 const response = await AutoDiallerFacade.callLeads(req.body.leads);
-                
+
                 return res.status(response.code).json({ status: response.status, message: response.message });
             }
 
