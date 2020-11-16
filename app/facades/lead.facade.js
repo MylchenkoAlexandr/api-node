@@ -16,7 +16,7 @@ class LeadFacade {
             if (createdLead.empty == 0) {
                 if ("phone" in createdLead) {
                     let guides = await UserRepository.findSuitableWorker("guide");
-                
+
                     if (guides) {
                         const phone = TransformationHelper.formatPhoneForCall(createdLead.phone);
 
@@ -122,6 +122,15 @@ class LeadFacade {
             }
 
             return await LeadService.getRawLead(updatedLead.id);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getGuideLeads() {
+        try {
+            const leads = await LeadService.getGuideLeads();
+            return { code: 200, status: 'success', leads };
         } catch (error) {
             throw error;
         }

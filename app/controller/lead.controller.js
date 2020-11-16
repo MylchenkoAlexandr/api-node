@@ -17,6 +17,16 @@ async function getAll(req, res) {
     }
 }
 
+async function getAllLeadsForGuide(req, res) {
+    try {
+        const response = await LeadFacade.getGuideLeads();
+        return res.status(response.code).json({ status: response.status, leads: response.leads });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: "Server Error!" });
+        throw err;
+    }
+}
+
 async function getLeads(req, res) {
     try {
         const response = await LeadFacade.getAllLeads(req.params.type, req.params.user_id);
@@ -156,5 +166,6 @@ module.exports = {
     getCompaniesListByLeadData,
     uploadLeadFromMediaAlpha,
     uploadLeadFromUrl,
-    getLeadsBySource
+    getLeadsBySource,
+    getAllLeadsForGuide
 }   
