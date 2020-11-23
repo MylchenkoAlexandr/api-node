@@ -194,6 +194,18 @@ class LeadFacade {
             throw error;
         }
     }
+
+    async updateADstatusFields(lead_id, field, status){
+        try {  
+            const updateStatus = await LeadService.updateADstatusFields(lead_id, field, status);
+
+            if (updateStatus != -1) return { code: 200, status: "success", message: "Status changed" };
+
+            return { code: 404, status: "error", message: "Unexpected error" };
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new LeadFacade;

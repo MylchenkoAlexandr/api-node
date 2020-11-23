@@ -8,6 +8,8 @@ router.post('/token/:workerId', TwilioController.token);
 router.post('/conference/:conferenceId/connect/:id', TwilioController.connectToConference);
 router.post('/addworker', TwilioController.addWorkerToTheCall);
 
-router.post('/call/autodialer', TwilioController.callSelectedByAutoDialer);
+router.post('/call/selected', TwilioController.callSelectedByAutoDialer);
+
+router.post('/call/autodialer', TwilioController.callLeadListByAutoDialer);
 
 module.exports = router;

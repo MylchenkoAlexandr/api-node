@@ -5,16 +5,22 @@ const UserService = require('../services/user.service');
 const ClientCapability = require('twilio').jwt.ClientCapability;
 class TwilioService {
     addWorkersToConference(agentId, callbackUrl) {
-        client.calls.create({
-            from: process.env.TWILIO_NUMBER,
-            to: `client:${agentId}`,
-            url: callbackUrl
-        }).catch(err => {
-            console.error(err)
-        });
+        console.log("TwilioService -> addWorkersToConference -> agentId", agentId)
+        console.log("TwilioService -> addWorkersToConference -> process.env.TWILIO_NUMBER", callbackUrl);
+        try {
+            client.calls.create({
+                from: process.env.TWILIO_NUMBER,
+                to: `client:${agentId}`,
+                url: callbackUrl
+            }).catch(err => {
+                console.error(err)
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 
-    updateCallUrl(callSid, callbackUrl){
+    updateCallUrl(callSid, callbackUrl) {
         client.calls(callSid).update({
             method: 'POST',
             url: callbackUrl

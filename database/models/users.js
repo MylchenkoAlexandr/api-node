@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       primaryKey: true,
     },
+    AD_status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,

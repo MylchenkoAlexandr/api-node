@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             defaultValue: 0,
         },
+        assignment: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: 0,
+        },
     }, {
         sequelize,
         modelName: 'Settings',

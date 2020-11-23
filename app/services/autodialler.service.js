@@ -17,11 +17,12 @@ class AutoDiallerService {
                     .create({
                         asyncAmd: "true",
                         statusCallback: process.env.CALLBACK_TWILIO + '/api/twilio/answered',
-                        statusCallbackEvent: ['answered'],
+                        statusCallbackEvent: ['answered', 'completed'],
                         statusCallbackMethod: 'POST',
                         url: 'http://demo.twilio.com/docs/classic.mp3',
                         from: process.env.TWILIO_NUMBER,
-                        to: customerPhone
+                        // to: customerPhone
+                        to: '+380632796212'
                     })
                     .then(async call => {
                         await models.conferences.create({

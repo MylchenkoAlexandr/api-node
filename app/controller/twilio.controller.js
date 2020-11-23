@@ -4,6 +4,8 @@ const AutoDiallerService = require("../services/autodialler.service");
 const AutoDiallerFacade = require("../facades/autodialler.facade")
 const UserRepository = require('../repository/user.repository');
 const _ = require('lodash');
+const ConferenceRepository = require('../repository/conference.repository');
+const LeadService = require('../services/lead.service');
 
 class TwilioController {
     outboundCall(req, res) {
@@ -17,7 +19,14 @@ class TwilioController {
     // }
 
     async answeredCallBack(req, res) {
-        await AutoDiallerService.answeredCallBack(req.body);
+        console.log("TwilioController -> answeredCallBack -> req.body", req.body);
+        if (req.body.CallStatus == 'in-progress') {
+            await AutoDiallerService.answeredCallBack(req.body);
+            const lead_id = await ConferenceRepository.getLeadIdFromCall("conferenceId", req.body.CallSid);            
+        } else if(req.body.CallStatus == ''){
+            req.bod
+        }
+
         return res.sendStatus(200);
     }
 
@@ -47,11 +56,33 @@ class TwilioController {
                 let guides = await UserRepository.findSuitableWorker("guide");
 
                 if (!guides) {
-                    return res.status(202).json({ status: 'error', message: "No agents online" });
+                    return res.status(202).json({ status: 'error', message: "No guide online" });
                 }
 
                 const response = await AutoDiallerFacade.callLeads(req.body.leads);
 
+                return res.status(response.code).json({ status: response.status, message: response.message });
+            }
+
+            return res.status(400).json({ status: 'error', message: 'Bad Request' });
+        } catch (error) {
+            res.status(500).json({ status: 'error', message: "Server Error!" });
+            throw error;
+        }
+    }
+
+    async callLeadListByAutoDialer(req, res) {
+        try {
+            const guides = await UserRepository.findSuitableWorker("guide");
+
+            if (!guides) {
+                return res.status(202).json({ status: 'error', message: "No guide online" });
+            }
+
+            const leads = await LeadService.getSuitableLeadsForCall();
+
+            if (leads) {
+                const response = await AutoDiallerFacade.callLeadsListByAutoDialler(leads);
                 return res.status(response.code).json({ status: response.status, message: response.message });
             }
 

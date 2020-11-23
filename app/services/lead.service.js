@@ -284,6 +284,24 @@ class LeadService {
             throw error;
         }
     }
+
+    async getSuitableLeadsForCall(){
+        try {
+            const leads = await LeadRepository.getSuitableLeadsForCall();        
+            return leads;        
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateADstatusFields(lead_id, field, status){
+        try {
+            const lead = await LeadRepository.updateADstatusFields(lead_id, field, status);
+            return lead;
+        } catch (error) {
+            throw error;        
+        }
+    }
 }
 
 module.exports = new LeadService;

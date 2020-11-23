@@ -44,6 +44,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Leads.init({
+    AD_in_proccess: DataTypes.BOOLEAN,
+    AD_called: DataTypes.BOOLEAN,
     user_id: DataTypes.BIGINT.UNSIGNED,
     source_id: DataTypes.BIGINT.UNSIGNED,
     status_id: DataTypes.BIGINT.UNSIGNED,

@@ -12,6 +12,7 @@ class AutoDiallerFacade {
             throw err;
         }
     }
+
     callLeads(leads) {
         leads.forEach(async (item) => {
             let lead = await models.Leads.findOne({
@@ -24,6 +25,27 @@ class AutoDiallerFacade {
 
             let phone = TransformationHelper.formatPhoneForCall(lead.phone);
             await AutoDiallerService.outboundCall(phone, lead.id);
+        });
+
+        return { code: '200', status: 'success', message: "Calling leads" };
+    }
+
+    callLeadsListByAutoDialler(leads) {
+        leads.forEach(async (item) => {
+            let lead = await models.Leads.findOne({
+                where: {
+                    id: item.id
+                }
+            });
+            
+            if (item.AD_in_proccess) return;
+
+            await lead.update({
+                AD_in_proccess: 1
+            });
+
+            let phone = TransformationHelper.formatPhoneForCall(item.phone);
+            await AutoDiallerService.outboundCall(phone, item.id);
         });
 
         return { code: '200', status: 'success', message: "Calling leads" };
