@@ -61,6 +61,17 @@ const AgentRepository = {
         } catch (error) {
             throw error;
         }
+    },
+
+    async onlineAgents() {
+        let agents = await db.sequelize.query(`SELECT users.id FROM users WHERE users.active = true AND users.role_id = 2`, {
+            type: db.sequelize.QueryTypes.SELECT,
+        })
+            .catch(e => {
+                throw e;
+            });
+
+        return agents.length;
     }
 }
 

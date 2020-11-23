@@ -162,6 +162,14 @@ class AgentFacade {
             throw error;
         }
     }
+
+    async getOnlineAgents() {
+        try {
+            return await AgentService.getOnlineAgents();
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new AgentFacade;
