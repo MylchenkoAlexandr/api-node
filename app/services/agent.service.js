@@ -273,6 +273,14 @@ class AgentService {
             throw error;
         }
     }
+
+    async getOnlineAgents() {
+        try {
+            return await AgentRepository.onlineAgents();
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new AgentService;

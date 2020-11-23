@@ -5,7 +5,21 @@ const AuthMiddleware = require('../app/middleware/auth.middleware');
 const authenticateToken = AuthMiddleware.authenticateToken;
 const checkedAdminRole = AuthMiddleware.checkedAdminRole;
 
-const { getAgents, getSuitableAgents, createAgent, updateAgent, deleteAgent, updateAgentPassword, completedLead, startWork, createScript, getAllScripts, deleteScript, updateScript } = require('../app/controller/agent.controller');
+const {
+    getAgents,
+    getSuitableAgents,
+    createAgent,
+    updateAgent,
+    deleteAgent,
+    updateAgentPassword,
+    completedLead,
+    startWork,
+    createScript,
+    getAllScripts,
+    deleteScript,
+    updateScript,
+    getOnlineAgents
+} = require('../app/controller/agent.controller');
 
 router.get('/', authenticateToken, checkedAdminRole, getAgents);
 router.post('/suitable', authenticateToken, checkedAdminRole, getSuitableAgents);
@@ -19,5 +33,6 @@ router.get('/scripts/:agent_id/:type_id', authenticateToken, getAllScripts);
 router.post('/scripts/create', authenticateToken, createScript);
 router.patch('/scripts/:script_id', authenticateToken, updateScript);
 router.delete('/scripts/:script_id', authenticateToken, deleteScript);
+router.get('/online', authenticateToken, getOnlineAgents);
 
 module.exports = router;

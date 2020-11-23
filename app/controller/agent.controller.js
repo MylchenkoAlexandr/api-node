@@ -191,6 +191,16 @@ async function deleteScript(req, res) {
     }
 }
 
+async function getOnlineAgents(req, res) {
+    try {
+        const agents = await AgentFacade.getOnlineAgents();
+        res.status(200).json({ status: 'success', agents });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
 module.exports = {
     getAgents,
     createAgent,
@@ -203,5 +213,6 @@ module.exports = {
     createScript,
     getAllScripts,
     deleteScript,
-    updateScript
+    updateScript,
+    getOnlineAgents
 }

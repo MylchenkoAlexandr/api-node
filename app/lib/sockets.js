@@ -1,4 +1,6 @@
 const LeadService = require('../services/lead.service');
+const AgentService = require('../services/agent.service');
+const UserFacade = require('../facades/user.facade');
 const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 const RecordsRepository = require('../repository/records.repository');
@@ -77,7 +79,7 @@ module.exports = server => {
 
                 let exist;
                 let lead_id = lead.id;
-                
+
                 let formatedLead = await FormatService.formatLead(lead);
 
                 if (lead_id) {
@@ -88,7 +90,7 @@ module.exports = server => {
                     });
                 } else {
                     exist = await LeadService.foundExistLead(formatedLead);
-    
+
                 }
 
                 let uploadedLead;
@@ -284,6 +286,21 @@ module.exports = server => {
                 if (new_record) {
                     const one_record = await RecordsRepository.getOne(new_record.id);
                     socket.to(lead_id).emit("RECORD_ADD", one_record);
+                }
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        socket.on("agent-online", async ({user_id, online}) => {
+            try {
+                await UserFacade.statusHandler(user_id, "active", online);
+                const onlineAgents = await AgentService.getOnlineAgents();
+
+                for (user in users) {
+                    if (users[user].role_id === 3) {
+                        io.sockets.emit("GET_ONLINE_AGENTS", onlineAgents);
+                    }
                 }
             } catch (error) {
                 throw error;
