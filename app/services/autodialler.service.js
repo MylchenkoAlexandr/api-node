@@ -5,7 +5,7 @@ const UserService = require('../services/user.service');
 const ConferenceRepository = require('../repository/conference.repository');
 const UserRepository = require('../repository/user.repository');
 const _ = require('lodash');
-const clientSocker = require('socket.io-client')(process.env.WEBSOCKET_URL);
+const clientSocket = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 class AutoDiallerService {
     async outboundCall(customerPhone, lead_id) {
@@ -86,7 +86,7 @@ class AutoDiallerService {
                     agent_id: workerId
                 });
 
-                clientSocker.emit("assign-agent", existCall.lead_id, workerId);
+                clientSocket.emit("assign-agent", existCall.lead_id, workerId);
 
                 const callSid = existCall.conferenceId;
 

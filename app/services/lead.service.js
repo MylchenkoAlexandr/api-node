@@ -285,9 +285,9 @@ class LeadService {
         }
     }
 
-    async getSuitableLeadsForCall(){
+    async getSuitableLeadsForCall(limit){
         try {
-            const leads = await LeadRepository.getSuitableLeadsForCall();        
+            const leads = await LeadRepository.getSuitableLeadsForCall(limit);        
             return leads;        
         } catch (error) {
             throw error;
@@ -302,6 +302,10 @@ class LeadService {
             throw error;        
         }
     }
+
+    async phoneNumberSearcher(lead_id){}
+
+    
 }
 
 module.exports = new LeadService;

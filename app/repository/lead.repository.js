@@ -212,11 +212,25 @@ const LeadRepository = {
         }
     },
 
-    async getSuitableLeadsForCall() {
+    /**
+     * 
+     * @param {integer} limit count of leads neede
+     */
+    async getSuitableLeadsForCall(limit = null) {
         try {
-            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (2, 4) AND leads.status_id IN (1, 2, 3, 4, 5, 11) AND leads.AD_in_proccess = 0 AND leads.AD_called = 0 AND leads.phone IS NOT NULL ORDER BY leads.id DESC;`, {
+            let limitLeads;
+
+            if (limit) {
+                limitLeads = "LIMIT " + limit;
+            }
+
+            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (2, 4) AND leads.status_id IN (1, 2, 3, 4, 5, 11) AND leads.AD_status <> 3 AND leads.phone IS NOT NULL ORDER BY leads.id DESC ` + limitLeads, {
                 type: db.sequelize.QueryTypes.SELECT,
             });
+
+            if (limit) {
+                return data[0];
+            }
 
             return data;
         } catch (error) {
@@ -224,7 +238,7 @@ const LeadRepository = {
         }
     },
 
-    async updateADstatusFields(lead_id, field, status){
+    async updateADstatusFields(lead_id, field, status) {
         try {
             let data = await db.sequelize.query(`UPDATE leads SET leads.${field} = ${status} WHERE leads.id = ${lead_id};`, {
                 type: db.sequelize.QueryTypes.UPDATE,

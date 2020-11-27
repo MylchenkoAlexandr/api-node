@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             defaultValue: 0,
         },
+        default_phone: {
+            type: DataTypes.STRING,
+            defaultValue: 0,
+        }
     }, {
         sequelize,
         modelName: 'Settings',

@@ -12,15 +12,15 @@ class SettingsService {
         }
     }
 
-    async update(updateSettings) {
-        
+    async update(updateSettings) {        
         try {
             const settings = await models.Settings.findAll({
                 limit: 1
             });
 
             await  settings[0].update({
-                assignment: +updateSettings.assignment
+                assignment: +updateSettings.assignment,
+                default_phone: updateSettings.default_phone
             });
 
             return {

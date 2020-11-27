@@ -18,13 +18,10 @@ class TwilioController {
     //     return res.sendStatus(200);
     // }
 
-    async answeredCallBack(req, res) {
-        console.log("TwilioController -> answeredCallBack -> req.body", req.body);
+    async answeredCallBack(req, res) {        
         if (req.body.CallStatus == 'in-progress') {
             await AutoDiallerService.answeredCallBack(req.body);
-            const lead_id = await ConferenceRepository.getLeadIdFromCall("conferenceId", req.body.CallSid);            
-        } else if(req.body.CallStatus == ''){
-            req.bod
+            // const lead_id = await ConferenceRepository.getLeadIdFromCall("conferenceId", req.body.CallSid);            
         }
 
         return res.sendStatus(200);

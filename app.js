@@ -35,6 +35,8 @@ app.use('/api/twilio', require('./routes/twilio.routes'));
 app.use('/api/user', require('./routes/user.routes'));
 app.use('/api/autodialler', require('./routes/autodialler.routes'));
 app.use('/api/settings', require('./routes/settings.routes'));
+app.use('/api/state', require('./routes/state.routes'));
+app.use('/api/phone', require('./routes/phone.routes'));
 
 app.use('*', (req, res) => {
     res.sendStatus(404);
