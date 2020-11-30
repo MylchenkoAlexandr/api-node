@@ -234,7 +234,7 @@ class FormatService {
      * Function for formating lead data for quoters
      * @param {object} lead 
      */
-    async formatLeadForQuote(lead) {
+    formatLeadForQuote(lead) {
         let formatedLead = {
             birthdate: lead.birth_date,
             state: lead.state,
