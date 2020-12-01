@@ -4,7 +4,8 @@ const TransformationHelper = require('../helpers/transformation.helper');
 const LeadRepository = {
     async getGuideLeads() {
         try {
-            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state, leads.updatedAt AS updated FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (2, 4) AND leads.status_id IN (1, 2, 3, 4, 5, 11) AND leads.phone IS NOT NULL ORDER BY leads.id DESC;`, {
+            // leads.source_id IN (2, 4) AND
+            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state, leads.updatedAt AS updated FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.status_id IN (1, 2, 3, 4, 5, 11) AND leads.phone IS NOT NULL ORDER BY leads.id DESC;`, {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
