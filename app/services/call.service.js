@@ -22,10 +22,15 @@ class CallService {
         }
     }
 
-    async transferCallToGuide(call) {
+    async transferCallToGuide(call, guide_id = null) {
         try {
             const callSid = call.CallSid;
-            const guideId = await UserService.findSuitableWorker("guide");
+
+            let guideId = guide_id;
+
+            if (!guideId) {
+                guideId = await UserService.findSuitableWorker("guide");
+            }
 
             if (guideId && callSid) {
                 const callbackUrl = TwilioService.generateConnectConferenceUrl(guideId, callSid);

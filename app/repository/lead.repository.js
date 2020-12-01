@@ -52,7 +52,7 @@ const LeadRepository = {
 
     async getOne(id) {
         try {
-            let lead = await db.sequelize.query("SELECT leads.id, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.updatedAt AS updated, sources.title AS source_title, sources.name AS source FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
+            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.updatedAt AS updated, sources.title AS source_title, sources.name AS source FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             });
@@ -201,7 +201,7 @@ const LeadRepository = {
                 limitLeads = "LIMIT " + limit;
             }
 
-            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (2, 4) AND leads.status_id IN (1, 2, 3, 4, 5, 11) AND leads.AD_status <> 3 AND leads.phone IS NOT NULL ORDER BY leads.id DESC ` + limitLeads, {
+            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (2, 4) AND leads.status_id IN (1, 2, 3, 4, 5, 11) AND leads.AD_status NOT IN(1, 2, 4) AND leads.phone IS NOT NULL ORDER BY leads.id DESC ` + limitLeads, {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 

@@ -1,6 +1,20 @@
 const db = require('../../database/models');
 const _ = require('lodash');
+
 class UserRepository {
+    async getStatus(user_id, field){
+        try {
+            const data = await db.sequelize.query(`SELECT users.${field} FROM users WHERE users.id = ${user_id}`, {
+                type: db.sequelize.QueryTypes.SELECT
+            }).catch(e => console.log("🚀 ~ file: user.repository.js ~ line 10 ~ UserRepository ~ getStatus ~ e", e));
+        
+            return data[0][field];            
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
     async statusHandler(user_id, field, status) {
         try {
             const data = await db.sequelize.query(`UPDATE users SET users.${field} = ${status} WHERE users.id = ${user_id}`, {
