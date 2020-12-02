@@ -118,16 +118,17 @@ class FormatService {
 
             if ("agent" in lead) {
                 formatedLead.user_id = lead.agent;
-
                 delete lead.agent;
-            } else if ("state_id" in formatedLead) {
-                if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
-                    const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
-                    if (suitableAgent) {
-                        formatedLead.user_id = suitableAgent;
-                    }
-                }
             }
+            // TODO commented out for that stage
+            // else if ("state_id" in formatedLead) {
+            //     if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
+            //         const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
+            //         if (suitableAgent) {
+            //             formatedLead.user_id = suitableAgent;
+            //         }
+            //     }
+            // }
 
             if ("status" in lead) {
                 status = await models.Status.findOne({

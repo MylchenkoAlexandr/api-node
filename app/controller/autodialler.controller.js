@@ -59,6 +59,9 @@ class AutoDiallerController {
 
                 if (lead) {
                     const fromPhone = await PhoneService.pickPhoneNumberByArea(lead);
+
+                    clientSocket.emit("switch-AD_status", lead.id, 5);
+
                     CallService.createOutboundCall({
                         statusCallback: process.env.CALLBACK_TWILIO + '/api/autodialler/callback/one-by-one/' + lead.id + '/' + guide_id,
                         statusCallbackEvent: ['answered', 'completed'],
@@ -83,7 +86,6 @@ class AutoDiallerController {
         try {
             if (req.body && req.params.id) {
                 if (req.body.CallStatus == 'in-progress') {
-                    console.log("🚀 ~ file: autodialler.controller.js ~ line 93 ~ AutoDiallerController ~ callBackOneByOne ~ req.params.user_id", req.params.user_id);
                     await CallService.transferCallToGuide(req.body, req.params.user_id);
                     clientSocket.emit("switch-AD_status", req.params.id, 1);
                 } else {
