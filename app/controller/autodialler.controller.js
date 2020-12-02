@@ -65,8 +65,7 @@ class AutoDiallerController {
                         statusCallbackMethod: 'POST',
                         url: 'http://demo.twilio.com/docs/classic.mp3',
                         from: TransformationHelper.formatPhoneForCall(fromPhone),
-                        // to: TransformationHelper.formatPhoneForCall(lead.phone)
-                        to: '+13108769581'
+                        to: TransformationHelper.formatPhoneForCall(lead.phone)
                     }, lead.id);
 
                     return res.status(200).json({ status: "success", message: "AutoDialer flow has started!" });
