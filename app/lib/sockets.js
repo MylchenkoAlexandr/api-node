@@ -229,6 +229,20 @@ module.exports = server => {
             }
         });
 
+        socket.on("restart-AD", (user_id) => {
+            io.sockets.emit("RESTART_AD", user_id);
+        });
+
+        socket.on("switch-AD_status", async (lead_id, status) => {
+            try {
+                await LeadRepository.updateADstatusFields(lead_id, "AD_status", status);
+                const updatedLead = await LeadRepository.getOne(lead_id);
+                io.sockets.emit("UPDATE_LEADS", updatedLead);
+            } catch (error) {
+                throw error;
+            }
+        });
+
         socket.on("busy-lead", lead_id => {
             socket.join(lead_id, async () => {
                 try {
@@ -292,7 +306,7 @@ module.exports = server => {
             }
         });
 
-        socket.on("agent-online", async ({user_id, online}) => {
+        socket.on("agent-online", async ({ user_id, online }) => {
             try {
                 await UserFacade.statusHandler(user_id, "active", online);
                 const onlineAgents = await AgentService.getOnlineAgents();

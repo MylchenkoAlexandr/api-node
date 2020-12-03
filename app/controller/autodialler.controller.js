@@ -4,7 +4,8 @@ const LeadService = require('../services/lead.service');
 const CallService = require('../services/call.service');
 const PhoneService = require('../services/phone.service');
 const TransformationHelper = require('../helpers/transformation.helper');
-const models = require('../../database/models');
+const UserService = require('../services/user.service');
+const clientSocket = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 class AutoDiallerController {
     async getLeadIdFromCall(req, res) {
@@ -33,35 +34,45 @@ class AutoDiallerController {
                 return res.status(202).json({ status: 'error', message: "Need GO ONLINE to start AutoDialler proccess" });
             }
 
-            const lead = await LeadService.getSuitableLeadsForCall(1);
+            const guideIdADStatus = await UserService.getStatus(guide_id, "AD_status");
 
-            let agent_id;
+            if (guideIdADStatus) {
+                const lead = await LeadService.getSuitableLeadsForCall(1);
 
-            if (lead.user_id != null) {
-                agent_id = await await UserRepository.findSuitableWorker("agent", null, lead.user_id);
-            }
+                if (!lead) {
+                    return res.status(202).json({ status: 'error', message: "No suitable leads for call" });
+                }
 
-            if (!agent_id) {
-                agent_id = await UserRepository.findSuitableWorker("agent", lead.state_id);
-            }
+                let agent_id;
 
-            if (!agent_id) {
-                return res.status(202).json({ status: 'error', message: "All agent are offline" });
-            }
+                if (lead.user_id != null) {
+                    agent_id = await await UserRepository.findSuitableWorker("agent", null, lead.user_id);
+                }
 
-            if (lead) {
-                const fromPhone = await PhoneService.pickPhoneNumberByArea(lead);
-                CallService.createOutboundCall({
-                    statusCallback: process.env.CALLBACK_TWILIO + '/api/autodialler/callback/one-by-one',
-                    statusCallbackEvent: ['answered', 'completed'],
-                    statusCallbackMethod: 'POST',
-                    url: 'http://demo.twilio.com/docs/classic.mp3',
-                    from: TransformationHelper.formatPhoneForCall(fromPhone),
-                    // to: TransformationHelper.formatPhoneForCall(lead.phone)
-                    to: '+380632796212'
-                }, lead.id);
+                if (!agent_id) {
+                    agent_id = await UserRepository.findSuitableWorker("agent", lead.state_id);
+                }
 
-                return res.status(200).json({ status: "success", message: "AutoDialer flow has started!" });
+                if (!agent_id) {
+                    return res.status(202).json({ status: 'error', message: "All agent are offline" });
+                }
+
+                if (lead) {
+                    const fromPhone = await PhoneService.pickPhoneNumberByArea(lead);
+
+                    clientSocket.emit("switch-AD_status", lead.id, 5);
+
+                    CallService.createOutboundCall({
+                        statusCallback: process.env.CALLBACK_TWILIO + '/api/autodialler/callback/one-by-one/' + lead.id + '/' + guide_id,
+                        statusCallbackEvent: ['answered', 'completed'],
+                        statusCallbackMethod: 'POST',
+                        url: 'http://demo.twilio.com/docs/classic.mp3',
+                        from: TransformationHelper.formatPhoneForCall(fromPhone),
+                        to: TransformationHelper.formatPhoneForCall(lead.phone)
+                    }, lead.id);
+
+                    return res.status(200).json({ status: "success", message: "AutoDialer flow has started!" });
+                }
             }
 
             return res.status(400).json({ status: 'error', message: 'Bad Request' });
@@ -73,25 +84,26 @@ class AutoDiallerController {
 
     async callBackOneByOne(req, res) {
         try {
-            if (req.body) {
+            if (req.body && req.params.id) {
                 if (req.body.CallStatus == 'in-progress') {
-                    await CallService.transferCallToGuide(req.body);
-                    // websocket for switching color to green
-                    // set AD_STATUS in lead answered
+                    await CallService.transferCallToGuide(req.body, req.params.user_id);
+                    clientSocket.emit("switch-AD_status", req.params.id, 1);
                 } else {
-                    // websocket for switching color to red
-                    // set AD_STATUS in lead 
                     console.log(req.body.CallStatus);
+                    let status = 3;
+                    switch (req.body.CallStatus) {
+                        case "completed":
+                            status = 4;
+                            break;
+                        case "busy":
+                            setTimeout(() => {
+                                clientSocket.emit("restart-AD", req.params.user_id);
+                            }, "1000")
+                            status = 2;
+                            break;
+                    }
 
-                    // switch(req.body.CallStatus){
-                    //     case "completed":
-
-                    //         break;
-
-                    //     case "busy":
-
-                    //         break;
-                    // }
+                    clientSocket.emit("switch-AD_status", req.params.id, status);
                 }
             }
             return res.status(200);
