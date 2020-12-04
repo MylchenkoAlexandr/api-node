@@ -63,16 +63,36 @@ class LeadService {
         let exist;
 
         try {
-            exist = await models.Leads.findOne({
-                where: {
-                    type_id: formatedLead.type_id,
-                    email: formatedLead.email,
-                    phone: formatedLead.phone,
-                    fullname: formatedLead.fullname
-                }
-            });
+            if (!formatedLead.empty) {
+                exist = await models.Leads.findOne({
+                    where: {
+                        type_id: formatedLead.type_id,
+                        email: formatedLead.email,
+                        phone: formatedLead.phone,
+                        fullname: formatedLead.fullname
+                    }
+                });
 
-            if (!exist) {
+                if (!exist) {
+                    exist = await models.Leads.findOne({
+                        where: {
+                            type_id: formatedLead.type_id,
+                            phone: formatedLead.phone,
+                            fullname: formatedLead.fullname
+                        }
+                    });
+
+                    if (!exist) {
+                        exist = await models.Leads.findOne({
+                            where: {
+                                type_id: formatedLead.type_id,
+                                email: formatedLead.email,
+                                fullname: formatedLead.fullname
+                            }
+                        });
+                    }
+                }
+            } else {
                 exist = await models.Leads.findOne({
                     where: {
                         type_id: formatedLead.type_id,
@@ -89,6 +109,15 @@ class LeadService {
                             fullname: formatedLead.fullname
                         }
                     });
+
+                    if (!exist) {
+                        exist = await models.Leads.findOne({
+                            where: {
+                                type_id: formatedLead.type_id,
+                                fullname: formatedLead.fullname
+                            }
+                        });
+                    }
                 }
             }
 
@@ -112,7 +141,7 @@ class LeadService {
     /**
      * Get all leads skipping any params
      */
-    async all(){
+    async all() {
         try {
             const leads = await LeadRepository.All();
             return leads;
@@ -285,27 +314,27 @@ class LeadService {
         }
     }
 
-    async getSuitableLeadsForCall(limit){
+    async getSuitableLeadsForCall(limit) {
         try {
-            const leads = await LeadRepository.getSuitableLeadsForCall(limit);        
-            return leads;        
+            const leads = await LeadRepository.getSuitableLeadsForCall(limit);
+            return leads;
         } catch (error) {
             throw error;
         }
     }
 
-    async updateADstatusFields(lead_id, field, status){
+    async updateADstatusFields(lead_id, field, status) {
         try {
             const lead = await LeadRepository.updateADstatusFields(lead_id, field, status);
             return lead;
         } catch (error) {
-            throw error;        
+            throw error;
         }
     }
 
-    async phoneNumberSearcher(lead_id){}
+    async phoneNumberSearcher(lead_id) { }
 
-    
+
 }
 
 module.exports = new LeadService;
