@@ -101,7 +101,7 @@ class LeadService {
                     }
                 });
 
-                if (!exist) {
+                if (!exist && formatedLead.email) {
                     exist = await models.Leads.findOne({
                         where: {
                             type_id: formatedLead.type_id,
@@ -109,15 +109,15 @@ class LeadService {
                             fullname: formatedLead.fullname
                         }
                     });
+                }
 
-                    if (!exist) {
-                        exist = await models.Leads.findOne({
-                            where: {
-                                type_id: formatedLead.type_id,
-                                fullname: formatedLead.fullname
-                            }
-                        });
-                    }
+                if (!exist) {
+                    exist = await models.Leads.findOne({
+                        where: {
+                            type_id: formatedLead.type_id,
+                            fullname: formatedLead.fullname
+                        }
+                    });
                 }
             }
 
