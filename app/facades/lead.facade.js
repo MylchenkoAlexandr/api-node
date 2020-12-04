@@ -45,6 +45,8 @@ class LeadFacade {
                                 fullname: createdLead.fullname
                             }
 
+                            email_params.term = email_params.term === 'fex' ? 'final expense' : email_params.term + ' year term';
+
                             if (typeof email_params.companiesInfo == 'string') {
                                 email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
                             }
@@ -54,7 +56,7 @@ class LeadFacade {
                             const mail_options = {
                                 from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
                                 to: email_params.email,
-                                subject: `To: ${email_params.fullname}, From: ❤️ @ Blueberry`,
+                                subject: `We saved your quote for ${email_params.term} life insurance of $${email_params.coverage_amount}`,
                                 html
                             };
 
@@ -100,6 +102,8 @@ class LeadFacade {
                             fullname: updatedLead.fullname
                         }
 
+                        email_params.term = email_params.term === 'fex' ? 'final expense' : email_params.term + ' year term';
+
                         if (typeof email_params.companiesInfo == 'string') {
                             email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
                         }
@@ -109,7 +113,7 @@ class LeadFacade {
                         const mail_options = {
                             from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
                             to: email_params.email,
-                            subject: `To: ${email_params.fullname}, From: ❤️ @ Blueberry`,
+                            subject: `We saved your quote for ${email_params.term} life insurance of $${email_params.coverage_amount}`,
                             html
                         };
 
@@ -202,6 +206,15 @@ class LeadFacade {
             if (updateStatus != -1) return { code: 200, status: "success", message: "Status changed" };
 
             return { code: 404, status: "error", message: "Unexpected error" };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getLeadsByFilters(params) {
+        try {
+            const leads = await LeadService.getLeadsByFilters(params);
+            return { code: 200, status: 'success', leads };
         } catch (error) {
             throw error;
         }

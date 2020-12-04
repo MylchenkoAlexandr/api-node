@@ -118,16 +118,17 @@ class FormatService {
 
             if ("agent" in lead) {
                 formatedLead.user_id = lead.agent;
-
                 delete lead.agent;
-            } else if ("state_id" in formatedLead) {
-                if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
-                    const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
-                    if (suitableAgent) {
-                        formatedLead.user_id = suitableAgent;
-                    }
-                }
             }
+            // TODO commented out for that stage
+            // else if ("state_id" in formatedLead) {
+            //     if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
+            //         const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
+            //         if (suitableAgent) {
+            //             formatedLead.user_id = suitableAgent;
+            //         }
+            //     }
+            // }
 
             if ("status" in lead) {
                 status = await models.Status.findOne({
@@ -268,6 +269,11 @@ class FormatService {
             rawLead.contact = rawLead.contact.replace(/"/ig, '');
         }
 
+        if (rawLead.name) {
+            rawLead.contact = rawLead.name.replace(/"/ig, '');
+            delete rawLead.name;
+        }
+
         if (rawLead.email == 'NULL' || rawLead.email == 0) {
             delete rawLead.email;
         } else {
@@ -297,7 +303,8 @@ class FormatService {
 
         if (rawLead.phone != 0 || rawLead.phone != 'NULL') {
             let clearPhone = String(rawLead.phone).length == 11 ? String(rawLead.phone).substring(1) : rawLead.phone;
-            rawLead.phone = TransformationHelper.phoneNumber(clearPhone).replace(' ', '');
+
+            rawLead.phone = TransformationHelper.phoneNumber(clearPhone).toString();
         } else {
             delete rawLead.phone;
         }
@@ -306,6 +313,7 @@ class FormatService {
             const gender = rawLead.gender == 0 || rawLead.gender == 'NULL' ? false : rawLead.gender.charAt(0);
 
             if (gender) {
+
                 rawLead.gender = gender.toLowerCase();
             } else {
                 delete rawLead.gender;
@@ -313,14 +321,12 @@ class FormatService {
         }
 
         if ('coverage_length' in rawLead && 'product_type' in rawLead) {
-            if (!(rawLead.coverage_leng == 0 || rawLead.coverage_length == 'NULL') && !(rawLead.product_type == 0 || rawLead.product_type == 'NULL')) {
-                console.log('UP');
+            if (rawLead.coverage_length != 0 && rawLead.coverage_length != 'NULL') {
+                rawLead.term = rawLead.coverage_length;
             }
         }
 
-        console.log(rawLead);
-
-        // return rawLead;
+        return rawLead;
     }
 
     /**
