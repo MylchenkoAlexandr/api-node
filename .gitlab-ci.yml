@@ -1,0 +1,13 @@
+image: node:latest
+
+services:
+  - mysql:latest
+
+cache:
+  paths:
+    - node_modules/
+
+job:
+  script: 
+  - npm i
+  - npx sequelize db:migrate
