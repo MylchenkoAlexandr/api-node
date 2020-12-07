@@ -1,6 +1,7 @@
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const FormatService = require('../services/format.service');
 const LeadFacade = require('../facades/lead.facade');
+const LeadService = require('../services/lead.service');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
@@ -19,8 +20,8 @@ async function getAll(req, res) {
 
 async function getAllLeadsForGuide(req, res) {
     try {
-        const response = await LeadFacade.getGuideLeads();
-        return res.status(response.code).json({ status: response.status, leads: response.leads });
+        const response = await LeadService.getSuitableLeadsForCall();
+        return res.status(200).json({ status: "Success", leads: response });
     } catch (err) {
         res.status(500).json({ status: 'error', message: "Server Error!" });
         throw err;
