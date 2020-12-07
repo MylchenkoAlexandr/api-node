@@ -37,39 +37,47 @@ class AutoDiallerController {
             const guideIdADStatus = await UserService.getStatus(guide_id, "AD_status");
 
             if (guideIdADStatus) {
-                const lead = await LeadService.getSuitableLeadsForCall(1);
+                const leads = await LeadService.getSuitableLeadsForCall();
 
-                if (!lead) {
+                let suitableLead;
+
+                for (let lead of leads) {
+                    console.log(lead.id);
+                    let agent_id;
+
+                    if (lead.user_id != null) {
+                        agent_id = await UserRepository.findSuitableWorker("agent", null, lead.user_id);
+                    }
+
+                    if (!agent_id) {
+                        agent_id = await UserRepository.findSuitableWorker("agent", lead.state_id);
+                    }
+
+                    if (!agent_id) {
+                        return res.status(202).json({ status: 'error', message: "All agent are offline" });
+                    }
+
+                    suitableLead = lead;
+                    break;
+                }
+
+                if (!suitableLead) {
                     return res.status(202).json({ status: 'error', message: "No suitable leads for call" });
                 }
 
-                let agent_id;
+                if (suitableLead) {
+                    const fromPhone = await PhoneService.pickPhoneNumberByArea(suitableLead);
 
-                if (lead.user_id != null) {
-                    agent_id = await await UserRepository.findSuitableWorker("agent", null, lead.user_id);
-                }
-
-                if (!agent_id) {
-                    agent_id = await UserRepository.findSuitableWorker("agent", lead.state_id);
-                }
-
-                if (!agent_id) {
-                    return res.status(202).json({ status: 'error', message: "All agent are offline" });
-                }
-
-                if (lead) {
-                    const fromPhone = await PhoneService.pickPhoneNumberByArea(lead);
-
-                    clientSocket.emit("switch-AD_status", lead.id, 5);
+                    clientSocket.emit("switch-AD_status", suitableLead.id, 5);
 
                     CallService.createOutboundCall({
-                        statusCallback: process.env.CALLBACK_TWILIO + '/api/autodialler/callback/one-by-one/' + lead.id + '/' + guide_id,
+                        statusCallback: process.env.CALLBACK_TWILIO + '/api/autodialler/callback/one-by-one/' + suitableLead.id + '/' + guide_id,
                         statusCallbackEvent: ['answered', 'completed'],
                         statusCallbackMethod: 'POST',
                         url: 'http://demo.twilio.com/docs/classic.mp3',
                         from: TransformationHelper.formatPhoneForCall(fromPhone),
-                        to: TransformationHelper.formatPhoneForCall(lead.phone)
-                    }, lead.id);
+                        to: TransformationHelper.formatPhoneForCall(suitableLead.phone)
+                    }, suitableLead.id);
 
                     return res.status(200).json({ status: "success", message: "AutoDialer flow has started!" });
                 }
