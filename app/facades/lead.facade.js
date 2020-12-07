@@ -3,14 +3,27 @@ const NinjaQuoterService = require('../services/ninja-quoter.service');
 const FormatService = require('../services/format.service');
 const MailService = require('../services/mail.service');
 const PriceService = require('../services/price.service');
+const AutoDiallerService = require('../services/autodialler.service');
+const TransformationHelper = require('../helpers/transformation.helper');
+const LeadRepository = require('../repository/lead.repository');
+const UserRepository = require('../repository/user.repository');
 
 class LeadFacade {
-
     async createLead(formatedLead, quoter) {
         try {
             const createdLead = await LeadService.createLead(formatedLead);
 
             if (createdLead.empty == 0) {
+                if ("phone" in createdLead) {
+                    let guides = await UserRepository.findSuitableWorker("guide");
+
+                    if (guides) {
+                        const phone = TransformationHelper.formatPhoneForCall(createdLead.phone);
+
+                        // await AutoDiallerService.outboundCall(phone, createdLead.id);
+                    }
+                }
+
                 const leadProperty = JSON.parse(createdLead.property);
                 const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
                 const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
@@ -32,6 +45,8 @@ class LeadFacade {
                                 fullname: createdLead.fullname
                             }
 
+                            email_params.term = email_params.term === 'fex' ? 'final expense' : email_params.term + ' year term';
+
                             if (typeof email_params.companiesInfo == 'string') {
                                 email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
                             }
@@ -41,7 +56,7 @@ class LeadFacade {
                             const mail_options = {
                                 from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
                                 to: email_params.email,
-                                subject: `To: ${email_params.fullname}, From: ❤️ @ Blueberry`,
+                                subject: `We saved your quote for ${email_params.term} life insurance of $${email_params.coverage_amount}`,
                                 html
                             };
 
@@ -87,6 +102,8 @@ class LeadFacade {
                             fullname: updatedLead.fullname
                         }
 
+                        email_params.term = email_params.term === 'fex' ? 'final expense' : email_params.term + ' year term';
+
                         if (typeof email_params.companiesInfo == 'string') {
                             email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
                         }
@@ -96,7 +113,7 @@ class LeadFacade {
                         const mail_options = {
                             from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
                             to: email_params.email,
-                            subject: `To: ${email_params.fullname}, From: ❤️ @ Blueberry`,
+                            subject: `We saved your quote for ${email_params.term} life insurance of $${email_params.coverage_amount}`,
                             html
                         };
 
@@ -111,6 +128,24 @@ class LeadFacade {
             return await LeadService.getRawLead(updatedLead.id);
         } catch (error) {
             throw error;
+        }
+    }
+
+    async getGuideLeads() {
+        try {
+            const leads = await LeadService.getGuideLeads();
+            return { code: 200, status: 'success', leads };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getAll() {
+        try {
+            const leads = await LeadService.all();
+            return { code: 200, status: 'success', leads };
+        } catch (error) {
+
         }
     }
 
@@ -158,6 +193,27 @@ class LeadFacade {
         try {
             const leads = await LeadService.getLeadsBySource(source);
 
+            return { code: 200, status: 'success', leads };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateADstatusFields(lead_id, field, status){
+        try {  
+            const updateStatus = await LeadService.updateADstatusFields(lead_id, field, status);
+
+            if (updateStatus != -1) return { code: 200, status: "success", message: "Status changed" };
+
+            return { code: 404, status: "error", message: "Unexpected error" };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getLeadsByFilters(params) {
+        try {
+            const leads = await LeadService.getLeadsByFilters(params);
             return { code: 200, status: 'success', leads };
         } catch (error) {
             throw error;

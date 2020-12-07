@@ -15,6 +15,10 @@ class TransformationHelper {
         }
     }
 
+    formatPhoneForCall(phone) {
+        return "+1" + phone.replace(/\D/g, "");
+    }
+
     /**
      * Date formatting with american standart
      * @param {Date} date 

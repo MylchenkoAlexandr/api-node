@@ -1,4 +1,6 @@
 const LeadService = require('../services/lead.service');
+const AgentService = require('../services/agent.service');
+const UserFacade = require('../facades/user.facade');
 const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 const RecordsRepository = require('../repository/records.repository');
@@ -67,7 +69,7 @@ module.exports = server => {
             try {
                 let quoter = "ninjaQuoter";
 
-                if (lead.type) {
+                if ("type" in lead) {
                     switch (lead.type) {
                         case "life":
                             quoter = "ninjaQuoter";
@@ -75,8 +77,21 @@ module.exports = server => {
                     }
                 }
 
-                const formatedLead = await FormatService.formatLead(lead);
-                let exist = await LeadService.foundExistLead(formatedLead);
+                let exist;
+                let lead_id = lead.id;
+
+                let formatedLead = await FormatService.formatLead(lead);
+
+                if (lead_id) {
+                    exist = await models.Leads.findOne({
+                        where: {
+                            id: lead_id
+                        }
+                    });
+                } else {
+                    exist = await LeadService.foundExistLead(formatedLead);
+                }
+
                 let uploadedLead;
 
                 if (exist) {
@@ -213,6 +228,20 @@ module.exports = server => {
             }
         });
 
+        socket.on("restart-AD", (user_id) => {
+            io.sockets.emit("RESTART_AD", user_id);
+        });
+
+        socket.on("switch-AD_status", async (lead_id, status) => {
+            try {
+                await LeadRepository.updateADstatusFields(lead_id, "AD_status", status);
+                const updatedLead = await LeadRepository.getOne(lead_id);
+                io.sockets.emit("UPDATE_LEADS", updatedLead);
+            } catch (error) {
+                throw error;
+            }
+        });
+
         socket.on("busy-lead", lead_id => {
             socket.join(lead_id, async () => {
                 try {
@@ -276,6 +305,21 @@ module.exports = server => {
             }
         });
 
+        socket.on("agent-online", async ({ user_id, online }) => {
+            try {
+                await UserFacade.statusHandler(user_id, "active", online);
+                const onlineAgents = await AgentService.getOnlineAgents();
+
+                for (user in users) {
+                    if (users[user].role_id === 3) {
+                        io.sockets.emit("GET_ONLINE_AGENTS", onlineAgents);
+                    }
+                }
+            } catch (error) {
+                throw error;
+            }
+        });
+
         socket.on('disconnect', async () => {
             if (users[socket.id]) {
                 socket.leaveAll();
@@ -302,7 +346,6 @@ module.exports = server => {
                 delete users[socket.id];
             }
         });
-
     });
 
     return io;

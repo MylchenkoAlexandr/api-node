@@ -9,40 +9,39 @@ class FormatService {
      * @param {object} lead
      */
     async formatLead(lead) {
+        if (lead.length <= 0) {
+            throw new Error('Lead object is empty!');
+        }
+
+        if (!("email" in lead) && !("phone" in lead)) {
+            throw new Error("Phone and Email is empty, lead is invalid");
+        }
+
+        const mandatoryFields = [
+            "source",
+            "type"
+        ];
+
+        // Try to find mandatory fields in lead
+        mandatoryFields.forEach(index => {
+            if (!(index in lead)) {
+                throw new Error('Missed mandatory field: ' + index);
+            }
+        });
+
+        /**
+         * !! Setting values you can find inside IF statements
+         * Fetching all usefull fields:
+         *  - status_id
+         *  - source_id
+         *  - type_id
+         *  - user_id
+         *  - state_id
+         *  - empty
+         *  - fullname
+         *  - medication
+         */
         try {
-            if (lead.length <= 0) {
-                throw new Error('Lead object is empty!');
-            }
-
-            if (!("email" in lead) && !("phone" in lead)) {
-                throw new Error("Phone and Email is empty, lead is invalid");
-            }
-
-            const mandatoryFields = [
-                "source",
-                "type"
-            ];
-
-            // Try to find mandatory fields in lead
-            mandatoryFields.forEach(index => {
-                if (!(index in lead)) {
-                    throw new Error('Missed mandatory field: ' + index);
-                }
-            });
-
-            /**
-             * !! Setting values you can find inside IF statements
-             * Fetching all usefull fields:
-             *  - status_id
-             *  - source_id
-             *  - type_id
-             *  - user_id
-             *  - state_id
-             *  - empty
-             *  - fullname
-             *  - medication
-             */
-
             let source, status, type, state, fullname;
 
             if ("type" in lead) {
@@ -65,7 +64,7 @@ class FormatService {
                     where: {
                         name: lead.source
                     }
-                });
+                })
 
                 if (source.dataValues.id) {
                     delete lead.source;
@@ -101,10 +100,7 @@ class FormatService {
             }
 
             if (!("state" in lead) && "zipcode" in lead) {
-                const parseZipCode = zipcodes.lookup(lead.zip || lead.zipcode);
-                if ("state" in parseZipCode) {
-                    lead.state = parseZipCode.state;
-                }
+                lead.state = zipcodes.lookup(lead.zip || lead.zipcode).state;
             }
 
             if ("state" in lead) {
@@ -122,16 +118,17 @@ class FormatService {
 
             if ("agent" in lead) {
                 formatedLead.user_id = lead.agent;
-
                 delete lead.agent;
-            } else if ("state_id" in formatedLead) {
-                if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
-                    const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
-                    if (suitableAgent) {
-                        formatedLead.user_id = suitableAgent;
-                    }
-                }
             }
+            // TODO commented out for that stage
+            // else if ("state_id" in formatedLead) {
+            //     if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
+            //         const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
+            //         if (suitableAgent) {
+            //             formatedLead.user_id = suitableAgent;
+            //         }
+            //     }
+            // }
 
             if ("status" in lead) {
                 status = await models.Status.findOne({
@@ -241,7 +238,7 @@ class FormatService {
     formatLeadForQuote(lead) {
         let formatedLead = {
             birthdate: lead.birth_date,
-            state: lead.state || zipcodes.lookup(lead.zip || lead.zipcode).state,
+            state: lead.state,
             gender: lead.gender.toLowerCase(),
             smoker: Boolean(+lead.tobacco),
             coverage: lead.coverage_amount,
@@ -266,33 +263,67 @@ class FormatService {
         rawLead.type = type;
         rawLead.empty = 1;
 
+        if ('city' in rawLead) delete rawLead.city;
+
         if (rawLead.contact) {
             rawLead.contact = rawLead.contact.replace(/"/ig, '');
         }
 
-        console.log(rawLead);
+        if (rawLead.name) {
+            rawLead.contact = rawLead.name.replace(/"/ig, '');
+            delete rawLead.name;
+        }
 
         if (rawLead.email == 'NULL' || rawLead.email == 0) {
-            delete rawLead.email
+            delete rawLead.email;
         } else {
             rawLead.email = rawLead.email.replace(/"/ig, '');
         }
 
-        if (rawLead.birth_date != 0 && rawLead.birth_date != 'NULL') {
-            let newDate = new Date(rawLead.birth_date);
+        let newDate = false;
+
+        if ('birth_date' in rawLead) {
+            newDate = rawLead.birth_date == 0 || rawLead.birth_date == 'NULL' ? false : new Date(rawLead.birth_date);
+
+        } else if ('dob' in rawLead) {
+            newDate = rawLead.dob == 0 || rawLead.dob == 'NULL' ? false : new Date(rawLead.dob);
+        }
+
+        if ('dob' in rawLead) delete rawLead.dob
+
+        if (newDate) {
             const yy = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(newDate);
             const mm = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(newDate);
             const dd = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(newDate);
+
             rawLead.birth_date = yy + '-' + mm + '-' + dd;
         } else {
-            delete rawLead.birth_date;
+            if ('birth_date' in rawLead) delete rawLead.birth_date
         }
 
-        if (rawLead.phone != 0 && rawLead.phone != 'NULL') {
+        if (rawLead.phone != 0 || rawLead.phone != 'NULL') {
             let clearPhone = String(rawLead.phone).length == 11 ? String(rawLead.phone).substring(1) : rawLead.phone;
-            rawLead.phone = TransformationHelper.phoneNumber(clearPhone).replace(' ', '');
+
+            rawLead.phone = TransformationHelper.phoneNumber(clearPhone).toString();
         } else {
             delete rawLead.phone;
+        }
+
+        if ('gender' in rawLead) {
+            const gender = rawLead.gender == 0 || rawLead.gender == 'NULL' ? false : rawLead.gender.charAt(0);
+
+            if (gender) {
+
+                rawLead.gender = gender.toLowerCase();
+            } else {
+                delete rawLead.gender;
+            }
+        }
+
+        if ('coverage_length' in rawLead && 'product_type' in rawLead) {
+            if (rawLead.coverage_length != 0 && rawLead.coverage_length != 'NULL') {
+                rawLead.term = rawLead.coverage_length;
+            }
         }
 
         return rawLead;
