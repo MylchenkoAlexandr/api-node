@@ -4,6 +4,16 @@ const url = require('url');
 const UserService = require('../services/user.service');
 const ClientCapability = require('twilio').jwt.ClientCapability;
 class TwilioService {
+    redirectCall(callSid, toPhone) {
+        try {
+            client.calls(callSid).update({
+                to: toPhone
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
+
     addWorkersToConference(agentId, callbackUrl) {
         try {
             client.calls.create({

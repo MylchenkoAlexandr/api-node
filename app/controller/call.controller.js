@@ -4,6 +4,7 @@ const VoiceResponse = twilio.twiml.VoiceResponse;
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const axios = require('axios');
 const RecordService = require('../services/records.service');
+const CallService = require('../services/call.service');
 
 function token(req, res) {
     const capability = new ClientCapability({
@@ -74,9 +75,25 @@ async function transcriptionCallback(req, res) {
     }
 }
 
+async function inboundCall(req, res) {
+    try {
+        console.log(req.body);
+        if ("CallSid" in req.body && "from" in req.body) {
+            await CallService.proccessInboundCall(req.body);
+
+            return res.sendStatus(200);
+        }
+        res.status(400).json({ status: 'error', message: "Bad request!" });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: "Server Error!" });
+        throw error
+    }
+}
+
 module.exports = {
     token,
     voice,
     recordCallback,
-    transcriptionCallback
+    transcriptionCallback,
+    inboundCall
 }

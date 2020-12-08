@@ -106,6 +106,34 @@ class CallService {
             throw error;
         }
     }
+
+    async proccessInboundCall(call) {
+        let toPhone;
+
+        let lead = await models.Leads.findOne({
+            where: {
+                phone: call.from
+            }
+        });
+
+        if (lead) {
+            if (lead.user_id) {
+                toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(lead.user_id);
+            }
+
+            if (!toPhone && lead.state_id) {
+                toPhone = await UserRepository.findSuitableAgentWithPhoneNumber();
+            }
+        }
+
+        if (!toPhone) {
+            toPhone = "+13108769581";
+        }
+
+        console.log(toPhone);
+
+        TwilioService.redirectCall(call.CallSid, toPhone);
+    }
 }
 
 module.exports = new CallService;

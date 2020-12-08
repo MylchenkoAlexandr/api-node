@@ -24,6 +24,7 @@ class AuthFacade {
                             email: user.email,
                             fname: user.fname,
                             lname: user.lname,
+                            phone: user.phone,
                             states: JSON.parse(user.states),
                             role_id: user.role_id,
                             uncompleted_lead: user.uncompleted_lead
@@ -58,6 +59,7 @@ class AuthFacade {
                         email: candidate.email,
                         fname: candidate.fname,
                         lname: candidate.lname,
+                        phone: user.phone,
                         states: JSON.parse(candidate.states),
                         role_id: candidate.role_id,
                         uncompleted_lead: candidate.uncompleted_lead
