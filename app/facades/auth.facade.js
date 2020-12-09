@@ -59,7 +59,7 @@ class AuthFacade {
                         email: candidate.email,
                         fname: candidate.fname,
                         lname: candidate.lname,
-                        phone: user.phone,
+                        phone: candidate.phone,
                         states: JSON.parse(candidate.states),
                         role_id: candidate.role_id,
                         uncompleted_lead: candidate.uncompleted_lead

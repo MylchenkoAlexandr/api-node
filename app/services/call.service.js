@@ -1,3 +1,4 @@
+const twilio = require('twilio');
 const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const models = require('../../database/models');
 const UserService = require('./user.service');
@@ -5,10 +6,10 @@ const TwilioService = require('../services/twilio.service');
 const clientSocket = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const UserRepository = require('../repository/user.repository');
 
+
 class CallService {
     createOutboundCall(callParams, lead_id) {
         try {
-            console.log("calling");
             client.calls.create(callParams)
                 .then(async call => {
                     await models.conferences.create({
@@ -105,34 +106,6 @@ class CallService {
         } catch (error) {
             throw error;
         }
-    }
-
-    async proccessInboundCall(call) {
-        let toPhone;
-
-        let lead = await models.Leads.findOne({
-            where: {
-                phone: call.from
-            }
-        });
-
-        if (lead) {
-            if (lead.user_id) {
-                toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(lead.user_id);
-            }
-
-            if (!toPhone && lead.state_id) {
-                toPhone = await UserRepository.findSuitableAgentWithPhoneNumber();
-            }
-        }
-
-        if (!toPhone) {
-            toPhone = "+13108769581";
-        }
-
-        console.log(toPhone);
-
-        TwilioService.redirectCall(call.CallSid, toPhone);
     }
 }
 

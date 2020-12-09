@@ -48,14 +48,19 @@ class UserRepository {
         return _.isEmpty(data) ? false : data[0].id;
     }
 
-    async findSuitableAgentWithPhoneNumber(id = null) {
+    async findSuitableAgentWithPhoneNumber(id = null, state_id = null) {
         let query = ' ';
+        let state = ' ';
 
         if (id) {
             query = ' users.id = ' + id + ' AND ';
         }
 
-        const data = await db.sequelize.query('SELECT users.id FROM users WHERE' + query + 'users.phone IS NOT NULL AND users.active = 1 AND users.in_call = 0;', {
+        if (state_id) {
+            state = " users_states.state_id = '" + state_id + "' AND ";
+        }
+
+        const data = await db.sequelize.query('SELECT users.id FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE' + state + query + 'users.phone IS NOT NULL AND users.active = 1 AND users.in_call = 0;', {
             type: db.sequelize.QueryTypes.SELECT,
         }).catch(e => {
             throw e;
