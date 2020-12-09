@@ -109,18 +109,6 @@ class LeadService {
         }
     }
 
-    /**
-     * Get all leads skipping any params
-     */
-    async all(){
-        try {
-            const leads = await LeadRepository.All();
-            return leads;
-        } catch (error) {
-            throw error;
-        }
-    }
-
     /** 
      * Function for get all leads
      * @param {string} type
@@ -300,6 +288,15 @@ class LeadService {
             return lead;
         } catch (error) {
             throw error;        
+        }
+    }
+
+    async getLeadsByFilters(params) {
+        try {
+            const leads = await LeadRepository.getLeadsByFilters(params);
+            return leads;
+        } catch (error) {
+            throw error;
         }
     }
 
