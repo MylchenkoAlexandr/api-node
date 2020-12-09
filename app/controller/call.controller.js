@@ -112,9 +112,11 @@ async function inboundCall(req, res) {
             if (!toPhone) {
                 toPhone = "+13108769581";
             } else {
-                toPhone = TransformationHelper.formatPhoneForCall(toPhone);
+                toPhone = TransformationHelper.formatPhoneForCall(toPhone);                
             }
-
+            
+            console.log("🚀 ~ file: call.controller.js ~ line 116 ~ inboundCall ~ toPhone", toPhone)
+            
             twiml.dial(toPhone);
 
             res.type('text/xml');
