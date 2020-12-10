@@ -81,7 +81,7 @@ async function transcriptionCallback(req, res) {
 async function inboundCall(req, res) {
     try {
         let formatedPhone = TransformationHelper.phoneNumber(req.body.From).replace('+1 ', '').replace(' ', '');
-        
+
         if ("CallSid" in req.body && "From" in req.body) {
             const twiml = new VoiceResponse();
             twiml.say({ voice: 'alice' }, 'Hello, welcome to Blueberry! Please wait connection with agent!');
@@ -113,6 +113,14 @@ async function inboundCall(req, res) {
             if (!toPhone) {
                 toPhone = "+13108769581";
             } else {
+                models.Users.update({
+                    INBOUND_status: 0
+                }, {
+                    where: {
+                        phone: toPhone
+                    }
+                });
+
                 toPhone = TransformationHelper.formatPhoneForCall(toPhone);
             }
 

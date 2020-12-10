@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,
     },
+    INBOUND_status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,
