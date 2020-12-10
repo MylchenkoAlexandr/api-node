@@ -45,6 +45,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   Leads.init({
     AD_status: DataTypes.BOOLEAN,
+    AD_procced: DataTypes.BOOLEAN,
+    CRON_hours: DataTypes.INTEGER,
     user_id: DataTypes.BIGINT.UNSIGNED,
     source_id: DataTypes.BIGINT.UNSIGNED,
     status_id: DataTypes.BIGINT.UNSIGNED,
@@ -57,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
     fullname: DataTypes.STRING,
     busy: DataTypes.BOOLEAN,
     busy_agent_id: DataTypes.BIGINT.UNSIGNED,
+
     property: {
       type: DataTypes.TEXT,
       get() {

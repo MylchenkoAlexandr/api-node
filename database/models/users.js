@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,
     },
+    INBOUND_status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,
@@ -48,6 +52,10 @@ module.exports = (sequelize, DataTypes) => {
     email: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     password: {
       type: DataTypes.STRING,

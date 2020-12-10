@@ -1,3 +1,4 @@
+const twilio = require('twilio');
 const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const models = require('../../database/models');
 const UserService = require('./user.service');
@@ -5,10 +6,10 @@ const TwilioService = require('../services/twilio.service');
 const clientSocket = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const UserRepository = require('../repository/user.repository');
 
+
 class CallService {
     createOutboundCall(callParams, lead_id) {
         try {
-            console.log("calling");
             client.calls.create(callParams)
                 .then(async call => {
                     await models.conferences.create({

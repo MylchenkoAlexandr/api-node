@@ -193,13 +193,13 @@ const LeadRepository = {
      */
     async getSuitableLeadsForCall(limit = null) {
         try {
-            let limitLeads;
+            let limitLeads = ';';
 
             if (limit) {
-                limitLeads = "LIMIT " + limit;
+                limitLeads = " LIMIT " + limit;
             }
 
-            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (1, 2, 4, 5) AND leads.status_id IN (1, 2, 3, 4, 5, 11) AND leads.AD_status NOT IN(1, 2, 4) AND leads.phone IS NOT NULL ORDER BY leads.id DESC ` + limitLeads, {
+            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (1, 2, 4, 5) AND leads.status_id IN (1, 11) AND leads.AD_status NOT IN(1, 2, 4) AND leads.phone IS NOT NULL ORDER BY leads.id DESC` + limitLeads, {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 

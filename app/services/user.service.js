@@ -1,10 +1,9 @@
-const userRepository = require('../repository/user.repository');
 const UserRepository = require('../repository/user.repository');
-
+const models = require('../../database/models')
 class UserService {
-    async getStatus(user_id, field){
+    async getStatus(user_id, field) {
         try {
-            const status = await UserRepository.getStatus(user_id, field);            
+            const status = await UserRepository.getStatus(user_id, field);
             return status;
         } catch (error) {
             throw error;
@@ -30,6 +29,20 @@ class UserService {
             const userId = await UserRepository.findSuitableWorker(roleName, state_id);
 
             return userId;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateColumns(id, fields) {
+        try {
+            await models.Users.update({ ...fields }, {
+                where: {
+                    id: id
+                }
+            })
+            
+            return { code: 200, status: "success", message: "Update success!" };
         } catch (error) {
             throw error;
         }
