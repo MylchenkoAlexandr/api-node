@@ -81,6 +81,7 @@ async function transcriptionCallback(req, res) {
 async function inboundCall(req, res) {
     try {
         let formatedPhone = TransformationHelper.phoneNumber(req.body.From).replace('+1 ', '').replace(' ', '');
+        
         if ("CallSid" in req.body && "From" in req.body) {
             const twiml = new VoiceResponse();
             twiml.say({ voice: 'alice' }, 'Hello, welcome to Blueberry! Please wait connection with agent!');
@@ -99,7 +100,7 @@ async function inboundCall(req, res) {
                 }
 
                 if (!toPhone && lead.state_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber();
+                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, lead.state_id);
                 }
             } else {
                 let state_id = await StateService.getStateIdFromPhone(formatedPhone);
@@ -112,11 +113,9 @@ async function inboundCall(req, res) {
             if (!toPhone) {
                 toPhone = "+13108769581";
             } else {
-                toPhone = TransformationHelper.formatPhoneForCall(toPhone);                
+                toPhone = TransformationHelper.formatPhoneForCall(toPhone);
             }
-            
-            console.log("🚀 ~ file: call.controller.js ~ line 116 ~ inboundCall ~ toPhone", toPhone)
-            
+
             twiml.dial(toPhone);
 
             res.type('text/xml');
