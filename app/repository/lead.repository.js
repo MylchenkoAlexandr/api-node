@@ -223,6 +223,46 @@ const LeadRepository = {
         } catch (error) {
             throw error;
         }
+    },
+
+    async getLeadsByFilters(params) {
+        try {
+            let where = '';
+
+            if (params.agent) {
+                where += 'leads.user_id=' + params.agent + ' AND ';
+            }
+
+            if (params.status) {
+                where += 'leads.status_id=' + params.status + ' AND ';
+            }
+
+            if (params.state) {
+                where += 'leads.state_id=' + params.state + ' AND ';
+            }
+
+            if (params.source) {
+                where += 'leads.source_id=' + params.source + ' AND ';
+            }
+
+            let data = await db.sequelize.query(`SELECT leads.id, leads.empty, leads.fullname, users.fname, users.lname, users.email as agent_email, leads.phone, CONCAT(users.fname, ' ', users.lname) as agent_fullname, leads.email, leads.property, leads.busy, sources.title AS source_title, sources.name AS source, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.updatedAt FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN sources ON leads.source_id = sources.id INNER JOIN status ON leads.status_id = status.id INNER JOIN states ON leads.state_id = states.id INNER JOIN prices ON leads.id = prices.lead_id WHERE ${where} leads.empty = 0 ORDER BY leads.id DESC;`, {
+                type: db.sequelize.QueryTypes.SELECT,
+            });
+
+            data = data.map(lead => {
+                lead.property = JSON.parse(lead.property);
+                lead.price = JSON.parse(lead.price);
+
+                lead = { ...lead, ...lead.property };
+
+                return lead;
+            });
+
+            return data;
+        } catch (error) {
+            throw error;
+        }
+
     }
 }
 
