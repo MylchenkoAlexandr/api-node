@@ -5,7 +5,7 @@ const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 const RecordsRepository = require('../repository/records.repository');
 const models = require('../../database/models');
-const FormatService = require('../services/format.service')
+const FormatService = require('../services/format.service');
 const LeadFacade = require('../facades/lead.facade');
 
 module.exports = server => {

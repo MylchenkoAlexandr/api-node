@@ -234,16 +234,34 @@ const LeadRepository = {
         try {
             let where = '';
 
-            if (params.agent) {
-                where += 'leads.user_id=' + params.agent + ' AND ';
+            if (params.agent.length) {
+                where += '('
+                params.agent.forEach ( (agent, idx) => {
+                    where += idx !== params.agent.length - 1 ? 'leads.user_id=' + agent + ' OR ' : 'leads.user_id=' + agent;
+                });
+                where += ') AND ';
+            } else {
+                where += 'leads.user_id=0 AND ';
             }
 
-            if (params.status) {
-                where += 'leads.status_id=' + params.status + ' AND ';
+            if (params.status.length) {
+                where += '(';
+                params.status.forEach ( (status, idx) => {
+                    where +=  idx !== params.status.length - 1 ? 'leads.status_id=' + status + ' OR ' : 'leads.status_id=' + status;
+                });
+                where += ') AND ';
+            } else {
+                where += 'leads.status_id=0 AND ';
             }
 
-            if (params.state) {
-                where += 'leads.state_id=' + params.state + ' AND ';
+            if (params.state.length) {
+                where += '(';
+                params.state.forEach ( (state, idx) => {
+                    where += idx !== params.state.length - 1 ? 'leads.state_id=' + state + ' OR ' : 'leads.state_id=' + state;
+                });
+                where += ') AND ';
+            } else {
+                where += 'leads.state_id=0 AND ';
             }
 
             if (params.source) {
