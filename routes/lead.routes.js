@@ -8,7 +8,7 @@ const checkedAdminRole = AuthMiddleware.checkedAdminRole;
 // const checkAssignAgentLead = LeadMiddleware.checkAssignAgentLead;
 const findUncompletedLead = LeadMiddleware.findUncompletedLead;
 
-const { test, getLeads, getAll, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRawLeads, uploadLeadFromUrl, getLeadsBySource, getAllLeadsForGuide } = require('../app/controller/lead.controller');
+const { test, getLeads, getAll, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRawLeads, uploadLeadFromUrl, getLeadsBySource, getAllLeadsForGuide, getLeadsByFilters } = require('../app/controller/lead.controller');
 const { uploadCSV } = require('../app/controller/upload.controller');
 
 router.post('/test', test);
@@ -22,5 +22,6 @@ router.post('/get-companies', getCompaniesListByLeadData);
 router.post('/upload/bulk-csv', authenticateToken, uploadCSV)
 router.post('/upload/media-alpha', uploadLeadFromMediaAlpha);
 router.post('/upload/media-alpha/url', uploadLeadFromUrl);
+router.post('/filter', getLeadsByFilters);
 
 module.exports = router;

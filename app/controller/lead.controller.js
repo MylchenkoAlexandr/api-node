@@ -158,6 +158,16 @@ async function getLeadsBySource(req, res) {
     }
 }
 
+async function getLeadsByFilters(req, res) {
+    try {
+        const response = await LeadFacade.getLeadsByFilters(req.body);
+
+        return res.status(response.code).json({status: response.status, leads: response.leads});
+    } catch (error) {
+        throw error;
+    }
+}
+
 module.exports = {
     test,
     getLead,
@@ -168,5 +178,6 @@ module.exports = {
     uploadLeadFromMediaAlpha,
     uploadLeadFromUrl,
     getLeadsBySource,
-    getAllLeadsForGuide
+    getAllLeadsForGuide,
+    getLeadsByFilters,
 }   

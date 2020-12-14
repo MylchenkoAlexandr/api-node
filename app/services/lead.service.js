@@ -332,9 +332,14 @@ class LeadService {
         }
     }
 
-    async phoneNumberSearcher(lead_id) { }
-
-
+    async getLeadsByFilters(params) {
+        try {
+            const leads = await LeadRepository.getLeadsByFilters(params);
+            return leads;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new LeadService;

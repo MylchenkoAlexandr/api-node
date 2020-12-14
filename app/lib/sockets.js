@@ -5,7 +5,7 @@ const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 const RecordsRepository = require('../repository/records.repository');
 const models = require('../../database/models');
-const FormatService = require('../services/format.service')
+const FormatService = require('../services/format.service');
 const LeadFacade = require('../facades/lead.facade');
 
 module.exports = server => {
@@ -22,6 +22,10 @@ module.exports = server => {
 
             if (role == 'agent') {
                 socket.join(user.id);
+            }
+
+            if (role == 'guide') {
+                socket.join("guide");
             }
         });
 
@@ -115,6 +119,14 @@ module.exports = server => {
                             io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
                             io.sockets.to(uploadedLead.user_id).emit("UPDATE_LEADS", uploadedLead);
 
+                            if (uploadedLead.source != 'manual') {
+                                if (!uploadedLead.AD_procced) {
+                                    io.sockets.to("guide").emit("UPDATE_LEADS", uploadedLead);
+                                } else {
+                                    io.sockets.to("guide").emit("DELETE_LEAD", uploadedLead.id);
+                                }
+                            }
+
                             if (uploadedLead.source === 'blueberry') {
                                 io.sockets.to("blueberry_leads").emit("UPDATE_LEADS", uploadedLead);
                             } else if (uploadedLead.source === 'mediaalpha') {
@@ -149,6 +161,10 @@ module.exports = server => {
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
                             io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
+
+                            if (uploadedLead.source != 'manual') {
+                                io.sockets.to("guide").emit("CREATE_LEAD", uploadedLead);
+                            }
 
                             if (uploadedLead.source === 'blueberry') {
                                 io.sockets.to("blueberry_leads").emit("CREATE_LEAD", uploadedLead);
