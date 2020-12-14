@@ -52,14 +52,19 @@ const LeadRepository = {
 
     async getOne(id) {
         try {
-            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.updatedAt AS updated, sources.title AS source_title, sources.name AS source FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
+            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_procced, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status_name, status.title AS status, states.title AS state, prices.price, leads.updatedAt AS updated, sources.title AS source, sources.name AS source_name FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             });
 
             lead.property = JSON.parse(lead.property);
+
+            if (lead.property.state) delete lead.property.state;
+
             lead.price = JSON.parse(lead.price);
             lead = { ...lead, ...lead.property };
+
+            console.log("🚀 ~ file: lead.repository.js ~ line 63 ~ getOne ~ lead", lead);
 
             return lead;
         } catch (error) {
