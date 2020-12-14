@@ -21,9 +21,11 @@ class AuthFacade {
                         message: "Login success",
                         user: {
                             id: user.id,
+                            INBOUND_status: user.INBOUND_status,
                             email: user.email,
                             fname: user.fname,
                             lname: user.lname,
+                            phone: user.phone,
                             states: JSON.parse(user.states),
                             role_id: user.role_id,
                             uncompleted_lead: user.uncompleted_lead
@@ -55,9 +57,11 @@ class AuthFacade {
                     message: "Verify success",
                     user: {
                         id: candidate.id,
+                        INBOUND_status: candidate.INBOUND_status,
                         email: candidate.email,
                         fname: candidate.fname,
                         lname: candidate.lname,
+                        phone: candidate.phone,
                         states: JSON.parse(candidate.states),
                         role_id: candidate.role_id,
                         uncompleted_lead: candidate.uncompleted_lead

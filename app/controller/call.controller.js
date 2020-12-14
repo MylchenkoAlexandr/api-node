@@ -4,6 +4,10 @@ const VoiceResponse = twilio.twiml.VoiceResponse;
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const axios = require('axios');
 const RecordService = require('../services/records.service');
+const models = require('../../database/models');
+const TransformationHelper = require('../helpers/transformation.helper');
+const StateService = require('../services/state.service');
+const UserRepository = require('../repository/user.repository');
 
 function token(req, res) {
     const capability = new ClientCapability({
@@ -74,9 +78,69 @@ async function transcriptionCallback(req, res) {
     }
 }
 
+async function inboundCall(req, res) {
+    try {
+        let formatedPhone = TransformationHelper.phoneNumber(req.body.From).replace('+1 ', '').replace(' ', '');
+
+        if ("CallSid" in req.body && "From" in req.body) {
+            const twiml = new VoiceResponse();
+            twiml.say({ voice: 'alice' }, 'Hello, welcome to Blueberry! Please wait connection with agent!');
+
+            let toPhone;
+
+            let lead = await models.Leads.findOne({
+                where: {
+                    phone: formatedPhone
+                }
+            });
+
+            if (lead) {
+                if (lead.user_id) {
+                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(lead.user_id);
+                }
+
+                if (!toPhone && lead.state_id) {
+                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, lead.state_id);
+                }
+            } else {
+                let state_id = await StateService.getStateIdFromPhone(formatedPhone);
+
+                if (state_id) {
+                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, state_id);
+                }
+            }
+
+            if (!toPhone) {
+                toPhone = "+13108769581";
+            } else {
+                models.Users.update({
+                    INBOUND_status: 0
+                }, {
+                    where: {
+                        phone: toPhone
+                    }
+                });
+
+                toPhone = TransformationHelper.formatPhoneForCall(toPhone);
+            }
+
+            twiml.dial(toPhone);
+
+            res.type('text/xml');
+            return res.status(200).send(twiml.toString());
+        }
+        return res.status(400).json({ status: 'error', message: "Bad request!" });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: "Server Error!" });
+        throw error
+    }
+}
+
+
 module.exports = {
     token,
     voice,
     recordCallback,
-    transcriptionCallback
+    transcriptionCallback,
+    inboundCall
 }

@@ -96,7 +96,7 @@ const LeadRepository = {
 
     async getRawLead(lead_id) {
         try {
-            let lead = await db.sequelize.query("SELECT leads.id, leads.createdAt, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, leads.email, leads.property, leads.busy, types.name AS type, sources.title AS source_title, sources.name AS source, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.updatedAt AS updated FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN sources ON leads.source_id = sources.id INNER JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id LEFT JOIN types ON leads.type_id = types.id WHERE leads.id = " + lead_id, {
+            let lead = await db.sequelize.query("SELECT leads.id, leads.createdAt, leads.empty, leads.phone, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, leads.email, leads.property, leads.busy, types.name AS type, sources.title AS source_title, sources.name AS source, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.updatedAt AS updated FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN sources ON leads.source_id = sources.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id LEFT JOIN types ON leads.type_id = types.id WHERE leads.empty = 1 AND leads.id = " + lead_id + " AND (leads.phone IS NOT NULL OR leads.email IS NOT NULL)", {
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             });
@@ -104,9 +104,7 @@ const LeadRepository = {
             lead.property = JSON.parse(lead.property);
             lead.price = JSON.parse(lead.price);
 
-            if ("birth_date" in lead.property) {
-                lead.property.birth_date = TransformationHelper.formatDate(lead.property.birth_date, false);
-            }
+            lead = { ...lead, ...lead.property };
 
             return lead;
         } catch (error) {
@@ -195,13 +193,13 @@ const LeadRepository = {
      */
     async getSuitableLeadsForCall(limit = null) {
         try {
-            let limitLeads;
+            let limitLeads = ';';
 
             if (limit) {
-                limitLeads = "LIMIT " + limit;
+                limitLeads = " LIMIT " + limit;
             }
 
-            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (1, 2, 4, 5) AND leads.status_id IN (1, 2, 3, 4, 5, 11) AND leads.AD_status NOT IN(1, 2, 4) AND leads.phone IS NOT NULL ORDER BY leads.id DESC ` + limitLeads, {
+            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (1, 2, 4, 5) AND leads.status_id IN (1, 11) AND leads.AD_status NOT IN(1, 2, 4) AND leads.phone IS NOT NULL ORDER BY leads.id DESC` + limitLeads, {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 

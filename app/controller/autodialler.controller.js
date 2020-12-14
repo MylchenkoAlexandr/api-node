@@ -5,6 +5,7 @@ const CallService = require('../services/call.service');
 const PhoneService = require('../services/phone.service');
 const TransformationHelper = require('../helpers/transformation.helper');
 const UserService = require('../services/user.service');
+const { trim, isUndefined } = require('lodash');
 const clientSocket = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 class AutoDiallerController {
@@ -31,47 +32,63 @@ class AutoDiallerController {
             const guide_id = await UserRepository.findSuitableWorker("guide", null, req.body.guide_id);
 
             if (!guide_id) {
-                return res.status(202).json({ status: 'error', message: "Need GO ONLINE to start AutoDialler proccess" });
+                return res.status(202).json({ status: 'error', message: "Need GO ONLINE to start AutoDialler proccess", AD_restart: false });
+            }
+
+            const agent = await UserRepository.findSuitableWorker("agent");
+
+            if (!agent) {
+                return res.status(202).json({ status: 'error', message: "No agents online" });
             }
 
             const guideIdADStatus = await UserService.getStatus(guide_id, "AD_status");
 
             if (guideIdADStatus) {
-                const lead = await LeadService.getSuitableLeadsForCall(1);
+                const leads = await LeadService.getSuitableLeadsForCall();
 
-                if (!lead) {
-                    return res.status(202).json({ status: 'error', message: "No suitable leads for call" });
-                }
+                let suitableLead;
 
                 let agent_id;
 
-                if (lead.user_id != null) {
-                    agent_id = await await UserRepository.findSuitableWorker("agent", null, lead.user_id);
+                for (let lead of leads) {
+                    if (lead.user_id != null) {
+                        agent_id = await UserRepository.findSuitableWorker("agent", null, lead.user_id);
+                    }
+
+                    if (!agent_id) {
+                        agent_id = await UserRepository.findSuitableWorker("agent", lead.state_id);
+                    }
+
+                    if (agent_id) {
+                        console.log(lead.id);
+                        suitableLead = lead;
+                        break;
+                    }
                 }
 
                 if (!agent_id) {
-                    agent_id = await UserRepository.findSuitableWorker("agent", lead.state_id);
+                    return res.status(200).json({ status: 'error', message: "No suitable agents for transfer", AD_restart: true });
                 }
 
-                if (!agent_id) {
-                    return res.status(202).json({ status: 'error', message: "All agent are offline" });
+                if (!suitableLead) {
+                    return res.status(202).json({ status: 'error', message: "No suitable leads for call", AD_restart: false });
                 }
 
-                if (lead) {
-                    const fromPhone = await PhoneService.pickPhoneNumberByArea(lead);
+                if (suitableLead) {
+                    const fromPhone = await PhoneService.pickPhoneNumberByArea(suitableLead);
 
-                    clientSocket.emit("switch-AD_status", lead.id, 5);
+                    clientSocket.emit("switch-AD_status", suitableLead.id, 5);
 
                     CallService.createOutboundCall({
-                        statusCallback: process.env.CALLBACK_TWILIO + '/api/autodialler/callback/one-by-one/' + lead.id + '/' + guide_id,
+                        statusCallback: process.env.CALLBACK_TWILIO + '/api/autodialler/callback/one-by-one/' + suitableLead.id + '/' + guide_id,
                         statusCallbackEvent: ['answered', 'completed'],
                         statusCallbackMethod: 'POST',
                         url: 'http://demo.twilio.com/docs/classic.mp3',
                         from: TransformationHelper.formatPhoneForCall(fromPhone),
-                        to: TransformationHelper.formatPhoneForCall(lead.phone)
-                    }, lead.id);
+                        to: TransformationHelper.formatPhoneForCall(suitableLead.phone)
+                    }, suitableLead.id);
 
-                    return res.status(200).json({ status: "success", message: "AutoDialer flow has started!" });
+                    return res.status(200).json({ status: "success", message: "AutoDialer flow has started!", AD_restart: false });
                 }
             }
 

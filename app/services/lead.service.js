@@ -63,19 +63,11 @@ class LeadService {
         let exist;
 
         try {
-            exist = await models.Leads.findOne({
-                where: {
-                    type_id: formatedLead.type_id,
-                    email: formatedLead.email,
-                    phone: formatedLead.phone,
-                    fullname: formatedLead.fullname
-                }
-            });
-
-            if (!exist) {
+            if (!formatedLead.empty) {
                 exist = await models.Leads.findOne({
                     where: {
                         type_id: formatedLead.type_id,
+                        email: formatedLead.email,
                         phone: formatedLead.phone,
                         fullname: formatedLead.fullname
                     }
@@ -85,7 +77,44 @@ class LeadService {
                     exist = await models.Leads.findOne({
                         where: {
                             type_id: formatedLead.type_id,
+                            phone: formatedLead.phone,
+                            fullname: formatedLead.fullname
+                        }
+                    });
+
+                    if (!exist) {
+                        exist = await models.Leads.findOne({
+                            where: {
+                                type_id: formatedLead.type_id,
+                                email: formatedLead.email,
+                                fullname: formatedLead.fullname
+                            }
+                        });
+                    }
+                }
+            } else {
+                exist = await models.Leads.findOne({
+                    where: {
+                        type_id: formatedLead.type_id,
+                        phone: formatedLead.phone,
+                        fullname: formatedLead.fullname
+                    }
+                });
+
+                if (!exist && formatedLead.email) {
+                    exist = await models.Leads.findOne({
+                        where: {
+                            type_id: formatedLead.type_id,
                             email: formatedLead.email,
+                            fullname: formatedLead.fullname
+                        }
+                    });
+                }
+
+                if (!exist) {
+                    exist = await models.Leads.findOne({
+                        where: {
+                            type_id: formatedLead.type_id,
                             fullname: formatedLead.fullname
                         }
                     });
@@ -104,6 +133,18 @@ class LeadService {
     async getGuideLeads() {
         try {
             return await LeadRepository.getGuideLeads();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Get all leads skipping any params
+     */
+    async all() {
+        try {
+            const leads = await LeadRepository.All();
+            return leads;
         } catch (error) {
             throw error;
         }
@@ -273,21 +314,21 @@ class LeadService {
         }
     }
 
-    async getSuitableLeadsForCall(limit){
+    async getSuitableLeadsForCall(limit) {
         try {
-            const leads = await LeadRepository.getSuitableLeadsForCall(limit);        
-            return leads;        
+            const leads = await LeadRepository.getSuitableLeadsForCall(limit);
+            return leads;
         } catch (error) {
             throw error;
         }
     }
 
-    async updateADstatusFields(lead_id, field, status){
+    async updateADstatusFields(lead_id, field, status) {
         try {
             const lead = await LeadRepository.updateADstatusFields(lead_id, field, status);
             return lead;
         } catch (error) {
-            throw error;        
+            throw error;
         }
     }
 
@@ -299,10 +340,6 @@ class LeadService {
             throw error;
         }
     }
-
-    async phoneNumberSearcher(lead_id){}
-
-    
 }
 
 module.exports = new LeadService;

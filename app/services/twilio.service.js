@@ -3,7 +3,20 @@ const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWI
 const url = require('url');
 const UserService = require('../services/user.service');
 const ClientCapability = require('twilio').jwt.ClientCapability;
+const twilio = require('twilio');
+const VoiceResponse = twilio.twiml.VoiceResponse;
+
 class TwilioService {
+    redirectCall(callSid, toPhone) {
+        try {
+            client.calls(callSid).update({
+                to: toPhone
+            }).catch(e => console.log(e));
+        } catch (error) {
+            throw error;
+        }
+    }
+
     addWorkersToConference(agentId, callbackUrl) {
         try {
             client.calls.create({

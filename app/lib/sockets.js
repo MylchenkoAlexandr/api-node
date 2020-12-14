@@ -90,7 +90,6 @@ module.exports = server => {
                     });
                 } else {
                     exist = await LeadService.foundExistLead(formatedLead);
-
                 }
 
                 let uploadedLead;
