@@ -64,8 +64,6 @@ const LeadRepository = {
             lead.price = JSON.parse(lead.price);
             lead = { ...lead, ...lead.property };
 
-            console.log("🚀 ~ file: lead.repository.js ~ line 63 ~ getOne ~ lead", lead);
-
             return lead;
         } catch (error) {
             throw error;

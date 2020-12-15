@@ -32,6 +32,12 @@ module.exports = {
           title: 'Click Listing',
           createdAt: new Date(),
           updatedAt: new Date()
+        },
+        {
+          name: 'liveTransfer',
+          title: 'Live Transfer',
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       ]);
   },
