@@ -3,7 +3,7 @@ const { getAllRecords, getOneRecord } = require('../app/controller/records.contr
 const AuthMiddleware = require('../app/middleware/auth.middleware');
 const authenticateToken = AuthMiddleware.authenticateToken;
 
-router.get('/all/:lead_id', authenticateToken, getAllRecords);
+router.get('/all', authenticateToken, getAllRecords);
 router.get('/:record_id', authenticateToken, getOneRecord);
 
 module.exports = router;

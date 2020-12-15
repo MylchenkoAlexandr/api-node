@@ -5,11 +5,10 @@ class RecordsService {
 
     /**
      * Get all records for lead
-     * @param {number} lead_id
-    */
-    async getAll(lead_id) {
+     */
+    async getAll() {
         try {
-            return await RecordsRepository.getAll(lead_id);
+            return await RecordsRepository.getAll();
         } catch (error) {
             throw error;
         }
