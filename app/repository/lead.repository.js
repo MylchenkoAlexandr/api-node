@@ -232,11 +232,15 @@ const LeadRepository = {
             if (params.agent.length) {
                 where += '('
                 params.agent.forEach ( (agent, idx) => {
-                    where += idx !== params.agent.length - 1 ? 'leads.user_id=' + agent + ' OR ' : 'leads.user_id=' + agent;
+                    if (agent === 0) {
+                        where += idx !== params.agent.length - 1 ? 'leads.user_id IS NULL OR ' : 'leads.user_id IS NULL';
+                    } else {
+                        where += idx !== params.agent.length - 1 ? 'leads.user_id=' + agent + ' OR ' : 'leads.user_id=' + agent;
+                    }
                 });
                 where += ') AND ';
             } else {
-                where += 'leads.user_id=0 AND ';
+                where += 'leads.user_id=-1 AND ';
             }
 
             if (params.status.length) {
@@ -246,7 +250,7 @@ const LeadRepository = {
                 });
                 where += ') AND ';
             } else {
-                where += 'leads.status_id=0 AND ';
+                where += 'leads.status_id=-1 AND ';
             }
 
             if (params.state.length) {
@@ -256,7 +260,7 @@ const LeadRepository = {
                 });
                 where += ') AND ';
             } else {
-                where += 'leads.state_id=0 AND ';
+                where += 'leads.state_id=-1 AND ';
             }
 
             if (params.source) {
