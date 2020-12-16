@@ -51,100 +51,98 @@ async function recordCallback(req, res) {
 
         return res.sendStatus(200);
     } catch (err) {
-        res.status(500).json({ status: 'error', message: "Server Error!" });
-        throw err;
+        res.status(500).json({ status: 'error', message: "Server Error!" }); clientSocket
     }
-}
 
-async function transcriptionCallback(req, res) {
-    try {
-        let transcriptionRequestBody = JSON.parse(req.body.AddOns);
-        const transcriptionUrl = transcriptionRequestBody.results[process.env.TWILIO_ADDONS_VOICEBASE_NAME].payload[0].url;
-        const recordingUrl = transcriptionRequestBody.results[process.env.TWILIO_ADDONS_VOICEBASE_NAME].links.recording;
-        const result = await axios.get(transcriptionUrl, {
-            auth: {
-                username: process.env.TWILIO_ACCOUNT_SID,
-                password: process.env.TWILIO_AUTH_TOKEN
-            }
-        });
-        const transcriptionText = result.data.media.transcripts.text;
-
-        await RecordService.saveTranscriptionText(recordingUrl, transcriptionText);
-
-        return res.sendStatus(200);
-    } catch (err) {
-        res.status(500).json({ status: 'error', message: "Server Error!" });
-        throw err;
-    }
-}
-
-async function inboundCall(req, res) {
-    try {
-        let formatedPhone = TransformationHelper.phoneNumber(req.body.From).replace('+1 ', '').replace(' ', '');
-
-        if ("CallSid" in req.body && "From" in req.body) {
-            const twiml = new VoiceResponse();
-            twiml.say({ voice: 'alice' }, 'Hello, welcome to Blueberry! Please wait connection with agent!');
-
-            let toPhone;
-
-            let lead = await models.Leads.findOne({
-                where: {
-                    phone: formatedPhone
+    async function transcriptionCallback(req, res) {
+        try {
+            let transcriptionRequestBody = JSON.parse(req.body.AddOns);
+            const transcriptionUrl = transcriptionRequestBody.results[process.env.TWILIO_ADDONS_VOICEBASE_NAME].payload[0].url;
+            const recordingUrl = transcriptionRequestBody.results[process.env.TWILIO_ADDONS_VOICEBASE_NAME].links.recording;
+            const result = await axios.get(transcriptionUrl, {
+                auth: {
+                    username: process.env.TWILIO_ACCOUNT_SID,
+                    password: process.env.TWILIO_AUTH_TOKEN
                 }
             });
+            const transcriptionText = result.data.media.transcripts.text;
 
-            if (lead) {
-                if (lead.user_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(lead.user_id);
-                }
+            await RecordService.saveTranscriptionText(recordingUrl, transcriptionText);
 
-                if (!toPhone && lead.state_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, lead.state_id);
-                }
+            return res.sendStatus(200);
+        } catch (err) {
+            res.status(500).json({ status: 'error', message: "Server Error!" });
+            throw err;
+        }
+    }
 
-                if(toPhone && lead.id){
-                    clientSocket.emit("assign-agent", lead.id, toPhone.id);
-                }
-            } else {
-                let state_id = await StateService.getStateIdFromPhone(formatedPhone);
+    async function inboundCall(req, res) {
+        try {
+            let formatedPhone = TransformationHelper.phoneNumber(req.body.From).replace('+1 ', '').replace(' ', '');
 
-                if (state_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, state_id);
-                }
-            }
+            if ("CallSid" in req.body && "From" in req.body) {
+                const twiml = new VoiceResponse();
+                twiml.say({ voice: 'alice' }, 'Hello, welcome to Blueberry! Please wait connection with agent!');
 
-            if (!toPhone) {
-                toPhone = "+13108769581";
-            } else {
-                models.Users.update({
-                    INBOUND_status: 0
-                }, {
+                let toPhone;
+
+                let lead = await models.Leads.findOne({
                     where: {
-                        phone: toPhone.phone
+                        phone: formatedPhone
                     }
                 });
 
-                toPhone = TransformationHelper.formatPhoneForCall(toPhone.phone);
+                if (lead) {
+                    if (lead.user_id) {
+                        toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(lead.user_id);
+                    }
+
+                    if (!toPhone && lead.state_id) {
+                        toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, lead.state_id);
+                    }
+
+                    if (toPhone && lead.id) {
+                        client.emit("assign-agent", lead.id, toPhone.id);
+                    }
+                } else {
+                    let state_id = await StateService.getStateIdFromPhone(formatedPhone);
+
+                    if (state_id) {
+                        toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, state_id);
+                    }
+                }
+
+                if (!toPhone) {
+                    toPhone = "+13108769581";
+                } else {
+                    models.Users.update({
+                        INBOUND_status: 0
+                    }, {
+                        where: {
+                            phone: toPhone.phone
+                        }
+                    });
+
+                    toPhone = TransformationHelper.formatPhoneForCall(toPhone.phone);
+                }
+
+                twiml.dial(toPhone);
+
+                res.type('text/xml');
+                return res.status(200).send(twiml.toString());
             }
-
-            twiml.dial(toPhone);
-
-            res.type('text/xml');
-            return res.status(200).send(twiml.toString());
+            return res.status(400).json({ status: 'error', message: "Bad request!" });
+        } catch (error) {
+            res.status(500).json({ status: 'error', message: "Server Error!" });
+            throw error
         }
-        return res.status(400).json({ status: 'error', message: "Bad request!" });
-    } catch (error) {
-        res.status(500).json({ status: 'error', message: "Server Error!" });
-        throw error
     }
-}
 
 
-module.exports = {
-    token,
-    voice,
-    recordCallback,
-    transcriptionCallback,
-    inboundCall
-}
+    module.exports = {
+        token,
+        voice,
+        recordCallback,
+        transcriptionCallback,
+        inboundCall
+    }
