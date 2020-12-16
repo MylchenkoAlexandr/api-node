@@ -103,7 +103,7 @@ async function inboundCall(req, res) {
                 }
 
                 if (toPhone && lead.id) {
-                    clientSocket.emit("assign-agent", lead.id, toPhone.id);
+                    client.emit("assign-agent", lead.id, toPhone.id);
                 }
             } else {
                 let state_id = await StateService.getStateIdFromPhone(formatedPhone);
