@@ -102,6 +102,10 @@ async function inboundCall(req, res) {
                 if (!toPhone && lead.state_id) {
                     toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, lead.state_id);
                 }
+
+                if(toPhone && lead.id){
+                    clientSocket.emit("assign-agent", lead.id, toPhone.id);
+                }
             } else {
                 let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
@@ -117,11 +121,11 @@ async function inboundCall(req, res) {
                     INBOUND_status: 0
                 }, {
                     where: {
-                        phone: toPhone
+                        phone: toPhone.phone
                     }
                 });
 
-                toPhone = TransformationHelper.formatPhoneForCall(toPhone);
+                toPhone = TransformationHelper.formatPhoneForCall(toPhone.phone);
             }
 
             twiml.dial(toPhone);
