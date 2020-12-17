@@ -60,13 +60,13 @@ class UserRepository {
             state = " users_states.state_id = '" + state_id + "' AND ";
         }
 
-        const data = await db.sequelize.query('SELECT users.phone FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE' + state + query + 'users.phone IS NOT NULL AND users.INBOUND_status = 1 AND users.in_call = 0;', {
+        const data = await db.sequelize.query('SELECT users.id, users.phone FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE' + state + query + 'users.phone IS NOT NULL AND users.INBOUND_status = 1 AND users.in_call = 0;', {
             type: db.sequelize.QueryTypes.SELECT,
         }).catch(e => {
             throw e;
         });
 
-        return _.isEmpty(data) ? false : data[0].phone;
+        return _.isEmpty(data) ? false : data[0];
     }
 
 }
