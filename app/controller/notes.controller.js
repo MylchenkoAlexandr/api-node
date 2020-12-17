@@ -1,10 +1,10 @@
-const NotesService = require('../services/notes.service');
+const NotesFacade = require('../facades/notes.facade');
 
 async function getNotes(req, res) {
     try {
-        const notes = await NotesService.getAll(req.params.lead_id);
+        const response = await NotesFacade.getNotes(req.params.lead_id);
 
-        return res.status(200).json({ status: 'success', message: 'All notes', notes });
+        return res.status(response.code).json({ status: response.status, message: response.message, notes: response.notes });
     } catch (err) {
         res.status(500).json({ status: 'error', message: 'Server Error!' });
         throw err;
@@ -12,20 +12,23 @@ async function getNotes(req, res) {
 }
 
 async function createNote(req, res) {
-    const note_param = {
-        user_id: req.body.user_id,
-        lead_id: req.body.lead_id,
-        message: req.body.message
-    }
-
     try {
-        if (note_param.user_id && note_param.lead_id && note_param.message && note_param.message != '') {
-            const note = await NotesService.create(note_param);
+        if (("user_id" in req.body)
+            && ("lead_id" in req.body)
+            && ("message" in req.body)
+            && req.body.message != ''
+        ) {
+            const note_options = {
+                user_id: req.body.user_id,
+                lead_id: req.body.lead_id,
+                message: req.body.message
+            }
+            const response = await NotesFacade.createNote(note_options);
 
-            return res.status(201).json({ status: 'success', message: 'Note created!', note });
+            return res.status(response.code).json({ status: response.status, message: response.message, note: response.note });
         }
 
-        return res.status(400).json({ status: 'error' });
+        return res.status(400).json({ status: 'error', message: 'Bad request' });
     } catch (err) {
         res.status(500).json({ status: 'error', message: 'Server Error' });
         throw err;
@@ -34,9 +37,9 @@ async function createNote(req, res) {
 
 async function deleteNote(req, res) {
     try {
-        const deleted = await NotesService.delete(req.params.note_id);
+        const response = await NotesFacade.deleteNote(req.params.note_id);
 
-        return res.status(200).json({ status: 'success', message: 'Note deleted!', deleted });
+        return res.status(response.code).json({ status: response.status, message: response.message });
     } catch (err) {
         res.status(500).json({ status: 'error', message: 'Server Error' });
         throw err;

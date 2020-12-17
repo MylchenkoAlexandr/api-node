@@ -1,63 +1,48 @@
 const MailService = require('../services/mail.service');
-const LeadService = require('../services/lead.service');
 
 async function sendMailToClient(req, res) {
     try {
-        const mail_options = {
-            from: req.body.email_agent,
-            to: req.body.email,
-            subject: "Blueberry Insurance",
-            text: req.body.text
-        };
+        if (("emailClient" in req.body) && ("fullnameClient" in req.body) && ("text" in req.body) && req.body.text.trim() != '') {
+            const email_options = {
+                from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                to: req.body.emailClient,
+                subject: `To: ${req.body.fullnameClient}, From: ❤️ @ Blueberry`,
+                text: req.body.text
+            };
 
-        await MailService.send(mail_options);
+            const email_params = {
+                lead_id: req.params.lead_id,
+                user_id: req.params.user_id,
+                text: req.body.text
+            }
 
-        return res.status(200).json({ status: "success", message: "Mail send" });
+            const email = await MailService.send(email_options, email_params);
+            return res.status(200).json({ status: "success", message: "Mail send", email });
+        }
+
+        return res.status(400).json({ status: "error", message: "Bad request" });
     } catch (error) {
         res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
     }
 }
 
-async function sendEmailWithCompanies(req, res) {
-
+async function getAllMailsByLead(req, res) {
     try {
-        if (
-            ("companies" in req.body)
-            && ("email" in req.body)
-            && ("coverage_amount" in req.body)
-            && ("term") in req.body
-        ) {
-            const email_params = req.body;
-            const email_sended = await LeadService.checkLeadAtSendedEmail(email_params.email);
+        const emails = await MailService.getAll(req.params.lead_id);
+        return res.status(200).json({ status: "success", emails });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: "Server Error" });
+        throw error;
+    }
+}
 
-            if (typeof email_params.companies == 'string') {
-                email_params.companies = JSON.parse(email_params.companies);
-            }
+async function getMails(req, res) {
+    try {
 
-            if (!email_sended) {
-                const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
-
-                const mail_options = {
-                    from: process.env.MAIL_SERVICE_USER_EMAIL,
-                    to: email_params.email,
-                    subject: "Blueberry Insurance",
-                    html
-                };
-
-                await MailService.send(mail_options);
-                await LeadService.updateLeadAtSendedEmail(email_params.email, true);
-
-                return res.status(200).json({ status: 'success', message: 'Email send' });
-            } else {
-                return res.status(200).json({ status: 'success', message: "Email don't send" });
-            }
-        }
-
-        return res.status(400).json({ status: 'error', message: 'Bad request' });
-    } catch (err) {
-        res.status(500).json({ status: 'error', message: "Server Error" });
-        throw err;
+    } catch (error) {
+        res.status(500).json({ status: "error", message: "Server Error" });
+        throw error;
     }
 }
 
@@ -79,5 +64,5 @@ async function createToken(req, res) {
 module.exports = {
     sendMailToClient,
     createToken,
-    sendEmailWithCompanies
+    getAllMailsByLead
 };

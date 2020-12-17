@@ -1,10 +1,8 @@
 const router = require('express').Router();
-const AuthMiddleware = require('../app/middleware/auth.middleware');
-const authenticateToken = AuthMiddleware.authenticateToken;
-const { sendMailToClient, createToken, sendEmailWithCompanies } = require('../app/controller/mail.controller');
+const { sendMailToClient, createToken, getAllMailsByLead } = require('../app/controller/mail.controller');
 
-router.post('/send', sendMailToClient);
-router.post('/send/companies', sendEmailWithCompanies);
+router.post('/:lead_id/:user_id/send', sendMailToClient);
+router.get('/:lead_id/all', getAllMailsByLead);
 router.post('/create', createToken);
 
 module.exports = router;

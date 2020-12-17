@@ -1,19 +1,18 @@
-const AgentService = require('../services/agent.service');
-const bcrypt = require('bcrypt');
+const AgentFacade = require('../facades/agent.facade');
+const CustomScriptsFacade = require('../facades/custom-scripts.facade');
 
 async function createAgent(req, res) {
     try {
-        if (("fname" in req.body)
+        if (("role_id" in req.body)
+            && req.body.role_id != 1
+            && ("fname" in req.body)
             && ("lname" in req.body)
             && ("email" in req.body)
             && ("password" in req.body)
             && ("states" in req.body)
         ) {
             const agent = req.body;
-            agent.password = await bcrypt.hash(agent.password, 10);
-            agent.states = JSON.stringify(agent.states);
-
-            const response = await AgentService.create(agent);
+            const response = await AgentFacade.createAgent(agent);
 
             return res.status(response.code).json({ status: response.status, message: response.message });
         }
@@ -34,13 +33,8 @@ async function updateAgent(req, res) {
             && ("banned" in req.body)
         ) {
             const agent = req.body;
+            const response = await AgentFacade.updateAgent(agent, req.params.agent_id);
 
-            if (req.body.password) agent.new_password = await bcrypt.hash(agent.password, 10);
-            agent.id = req.params.agent_id;
-            agent.states = JSON.stringify(agent.states);
-            delete agent.password;
-
-            const response = await AgentService.update(agent);
             return res.status(response.code).json({ status: response.status, message: response.message });
         }
 
@@ -53,7 +47,7 @@ async function updateAgent(req, res) {
 
 async function deleteAgent(req, res) {
     try {
-        const response = await AgentService.delete(req.params.agent_id);
+        const response = await AgentFacade.deleteAgent(req.params.agent_id);
 
         return res.status(response.code).json({ status: response.status, message: response.message });
     } catch (error) {
@@ -63,14 +57,13 @@ async function deleteAgent(req, res) {
 }
 
 async function updateAgentPassword(req, res) {
-    const passwords = {
-        old_password: req.body.old_password,
-        new_password: req.body.new_password,
-    };
-
     try {
         if (("old_password" in req.body) && ("new_password" in req.body)) {
-            const response = await AgentService.updatePassword(passwords, req.params.agent_id);
+            const passwords = {
+                old_password: req.body.old_password,
+                new_password: req.body.new_password,
+            };
+            const response = await AgentFacade.updateAgentPassword(passwords, req.params.agent_id);
 
             return res.status(response.code).json({ status: response.status, message: response.message });
         }
@@ -84,9 +77,9 @@ async function updateAgentPassword(req, res) {
 
 async function getAgents(req, res) {
     try {
-        const agents = await AgentService.getAll();
+        const response = await AgentFacade.getAgents();
 
-        return res.status(200).json({ status: 'success', agents });
+        return res.status(response.code).json({ status: response.status, agents: response.agents });
     } catch (error) {
         res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
@@ -96,9 +89,9 @@ async function getAgents(req, res) {
 async function getSuitableAgents(req, res) {
     try {
         if ("state_id" in req.body) {
-            const agents = await AgentService.getAllSuitable(req.body.state_id);
+            const response = await AgentFacade.getSuitableAgents(req.body.state_id);
 
-            return res.status(200).json({ status: 'success', agents });
+            return res.status(response.code).json({ status: response.status, agents: response.agents });
         }
 
         return res.status(400).json({ status: 'error', message: 'Bad Request' });
@@ -110,9 +103,9 @@ async function getSuitableAgents(req, res) {
 
 async function completedLead(req, res) {
     try {
-        await AgentService.completedLead(req.params.agent_id);
+        const response = await AgentFacade.completedLead(req.params.agent_id);
 
-        return res.status(200).json({ status: 'success', message: 'Lead completed' });
+        return res.status(response.code).json({ status: response.status, message: response.message });
     } catch (err) {
         res.status(500).json({ status: "error", message: "Server Error" });
         throw err;
@@ -121,9 +114,27 @@ async function completedLead(req, res) {
 
 async function startWork(req, res) {
     try {
-        await AgentService.startWorkWithLead(req.params.agent_id, req.params.lead_id);
+        const response = await AgentFacade.startWork(req.params.agent_id, req.params.lead_id);
 
-        return res.status(200).json({ status: 'success', message: 'Start work with lead' });
+        return res.status(response.code).json({ status: response.status, message: response.message });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
+async function getAllScripts(req, res) {
+    try {
+        const script_options = {
+            agent_id: req.params.agent_id,
+            type_id: req.params.type_id,
+        };
+
+        const response = await CustomScriptsFacade.getCustomScripts(script_options);
+
+        console.log(response);
+
+        return res.status(response.code).json({ status: response.status, scripts: response.scripts });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Server Error' });
         throw error;
@@ -142,12 +153,51 @@ async function createScript(req, res) {
                 html: req.body.html
             }
 
-            await AgentService.createCustomScript(script_options);
-
-            return res.status(200).json({ status: 'success', message: 'Script created' });
+            const response = await CustomScriptsFacade.createCustomScript(script_options);
+            return res.status(response.code).json({ status: response.status, message: response.message, script: response.script });
         }
 
-        return res.status(400).json({ status: 'error', message: 'Bad Request' });
+        return res.status(400).json({ status: 'error', message: 'Client Error' });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
+async function updateScript(req, res) {
+    try {
+        if ("html" in req.body) {
+            const script_options = {
+                script_id: req.params.script_id,
+                html: req.body.html
+            };
+
+            const response = await CustomScriptsFacade.updateCustomScript(script_options);
+            return res.status(response.code).json({ status: response.status, message: response.message });
+        }
+
+        return res.status(400).json({ status: 'error', message: 'Client Error' });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
+async function deleteScript(req, res) {
+    try {
+        const response = await CustomScriptsFacade.deleteCustomScriptById(req.params.script_id);
+
+        return res.status(response.code).json({ status: response.status, message: response.message });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
+async function getOnlineAgents(req, res) {
+    try {
+        const agents = await AgentFacade.getOnlineAgents();
+        res.status(200).json({ status: 'success', agents });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Server Error' });
         throw error;
@@ -163,5 +213,9 @@ module.exports = {
     updateAgentPassword,
     completedLead,
     startWork,
-    createScript
+    createScript,
+    getAllScripts,
+    deleteScript,
+    updateScript,
+    getOnlineAgents
 }

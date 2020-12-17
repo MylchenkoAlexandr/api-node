@@ -30,7 +30,16 @@ app.use('/api/mail', require('./routes/mail.routes'));
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/agents', require('./routes/agent.routes'));
 app.use('/api/notes', require('./routes/notes.routes'));
-app.use('/api/beneficiary', require('./routes/beneficiary.routes'));
+app.use('/api/beneficiaries', require('./routes/beneficiary.routes'));
+app.use('/api/twilio', require('./routes/twilio.routes'));
+app.use('/api/user', require('./routes/user.routes'));
+app.use('/api/autodialler', require('./routes/autodialler.routes'));
+app.use('/api/settings', require('./routes/settings.routes'));
+app.use('/api/state', require('./routes/state.routes'));
+app.use('/api/phone', require('./routes/phone.routes'));
+app.use('/api/status', require('./routes/status.routes'));
+app.use('/api/source', require('./routes/source.routes'));
+
 app.use('*', (req, res) => {
     res.sendStatus(404);
 });

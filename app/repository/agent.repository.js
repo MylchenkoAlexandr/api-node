@@ -11,11 +11,8 @@ const AgentRepository = {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
-            if (data[0]) {
-                return data[0].id;
-            } else {
-                return null;
-            }
+            if (data[0]) return data[0].id;
+            return null;
         } catch (error) {
             throw error;
         }
@@ -31,9 +28,7 @@ const AgentRepository = {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
-            if (data[0]) {
-                return data[0].role
-            }
+            return data[0].role
         } catch (error) {
             throw error;
         }
@@ -66,6 +61,17 @@ const AgentRepository = {
         } catch (error) {
             throw error;
         }
+    },
+
+    async onlineAgents() {
+        let agents = await db.sequelize.query(`SELECT users.id FROM users WHERE users.active = true AND users.role_id = 2`, {
+            type: db.sequelize.QueryTypes.SELECT,
+        })
+            .catch(e => {
+                throw e;
+            });
+
+        return agents.length;
     }
 }
 

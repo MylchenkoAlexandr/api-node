@@ -1,7 +1,5 @@
 const models = require('../../database/models');
-const NinjaQuoterService = require('./ninja-quoter.service');
-const FormatService = require('./format.service');
-const PriceService = require('./price.service');
+const zipcodes = require('zipcodes');
 const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 
@@ -9,9 +7,8 @@ class LeadService {
     /**
      * Create new lead
      * @param {object} lead
-     * @param {string} quoter
      */
-    async createLead(lead, quoter) {
+    async createLead(lead) {
         try {
             let { dataValues: createdLead } = await models.Leads.create({
                 user_id: lead.user_id,
@@ -26,24 +23,7 @@ class LeadService {
                 property: JSON.stringify(lead.property)
             });
 
-            if (createdLead) {
-                if (createdLead.empty == 0) {
-                    const leadProperty = lead.property;
-
-                    const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
-
-                    let guoter = new NinjaQuoterService(formatedLeadForQuote);
-
-                    const priceFromQuoter = await guoter.getPrice();
-
-                    await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
-                    
-                    return LeadRepository.getOne(createdLead.id);
-                }
-    
-    
-                return LeadRepository.getRawLead(createdLead.id);
-            }
+            return createdLead;
         } catch (err) {
             throw err;
         }
@@ -53,9 +33,8 @@ class LeadService {
      * Update exist lead record
      * @param {object} exist
      * @param {object} lead
-     * @param {string} quoter
      */
-    async updateLead(exist, lead, quoter) {
+    async updateLead(exist, lead) {
         try {
             let { dataValues: updatedLead } = await exist.update({
                 user_id: lead.user_id,
@@ -70,23 +49,7 @@ class LeadService {
                 property: JSON.stringify(lead.property)
             });
 
-            if (updatedLead) {
-                if (updatedLead.empty == 0) {
-                    const leadProperty = JSON.parse(updatedLead.property);
-
-                    const formatedLeadForQuote = await FormatService.formatLeadForQuote(leadProperty);
-
-                    let guoter = new NinjaQuoterService(formatedLeadForQuote);
-
-                    const priceFromQuoter = await guoter.getPrice();
-
-                    await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
-
-                    return LeadRepository.getOne(updatedLead.id);
-                }
-
-                return LeadRepository.getRawLead(updatedLead.id);
-            }
+            return updatedLead;
         } catch (err) {
             throw err;
         }
@@ -100,12 +63,13 @@ class LeadService {
         let exist;
 
         try {
-            if ("email" in formatedLead && "phone" in formatedLead) {
+            if (!formatedLead.empty) {
                 exist = await models.Leads.findOne({
                     where: {
                         type_id: formatedLead.type_id,
                         email: formatedLead.email,
-                        phone: formatedLead.phone
+                        phone: formatedLead.phone,
+                        fullname: formatedLead.fullname
                     }
                 });
 
@@ -113,7 +77,8 @@ class LeadService {
                     exist = await models.Leads.findOne({
                         where: {
                             type_id: formatedLead.type_id,
-                            email: formatedLead.email
+                            phone: formatedLead.phone,
+                            fullname: formatedLead.fullname
                         }
                     });
 
@@ -121,56 +86,81 @@ class LeadService {
                         exist = await models.Leads.findOne({
                             where: {
                                 type_id: formatedLead.type_id,
-                                phone: formatedLead.phone
+                                email: formatedLead.email,
+                                fullname: formatedLead.fullname
                             }
                         });
                     }
                 }
-            } else if ("email" in formatedLead && !("phone" in formatedLead)) {
+            } else {
                 exist = await models.Leads.findOne({
                     where: {
                         type_id: formatedLead.type_id,
-                        email: formatedLead.email
+                        phone: formatedLead.phone,
+                        fullname: formatedLead.fullname
                     }
                 });
-            } else if ("phone" in formatedLead && !("email" in formatedLead)) {
-                exist = await models.Leads.findOne({
-                    where: {
-                        type_id: formatedLead.type_id,
-                        phone: formatedLead.phone
-                    }
-                });
+
+                if (!exist && formatedLead.email) {
+                    exist = await models.Leads.findOne({
+                        where: {
+                            type_id: formatedLead.type_id,
+                            email: formatedLead.email,
+                            fullname: formatedLead.fullname
+                        }
+                    });
+                }
+
+                if (!exist) {
+                    exist = await models.Leads.findOne({
+                        where: {
+                            type_id: formatedLead.type_id,
+                            fullname: formatedLead.fullname
+                        }
+                    });
+                }
             }
 
-            console.log("foundExistLead -> exist", exist)
             return exist;
         } catch (err) {
             console.error(err)
         }
     }
 
+    /**
+     * Get all leads for guide user
+     */
+    async getGuideLeads() {
+        try {
+            return await LeadRepository.getGuideLeads();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Get all leads skipping any params
+     */
+    async all() {
+        try {
+            const leads = await LeadRepository.All();
+            return leads;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     /** 
      * Function for get all leads
      * @param {string} type
-     * @param {string} states
+     * @param {number} user_id
     */
     async getAll(type, user_id) {
         try {
-            let leads;
-
             const role = await AgentRepository.getRole(user_id);
 
-            if (role) {
-                if (role == 'admin') {
-                    leads = await LeadRepository.getAll(type);
-                } else if (role == 'agent') {
-                    leads = await LeadRepository.getByUserId(type, user_id);
-                }
-            }
-
-            if (leads) {
-                return leads;
-            }
+            if (role == 'admin') return await LeadRepository.getAll(type);
+            else if (role == 'agent') return await LeadRepository.getByUserId(type, user_id);
         } catch (error) {
             throw error;
         }
@@ -183,6 +173,8 @@ class LeadService {
     async getOne(lead_id) {
         try {
             const lead = await LeadRepository.getOne(lead_id);
+            const location = zipcodes.lookup(lead.zipcode);
+            if (location) lead.city = location.city;
 
             return lead;
         } catch (error) {
@@ -203,26 +195,22 @@ class LeadService {
     }
 
     /** 
-     * Function for get all blueberry leads
+     * Function for get one empty lead
     */
-    async blueberryLeads() {
+    async getRawLead(lead_id) {
         try {
-            const leads = await LeadRepository.getLeadsBySource(1);
-
-            return leads;
+            return await LeadRepository.getRawLead(lead_id);
         } catch (error) {
             throw error;
         }
     }
 
     /** 
-     * Function for get all MediaAlpha leads
+     * Function for get all blueberry leads
     */
-    async mediaAlphaLeads() {
+    async getLeadsBySource(source) {
         try {
-            const leads = await LeadRepository.getLeadsBySource(2);
-
-            return leads;
+            return await LeadRepository.getLeadsBySource(source);
         } catch (error) {
             throw error;
         }
@@ -278,9 +266,7 @@ class LeadService {
 
     async checkLeadAtSendedEmail(email_client) {
         try {
-            const email_sended = await LeadRepository.getEmailSended(email_client);
-
-            return email_sended;
+            return await LeadRepository.getEmailSended(email_client);
         } catch (error) {
             throw error;
         }
@@ -293,6 +279,63 @@ class LeadService {
             );
 
             if (lead) await lead.update({ email_sended: email_sended });
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateStatus(lead_id, statusName) {
+        try {
+            const updatedLead = await models.Leads.findOne({
+                where: {
+                    id: lead_id
+                }
+            });
+
+            if (updatedLead) {
+                const status = await models.Status.findOne({
+                    attributes: ['id'],
+                    where: {
+                        name: statusName
+                    }
+                });
+
+                if (status) {
+                    await updatedLead.update({
+                        status_id: status.id
+                    });
+
+                    return await LeadRepository.getOne(updatedLead.id);
+                }
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getSuitableLeadsForCall(limit) {
+        try {
+            const leads = await LeadRepository.getSuitableLeadsForCall(limit);
+            return leads;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateADstatusFields(lead_id, field, status) {
+        try {
+            const lead = await LeadRepository.updateADstatusFields(lead_id, field, status);
+            return lead;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getLeadsByFilters(params) {
+        try {
+            const leads = await LeadRepository.getLeadsByFilters(params);
+            return leads;
         } catch (error) {
             throw error;
         }

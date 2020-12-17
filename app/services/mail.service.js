@@ -3,6 +3,9 @@ const ejs = require('ejs');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
 
+const TransformationHelper = require('../helpers/transformation.helper');
+const MailRepository = require('../repository/mail.repository');
+
 require('dotenv').config();
 
 class MailService {
@@ -31,14 +34,41 @@ class MailService {
         });
     }
 
+    /** 
+     * @param {number} lead_id
+    */
+    async getAll(lead_id) {
+        try {
+            return await MailRepository.getAll(lead_id);
+        } catch (error) {
+            throw error;
+        }
+    }
+
     /**
-     * The function for send email for client
+     * Send email for client
      * @param {object} mail_options
+     * @param {object} email_params
      */
-    async send(mail_options) {
+    async send(email_options, email_params) {
         try {
             await this.transporter.verify();
-            await this.transporter.sendMail(mail_options);
+            await this.transporter.sendMail(email_options);
+            const { dataValues: savedEmail } = await MailRepository.create(email_params);
+            return await MailRepository.getOne(savedEmail.id);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Send email for client with quote information
+     * @param {object} mail_options
+     */
+    async sendNewsletter(email_options) {
+        try {
+            await this.transporter.verify();
+            await this.transporter.sendMail(email_options);
         } catch (error) {
             throw error;
         }
@@ -81,6 +111,7 @@ class MailService {
      */
     generateQuotesHtmlTemplate(filename, { coverage_amount, term, companies }) {
         let html;
+        coverage_amount = TransformationHelper.numberWithCommas(coverage_amount);
         ejs.renderFile(this.emails_path + filename, { coverage_amount, term, companies }, (err, html_code) => {
             if (err) throw err;
             html = html_code;

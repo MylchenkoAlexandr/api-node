@@ -1,21 +1,37 @@
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
-const jwt = require('jsonwebtoken');
-
 const FormatService = require('../services/format.service');
+const LeadFacade = require('../facades/lead.facade');
 const LeadService = require('../services/lead.service');
-const NinjaQuoterService = require('../services/ninja-quoter.service');
-const MailService = require('../services/mail.service');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
     return res.status(200).send(lead);
 }
 
+async function getAll(req, res) {
+    try {
+        const response = await LeadFacade.getAll();
+        return res.status(response.code).json({ status: response.status, leads: response.leads });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: "Server Error!" });
+        throw err;
+    }
+}
+
+async function getAllLeadsForGuide(req, res) {
+    try {
+        const response = await LeadService.getSuitableLeadsForCall();
+        return res.status(200).json({ status: "Success", leads: response });
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: "Server Error!" });
+        throw err;
+    }
+}
+
 async function getLeads(req, res) {
     try {
-        const leads = await LeadService.getAll(req.params.type, req.params.user_id);
-
-        return res.status(200).json({ status: "success", leads });
+        const response = await LeadFacade.getAllLeads(req.params.type, req.params.user_id);
+        return res.status(response.code).json({ status: response.status, leads: response.leads });
     } catch (err) {
         res.status(500).json({ status: 'error', message: "Server Error!" });
         throw err;
@@ -24,8 +40,8 @@ async function getLeads(req, res) {
 
 async function getRawLeads(req, res) {
     try {
-        const rawLeads = await LeadService.getRawLeads();
-        return res.status(200).json({ status: "success", rawLeads });
+        const response = await LeadFacade.getRawLeads();
+        return res.status(response.code).json({ status: response.status, rawLeads: response.leads });
     } catch (err) {
         res.status(500).json({ status: 'error', message: "Server Error" });
         throw err;
@@ -34,8 +50,8 @@ async function getRawLeads(req, res) {
 
 async function getLead(req, res) {
     try {
-        const lead = await LeadService.getOne(req.params.lead_id);
-        return res.status(200).json({ status: "success", lead });
+        const response = await LeadFacade.getOneLead(req.params.lead_id);
+        return res.status(response.code).json({ status: response.status, lead: response.lead });
     } catch (err) {
         res.status(500).json({ status: 'error', message: "Server Error" });
         throw err;
@@ -43,22 +59,18 @@ async function getLead(req, res) {
 }
 
 async function getCompaniesListByLeadData(req, res) {
-    const rawLead = JSON.parse(JSON.stringify(req.body));
-
-    rawLead.medications = rawLead['medications[]'];
-
-    if ("medications" in rawLead) {
-        delete rawLead['medications[]']
-    }
-
-    client.emit("process-lead", rawLead);
-
     try {
-        const formatedLeadForQuote = await FormatService.formatLeadForQuote(rawLead);
+        const rawLead = JSON.parse(JSON.stringify(req.body));
 
-        const quotes = new NinjaQuoterService(formatedLeadForQuote);
+        rawLead.medications = rawLead['medications[]'];
 
-        const companies = await quotes.getCompaniesInfo();
+        if ("medications" in rawLead) {
+            delete rawLead['medications[]']
+        }
+
+        client.emit("process-lead", rawLead);
+
+        const companies = await LeadFacade.getCompaniesList(rawLead);
 
         return res.status(200).json(companies);
     } catch (err) {
@@ -81,7 +93,7 @@ async function uploadLeadFromUrl(req, res) {
         rawLead = {
             agent: null,
             type: urlData.type,
-            source: "blueberry",
+            source: "clickListing",
             empty: 1
         };
 
@@ -105,8 +117,6 @@ async function uploadLeadFromUrl(req, res) {
         if ("dob" in urlData) {
             rawLead.birth_date = urlData.dob;
         }
-
-        console.log("uploadLeadFromUrl -> rawLead", rawLead)
 
         client.emit("process-lead", rawLead);
 
@@ -139,34 +149,35 @@ async function uploadLeadFromMediaAlpha(req, res) {
 
 }
 
-async function getBlueberryLeads(req, res) {
+async function getLeadsBySource(req, res) {
     try {
-        const leads = await LeadService.blueberryLeads();
-        return res.status(200).json({ status: "success", leads });
-    } catch (err) {
-        res.status(500).json({ status: 'error', message: "Server Error" });
-        throw err;
+        const response = await LeadFacade.getLeadsBySource(req.params.source);
+        return res.status(response.code).json({ status: response.status, leads: response.leads });
+    } catch (error) {
+        throw error;
     }
 }
 
-async function getMediaAlphaLeads(req, res) {
+async function getLeadsByFilters(req, res) {
     try {
-        const leads = await LeadService.mediaAlphaLeads();
-        return res.status(200).json({ status: "success", leads });
-    } catch (err) {
-        res.status(500).json({ status: 'error', message: "Server Error" });
-        throw err;
+        const response = await LeadFacade.getLeadsByFilters(req.body);
+
+        return res.status(response.code).json({status: response.status, leads: response.leads});
+    } catch (error) {
+        throw error;
     }
 }
 
 module.exports = {
     test,
     getLead,
+    getAll,
     getLeads,
     getRawLeads,
     getCompaniesListByLeadData,
     uploadLeadFromMediaAlpha,
     uploadLeadFromUrl,
-    getBlueberryLeads,
-    getMediaAlphaLeads
+    getLeadsBySource,
+    getAllLeadsForGuide,
+    getLeadsByFilters,
 }   

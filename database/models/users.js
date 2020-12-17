@@ -21,6 +21,22 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       primaryKey: true,
     },
+    AD_status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
+    INBOUND_status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
+    active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
+    in_call: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
     role_id: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
@@ -36,6 +52,10 @@ module.exports = (sequelize, DataTypes) => {
     email: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     password: {
       type: DataTypes.STRING,
