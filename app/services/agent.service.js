@@ -123,6 +123,7 @@ class AgentService {
             agents.forEach(agent => {
                 delete agent.dataValues.password;
                 agent.dataValues.states = JSON.parse(agent.dataValues.states);
+                agent.dataValues.fullname = agent.dataValues.fname + ' ' + agent.dataValues.lname;
             });
 
             return agents;
