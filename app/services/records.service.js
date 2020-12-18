@@ -14,6 +14,14 @@ class RecordsService {
         }
     }
 
+    async getRecordsByMinDuration(duration) {
+        try {
+            return await RecordsRepository.getRecordsByMinDuration(duration);
+        } catch (error) {
+            throw error;
+        }
+    };
+
     /**
      * Get one record
      * @param {number} record_id
@@ -36,6 +44,7 @@ class RecordsService {
                 lead_id: record.leadId,
                 datetime: record.datatime,
                 call_sid: record.callSid,
+                duration: record.duration,
                 sid: record.sid
             });
         } catch (error) {

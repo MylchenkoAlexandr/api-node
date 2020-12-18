@@ -64,6 +64,9 @@ const LeadRepository = {
             lead.price = JSON.parse(lead.price);
             lead = { ...lead, ...lead.property };
 
+            lead.age = TransformationHelper.calculateAge(...lead.birth_date.split('-'));
+            lead.bmi = TransformationHelper.calculateBMI(lead.weight, lead.height);
+
             return lead;
         } catch (error) {
             throw error;
