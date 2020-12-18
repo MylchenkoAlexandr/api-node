@@ -52,7 +52,7 @@ const LeadRepository = {
 
     async getOne(id) {
         try {
-            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_procced, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status_name, status.title AS status, states.title AS state, states.name AS state_name, prices.price, leads.updatedAt AS updated, sources.title AS source, sources.name AS source_name FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
+            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_procced, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status_name, status.name AS status, status.title AS status_title, states.name AS state, states.title AS state_title, prices.price, leads.updatedAt AS updated, sources.title AS source, sources.name AS source_name FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             });
@@ -205,7 +205,7 @@ const LeadRepository = {
                 limitLeads = " LIMIT " + limit;
             }
 
-            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (1, 2, 4, 5) AND leads.status_id IN (1, 11) AND leads.AD_status NOT IN(1, 2, 4) AND leads.phone IS NOT NULL ORDER BY leads.id DESC` + limitLeads, {
+            let data = await db.sequelize.query(`SELECT *, sources.title as source_title, leads.id as id, status.title as status_title, states.title as state_title FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (1, 2, 4, 5) AND leads.status_id IN (1, 11) AND leads.AD_status NOT IN(1, 2, 4) AND leads.phone IS NOT NULL ORDER BY leads.id DESC` + limitLeads, {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
@@ -237,7 +237,7 @@ const LeadRepository = {
 
             if (params.agent.length) {
                 where += '('
-                params.agent.forEach ( (agent, idx) => {
+                params.agent.forEach((agent, idx) => {
                     if (agent === 0) {
                         where += idx !== params.agent.length - 1 ? 'leads.user_id IS NULL OR ' : 'leads.user_id IS NULL';
                     } else {
@@ -251,8 +251,8 @@ const LeadRepository = {
 
             if (params.status.length) {
                 where += '(';
-                params.status.forEach ( (status, idx) => {
-                    where +=  idx !== params.status.length - 1 ? 'leads.status_id=' + status + ' OR ' : 'leads.status_id=' + status;
+                params.status.forEach((status, idx) => {
+                    where += idx !== params.status.length - 1 ? 'leads.status_id=' + status + ' OR ' : 'leads.status_id=' + status;
                 });
                 where += ') AND ';
             } else {
@@ -261,7 +261,7 @@ const LeadRepository = {
 
             if (params.state.length) {
                 where += '(';
-                params.state.forEach ( (state, idx) => {
+                params.state.forEach((state, idx) => {
                     where += idx !== params.state.length - 1 ? 'leads.state_id=' + state + ' OR ' : 'leads.state_id=' + state;
                 });
                 where += ') AND ';
