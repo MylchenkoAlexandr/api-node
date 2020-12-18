@@ -5,15 +5,22 @@ class RecordsService {
 
     /**
      * Get all records for lead
-     * @param {number} lead_id
-    */
-    async getAll(lead_id) {
+     */
+    async getAll() {
         try {
-            return await RecordsRepository.getAll(lead_id);
+            return await RecordsRepository.getAll();
         } catch (error) {
             throw error;
         }
     }
+
+    async getRecordsByMinDuration(duration) {
+        try {
+            return await RecordsRepository.getRecordsByMinDuration(duration);
+        } catch (error) {
+            throw error;
+        }
+    };
 
     /**
      * Get one record
@@ -37,6 +44,7 @@ class RecordsService {
                 lead_id: record.leadId,
                 datetime: record.datatime,
                 call_sid: record.callSid,
+                duration: record.duration,
                 sid: record.sid
             });
         } catch (error) {

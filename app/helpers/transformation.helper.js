@@ -43,6 +43,29 @@ class TransformationHelper {
         if (typeof number == 'string') return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
+
+    calculateAge(birth_year, birth_month, birth_day)
+    {
+        const today_date = new Date();
+        const today_year = today_date.getFullYear();
+        const today_month = today_date.getMonth();
+        const today_day = today_date.getDate();
+        let age = today_year - birth_year;
+
+        if ( today_month < (birth_month - 1))
+        {
+            age--;
+        }
+        if (((birth_month - 1) === today_month) && (today_day < birth_day))
+        {
+            age--;
+        }
+        return age;
+    }
+
+    calculateBMI(weight, height) {
+        return (703 * (weight / (height * height))).toFixed(1);
+    }
 }
 
 module.exports = new TransformationHelper;
