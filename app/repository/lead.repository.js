@@ -52,7 +52,7 @@ const LeadRepository = {
 
     async getOne(id) {
         try {
-            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_procced, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status_name, status.name AS status, status.title AS status_title, states.name AS state, states.title AS state_title, prices.price, leads.updatedAt AS updated, sources.title AS source, sources.name AS source_name FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
+            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_procced, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, states.title AS state_title, prices.price, leads.updatedAt AS updated, sources.name AS source, sources.name AS source_title FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             });
@@ -62,7 +62,10 @@ const LeadRepository = {
             if (lead.property.state) delete lead.property.state;
 
             lead.price = JSON.parse(lead.price);
+
             lead = { ...lead, ...lead.property };
+
+            delete lead.property
 
             lead.age = TransformationHelper.calculateAge(...lead.birth_date.split('-'));
             lead.bmi = TransformationHelper.calculateBMI(lead.weight, lead.height);
