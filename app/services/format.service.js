@@ -227,9 +227,7 @@ class FormatService {
             if ("AD_status" in lead) {
                 delete lead.AD_status;
             }
-            if ("state" in lead) {
-                delete lead.state;
-            }
+
             if ("state_title" in lead) {
                 delete lead.state_title;
             }
@@ -249,7 +247,7 @@ class FormatService {
             formatedLead.property = {
                 ...lead
             }
-            
+
             return formatedLead;
         } catch (err) {
             throw err;
