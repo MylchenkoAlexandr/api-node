@@ -119,7 +119,7 @@ class FormatService {
                 formatedLead.user_id = lead.agent;
                 delete lead.agent;
             }
-            
+
             // TODO commented out for that stage
             // else if ("state_id" in formatedLead) {
             //     if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
@@ -218,10 +218,38 @@ class FormatService {
                 lead.rate_class = lead.term == 'fex' ? 'lb' : 's';
             }
 
+            if ("id" in lead) {
+                delete lead.id;
+            }
+            if ("AD_procced" in lead) {
+                delete lead.AD_procced;
+            }
+            if ("AD_status" in lead) {
+                delete lead.AD_status;
+            }
+            if ("state" in lead) {
+                delete lead.state;
+            }
+            if ("state_title" in lead) {
+                delete lead.state_title;
+            }
+            if ("updated" in lead) {
+                delete lead.updated;
+            }
+            if ("source_title" in lead) {
+                delete lead.source_title;
+            }
+            if ("premium_price" in lead) {
+                delete lead.premium_price;
+            }
+            if ("premium_carrier" in lead) {
+                delete lead.premium_carrier;
+            }
+
             formatedLead.property = {
                 ...lead
             }
-
+            
             return formatedLead;
         } catch (err) {
             throw err;
