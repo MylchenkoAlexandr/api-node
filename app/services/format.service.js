@@ -110,7 +110,6 @@ class FormatService {
                         name: lead.state
                     }
                 });
-
                 if (state.dataValues.id) {
                     formatedLead.state_id = state.id;
                 }
@@ -120,6 +119,7 @@ class FormatService {
                 formatedLead.user_id = lead.agent;
                 delete lead.agent;
             }
+
             // TODO commented out for that stage
             // else if ("state_id" in formatedLead) {
             //     if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
@@ -136,8 +136,7 @@ class FormatService {
                     where: {
                         name: lead.status
                     }
-                })
-
+                });
                 if (status.dataValues.id) {
                     delete lead.status;
                     formatedLead.status_id = status.id;
@@ -179,7 +178,6 @@ class FormatService {
             const key_med = 'major_condition_';
 
             Object.keys(lead).forEach(key => {
-
                 if (key == `${key_med}aids_hiv`) medications.push("1");
                 if (key == `${key_med}alcohol_drug_abuse`) medications.push("2");
                 if (key == `${key_med}alzheimers_dementia`) medications.push("3");
@@ -202,7 +200,6 @@ class FormatService {
                 if (key == `${key_med}ulcers`) medications.push("20");
                 if (key == `${key_med}vascular_disease`) medications.push("21");
                 if (key == `${key_med}other`) medications.push("22");
-
                 if (key.includes(key_med)) delete lead[key];
             });
 
@@ -219,6 +216,32 @@ class FormatService {
 
             if ("term" in lead && !("rate_class" in lead)) {
                 lead.rate_class = lead.term == 'fex' ? 'lb' : 's';
+            }
+
+            if ("id" in lead) {
+                delete lead.id;
+            }
+            if ("AD_procced" in lead) {
+                delete lead.AD_procced;
+            }
+            if ("AD_status" in lead) {
+                delete lead.AD_status;
+            }
+
+            if ("state_title" in lead) {
+                delete lead.state_title;
+            }
+            if ("updated" in lead) {
+                delete lead.updated;
+            }
+            if ("source_title" in lead) {
+                delete lead.source_title;
+            }
+            if ("premium_price" in lead) {
+                delete lead.premium_price;
+            }
+            if ("premium_carrier" in lead) {
+                delete lead.premium_carrier;
             }
 
             formatedLead.property = {
