@@ -31,6 +31,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BIGINT.UNSIGNED,
             allowNull: false
         },
+        path: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
         filename: {
             type: DataTypes.STRING,
             allowNull: false

@@ -4,7 +4,7 @@ const models = require('../../database/models');
 
 class CustomScriptsService {
     constructor() {
-        this._path_url = path.normalize(path.join(__dirname, '..', '..', 'scripts'));
+        this._path_url = path.normalize(process.env.CUSTOM_SCRIPTS_PATH);
     }
 
     async getOne(script_id) {
@@ -33,6 +33,7 @@ class CustomScriptsService {
             const { dataValues: custom_script } = await models.CustomScripts.create({
                 user_id: agent_id,
                 type_id,
+                path: this._path_url,
                 filename
             });
 
