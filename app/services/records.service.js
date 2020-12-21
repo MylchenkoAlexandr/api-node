@@ -28,7 +28,9 @@ class RecordsService {
     */
     async getOne(record_id) {
         try {
-            return await RecordsRepository.getOne(record_id);
+            const record = await RecordsRepository.getOne(record_id);
+
+            return record;
         } catch (error) {
             throw error;
         }
@@ -62,6 +64,14 @@ class RecordsService {
             return await models.Records.update({
                 transcription_text: transcriptionText
             }, { where: { url: recordingUrl } });
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getAllRecordsById(lead_id){
+        try {
+            return await RecordsRepository.getByLeadId(lead_id);
         } catch (error) {
             throw error;
         }
