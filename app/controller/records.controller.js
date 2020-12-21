@@ -10,6 +10,20 @@ async function getAllRecords(req, res) {
     }
 }
 
+async function getAllRecordsById(req, res){
+    try {
+        if(req.params.lead_id){
+            const records = await RecordsService.getAllRecordsById(req.params.lead_id);
+            return res.status(200).json({ status: "success", message: "All records sending", records });
+        }
+
+        return res.status(400).json({ status: "error", message: "Bad request" });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: "Server Error" });
+        throw error;
+    }
+}
+
 async function getRecordsByMinDuration(req, res) {
     try {
         const records = await RecordsService.getRecordsByMinDuration(req.params.duration);
@@ -23,7 +37,7 @@ async function getRecordsByMinDuration(req, res) {
 async function getOneRecord(req, res) {
     try {
         const record = await RecordsService.getOne(req.params.record_id);
-        return res.status(200).json({ status: "success", message: "Record already", record });
+        return res.status(200).json({ status: "success", message: "Record ready", record });
     } catch (error) {
         res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
@@ -33,5 +47,6 @@ async function getOneRecord(req, res) {
 module.exports = {
     getAllRecords,
     getRecordsByMinDuration,
-    getOneRecord
+    getOneRecord,
+    getAllRecordsById
 }
