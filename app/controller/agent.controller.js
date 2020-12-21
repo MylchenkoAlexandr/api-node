@@ -131,9 +131,7 @@ async function getAllScripts(req, res) {
         };
 
         const response = await CustomScriptsFacade.getCustomScripts(script_options);
-
-        console.log(response);
-
+        
         return res.status(response.code).json({ status: response.status, scripts: response.scripts });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Server Error' });
