@@ -116,13 +116,7 @@ async function inboundCall(req, res) {
             if (!toPhone) {
                 toPhone = "+13108769581";
             } else {
-                models.Users.update({
-                    INBOUND_status: 0
-                }, {
-                    where: {
-                        phone: toPhone.phone
-                    }
-                });
+                client.emit("switch-inbound-status", { id: toPhone.id, status: false });
 
                 toPhone = TransformationHelper.formatPhoneForCall(toPhone.phone);
             }
