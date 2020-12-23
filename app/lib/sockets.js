@@ -336,6 +336,22 @@ module.exports = server => {
             }
         });
 
+        socket.on("switch-inbound-status", async ({id, status}) => {
+            try {
+                await models.Users.update({
+                    INBOUND_status: status
+                }, {
+                    where: {
+                        id: id
+                    }
+                });
+
+                io.sockets.to(id).emit("SWITCH_INBOUND_STATUS", status);
+            } catch (error) {
+                throw error;
+            }
+        });
+
         socket.on('disconnect', async () => {
             if (users[socket.id]) {
                 socket.leaveAll();
