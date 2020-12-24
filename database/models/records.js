@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     lead_id: DataTypes.BIGINT.UNSIGNED,
     url: DataTypes.TEXT,
     transcription_text: DataTypes.TEXT,
+    duration: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Records',

@@ -7,6 +7,7 @@ const RecordsRepository = require('../repository/records.repository');
 const models = require('../../database/models');
 const FormatService = require('../services/format.service');
 const LeadFacade = require('../facades/lead.facade');
+const fetch = require('node-fetch');
 
 module.exports = server => {
     const io = require("socket.io")(server);
@@ -306,16 +307,25 @@ module.exports = server => {
 
         socket.on("record-create", async ({ user_id, lead_id, url }) => {
             try {
-                const new_record = await models.Records.create({
-                    user_id: user_id,
-                    lead_id: lead_id,
-                    url: url
-                });
+                fetch(url + ".json", { method: "Get" })
+                    .then(res => res.json())
+                    .then(async (json) => {
+                        const new_record = await models.Records.create({
+                            user_id: user_id,
+                            lead_id: lead_id,
+                            url: url,
+                            duration: json.duration
+                        });
 
-                if (new_record) {
-                    const one_record = await RecordsRepository.getOne(new_record.id);
-                    socket.to(lead_id).emit("RECORD_ADD", one_record);
-                }
+                        if (new_record) {
+                            const record = await RecordsRepository.getOne(new_record.id);
+                            io.sockets.to(lead_id).emit("RECORD_ADD", record);
+
+                            if (+new_record.duration >= 121) {
+                                io.sockets.emit("CREATE_RECORD_IN_TABLE", record);
+                            }
+                        }
+                    });
             } catch (error) {
                 throw error;
             }
@@ -336,7 +346,7 @@ module.exports = server => {
             }
         });
 
-        socket.on("switch-inbound-status", async ({id, status}) => {
+        socket.on("switch-inbound-status", async ({ id, status }) => {
             try {
                 await models.Users.update({
                     INBOUND_status: status
