@@ -244,6 +244,11 @@ class FormatService {
                 delete lead.premium_carrier;
             }
 
+            if ("disableQuoting" in lead) {
+                formatedLead.disableQuoting = true;
+                delete lead.disableQuoting;
+            }
+
             formatedLead.property = {
                 ...lead
             }
