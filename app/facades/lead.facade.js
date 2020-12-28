@@ -88,7 +88,10 @@ class LeadFacade {
                 const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
                 const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
                 const priceFromQuoter = ninjaQuoterService.getPrice(companies);
-                await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
+
+                if (!("disableQuoting" in formatedLead)) {
+                    await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
+                }
 
                 if (companiesInfo.length !== 0) {
                     const email_sended = await LeadService.checkLeadAtSendedEmail(updatedLead.email);
