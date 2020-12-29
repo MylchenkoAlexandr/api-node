@@ -49,7 +49,6 @@ class FormatService {
                     attributes: ['id'],
                     where: {
                         name: lead.type
-
                     }
                 })
 
