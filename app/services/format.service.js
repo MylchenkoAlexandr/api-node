@@ -243,7 +243,7 @@ class FormatService {
             if ("premium_carrier" in lead) {
                 delete lead.premium_carrier;
             }
-
+            
             formatedLead.property = {
                 ...lead
             }

@@ -88,6 +88,7 @@ class LeadFacade {
                 const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
                 const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
                 const priceFromQuoter = ninjaQuoterService.getPrice(companies);
+
                 await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
 
                 if (companiesInfo.length !== 0) {
@@ -199,8 +200,8 @@ class LeadFacade {
         }
     }
 
-    async updateADstatusFields(lead_id, field, status){
-        try {  
+    async updateADstatusFields(lead_id, field, status) {
+        try {
             const updateStatus = await LeadService.updateADstatusFields(lead_id, field, status);
 
             if (updateStatus != -1) return { code: 200, status: "success", message: "Status changed" };
