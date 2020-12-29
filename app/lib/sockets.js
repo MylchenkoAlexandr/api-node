@@ -266,7 +266,7 @@ module.exports = server => {
                         where: { id: lead_id }
                     });
 
-                    if (candidate) {
+                    if (candidate && users[socket.id].id) {
                         await candidate.update({
                             busy: 1,
                             busy_agent_id: users[socket.id].id
