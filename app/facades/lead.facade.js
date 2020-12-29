@@ -89,9 +89,7 @@ class LeadFacade {
                 const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
                 const priceFromQuoter = ninjaQuoterService.getPrice(companies);
 
-                if (!("disableQuoting" in formatedLead)) {
-                    await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
-                }
+                await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
 
                 if (companiesInfo.length !== 0) {
                     const email_sended = await LeadService.checkLeadAtSendedEmail(updatedLead.email);
@@ -202,8 +200,8 @@ class LeadFacade {
         }
     }
 
-    async updateADstatusFields(lead_id, field, status){
-        try {  
+    async updateADstatusFields(lead_id, field, status) {
+        try {
             const updateStatus = await LeadService.updateADstatusFields(lead_id, field, status);
 
             if (updateStatus != -1) return { code: 200, status: "success", message: "Status changed" };
