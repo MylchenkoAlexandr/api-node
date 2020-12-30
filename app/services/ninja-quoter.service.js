@@ -18,7 +18,8 @@ class NinjaQuoterService {
             royal_neighbors: 0,
             liberty_bankers: 0,
             prosperity_life: 0,
-            americo: 0
+            americo: 0,
+            american_general: 0
         };
 
         this.companies = customerInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies;
@@ -69,6 +70,7 @@ class NinjaQuoterService {
                     password: ''
                 }
             });
+
             return response.data.results;
         } catch (error) {
             throw error;
