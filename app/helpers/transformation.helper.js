@@ -9,9 +9,19 @@ class TransformationHelper {
         let match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
 
         if (match) {
-            let intlCode = (match[1] ? '+1 ' : '');
+            let intlCode = (match[1] ? '+1' : '');
 
             return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
+        }
+    }
+
+    phoneNumberForSearch(phone) {
+        let cleaned = ('' + phone).replace(/\D/g, '');
+
+        let match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
+
+        if (match) {
+            return ['(', match[2], ')', match[3], '-', match[4]].join('');
         }
     }
 
@@ -44,20 +54,17 @@ class TransformationHelper {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
-    calculateAge(birth_year, birth_month, birth_day)
-    {
+    calculateAge(birth_year, birth_month, birth_day) {
         const today_date = new Date();
         const today_year = today_date.getFullYear();
         const today_month = today_date.getMonth();
         const today_day = today_date.getDate();
         let age = today_year - birth_year;
 
-        if ( today_month < (birth_month - 1))
-        {
+        if (today_month < (birth_month - 1)) {
             age--;
         }
-        if (((birth_month - 1) === today_month) && (today_day < birth_day))
-        {
+        if (((birth_month - 1) === today_month) && (today_day < birth_day)) {
             age--;
         }
         return age;
