@@ -79,13 +79,16 @@ async function transcriptionCallback(req, res) {
 
 async function inboundCall(req, res) {
     try {
-        let formatedPhone = TransformationHelper.phoneNumber(req.body.From).replace('+1 ', '').replace(' ', '');
-
         if ("CallSid" in req.body && "From" in req.body) {
-            const twiml = new VoiceResponse();
-            twiml.say({ voice: 'alice' }, 'Hello, welcome to Blueberry! Please wait connection with agent!');
-
             let toPhone;
+
+            const twiml = new VoiceResponse();
+
+            const formatedPhone = TransformationHelper.phoneNumberForSearch(req.body.From);
+
+            twiml.say({
+                voice: 'alice'
+            }, 'Hello, welcome to Blueberry! Please wait connection with agent!');
 
             let lead = await models.Leads.findOne({
                 where: {
@@ -101,10 +104,6 @@ async function inboundCall(req, res) {
                 if (!toPhone && lead.state_id) {
                     toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, lead.state_id);
                 }
-
-                if (toPhone && lead.id) {
-                    client.emit("assign-agent", lead.id, toPhone.id);
-                }
             } else {
                 let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
@@ -118,10 +117,16 @@ async function inboundCall(req, res) {
             } else {
                 client.emit("switch-inbound-status", { id: toPhone.id, status: false });
 
+                if (lead.user_id && lead.user_id != toPhone.id) {
+                    client.emit("assign-agent", lead.id, toPhone.id);
+                }
+
                 toPhone = TransformationHelper.formatPhoneForCall(toPhone.phone);
             }
 
-            twiml.dial(toPhone);
+            if (toPhone) {
+                twiml.dial(toPhone);
+            }
 
             res.type('text/xml');
             return res.status(200).send(twiml.toString());

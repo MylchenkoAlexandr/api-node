@@ -50,9 +50,9 @@ class FormatService {
                     where: {
                         name: lead.type
                     }
-                })
+                });
 
-                if (type.dataValues.id) {
+                if (type) {
                     delete lead.type;
                 }
             }
@@ -63,9 +63,9 @@ class FormatService {
                     where: {
                         name: lead.source
                     }
-                })
+                });
 
-                if (source.dataValues.id) {
+                if (source) {
                     delete lead.source;
                 }
             }
@@ -77,7 +77,6 @@ class FormatService {
 
             if ("state_id" in lead) {
                 formatedLead.state_id = lead.state_id;
-
                 if (formatedLead.state_id) {
                     delete lead.state_id;
                 }
@@ -109,7 +108,7 @@ class FormatService {
                         name: lead.state
                     }
                 });
-                if (state.dataValues.id) {
+                if (state) {
                     formatedLead.state_id = state.id;
                 }
             }
@@ -136,7 +135,7 @@ class FormatService {
                         name: lead.status
                     }
                 });
-                if (status.dataValues.id) {
+                if (status) {
                     delete lead.status;
                     formatedLead.status_id = status.id;
                 }
@@ -242,7 +241,7 @@ class FormatService {
             if ("premium_carrier" in lead) {
                 delete lead.premium_carrier;
             }
-            
+
             formatedLead.property = {
                 ...lead
             }
