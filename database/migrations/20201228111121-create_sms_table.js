@@ -10,7 +10,7 @@ module.exports = {
         type: Sequelize.BIGINT.UNSIGNED
       },
       lead_id: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
           model: 'leads',
@@ -18,7 +18,7 @@ module.exports = {
         },
       },
       user_id: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.BIGINT.UNSIGNED,
         references: {
           model: 'users',

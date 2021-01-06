@@ -26,11 +26,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BIGINT.UNSIGNED
         },
         lead_id: {
-            allowNull: false,
+            allowNull: true,
             type: DataTypes.BIGINT.UNSIGNED,
         },
         user_id: {
-            allowNull: false,
+            allowNull: true,
             type: DataTypes.BIGINT.UNSIGNED,
         },
         is_client_message: {
