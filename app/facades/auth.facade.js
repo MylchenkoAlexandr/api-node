@@ -26,6 +26,7 @@ class AuthFacade {
                             fname: user.fname,
                             lname: user.lname,
                             phone: user.phone,
+                            twilio_phone: user.twilio_phone,
                             states: JSON.parse(user.states),
                             role_id: user.role_id,
                             uncompleted_lead: user.uncompleted_lead
@@ -62,6 +63,7 @@ class AuthFacade {
                         fname: candidate.fname,
                         lname: candidate.lname,
                         phone: candidate.phone,
+                        twilio_phone: candidate.twilio_phone,
                         states: JSON.parse(candidate.states),
                         role_id: candidate.role_id,
                         uncompleted_lead: candidate.uncompleted_lead

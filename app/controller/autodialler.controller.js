@@ -5,7 +5,6 @@ const CallService = require('../services/call.service');
 const PhoneService = require('../services/phone.service');
 const TransformationHelper = require('../helpers/transformation.helper');
 const UserService = require('../services/user.service');
-const { trim, isUndefined } = require('lodash');
 const clientSocket = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 class AutoDiallerController {
