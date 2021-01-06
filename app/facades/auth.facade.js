@@ -13,7 +13,7 @@ class AuthFacade {
 
                 const password_mathes = await bcrypt.compare(password, user.password);
                 if (password_mathes) {
-                    const acces_token = jwt.sign({ data: email }, process.env.SECRET_KEY, { expiresIn: "24h" });
+                    const acces_token = jwt.sign({ data: email }, process.env.SECRET_KEY, { expiresIn: "365d" });
 
                     return {
                         code: 200,
