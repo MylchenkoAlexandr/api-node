@@ -104,6 +104,14 @@ async function inboundCall(req, res) {
                 if (!toPhone && lead.state_id) {
                     toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, lead.state_id);
                 }
+
+                if (!toPhone && !lead.state_id) {
+                    let state_id = await StateService.getStateIdFromPhone(formatedPhone);
+
+                    if (state_id) {
+                        toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, state_id);
+                    }
+                }
             } else {
                 let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
@@ -124,9 +132,9 @@ async function inboundCall(req, res) {
                 toPhone = TransformationHelper.formatPhoneForCall(toPhone.phone);
             }
 
-            if (toPhone) {
-                twiml.dial(toPhone);
-            }
+            // if (toPhone) {
+            //     twiml.dial(toPhone);
+            // }
 
             res.type('text/xml');
             return res.status(200).send(twiml.toString());
