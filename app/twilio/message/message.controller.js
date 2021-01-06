@@ -125,7 +125,7 @@ class MessageController {
                     await MessageService.create(null, null, 1, 1, data.Body);
                 }
 
-                return res.sendStatus(200);
+                return res.status(200).json();
             }
             return res.status(400).json({ status: 'error', message: 'Bad Request' });
         } catch (error) {
