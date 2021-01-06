@@ -133,8 +133,9 @@ async function inboundCall(req, res) {
         }
         return res.status(400).json({ status: 'error', message: "Bad request!" });
     } catch (error) {
+        console.log("🚀 ~ file: call.controller.js ~ line 136 ~ inboundCall ~ error", error)
         res.status(500).json({ status: 'error', message: "Server Error!" });
-        throw error
+        throw error;
     }
 }
 
