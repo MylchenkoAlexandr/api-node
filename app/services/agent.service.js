@@ -9,11 +9,12 @@ class AgentService {
      */
     async create(agent) {
         try {
-            const {dataValues: createdAgent} = await models.Users.create({
+            const { dataValues: createdAgent } = await models.Users.create({
                 role_id: agent.role_id,
                 fname: agent.fname,
                 lname: agent.lname,
                 email: agent.email,
+                twilio_phone: agent.twilio_phone,
                 password: agent.password,
                 states: agent.states,
                 not_assign: agent.not_assign
@@ -51,6 +52,7 @@ class AgentService {
                     fname: agent_options.fname,
                     lname: agent_options.lname,
                     email: agent_options.email,
+                    twilio_phone: agent_options.twilio_phone,
                     password: agent_options.new_password,
                     states: agent_options.states,
                     banned: agent_options.banned,
@@ -61,6 +63,7 @@ class AgentService {
                     fname: agent_options.fname,
                     lname: agent_options.lname,
                     email: agent_options.email,
+                    twilio_phone: agent_options.twilio_phone,
                     states: agent_options.states,
                     banned: agent_options.banned,
                     not_assign: agent_options.not_assign

@@ -8,6 +8,8 @@ const models = require('../../database/models');
 const FormatService = require('../services/format.service');
 const LeadFacade = require('../facades/lead.facade');
 const fetch = require('node-fetch');
+const MessageService = require('../twilio/message/message.service');
+const SmsRepository = require('../repository/sms.repository');
 
 module.exports = server => {
     const io = require("socket.io")(server);
@@ -388,6 +390,31 @@ module.exports = server => {
                 delete users[socket.id];
             }
         });
+
+        /**
+         * ------------- MESSAGES -------------
+         */
+
+        // add new one to the text tab 
+        socket.on("add-message", async (message_id) => {
+            try {
+                const message = await SmsRepository.getOneByIdWebsocket(message_id);
+                io.sockets.to(message.lead_id).emit("ADD_MESSAGE", message);
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        // update status of the exist message in text tab
+        socket.on("update-send-status", async (message_id) => {
+            try {
+                let message = await SmsRepository.getOneByIdWebsocket(message_id);
+                io.sockets.to(message.lead_id).emit("UPDATE_SEND_STATUS", message);
+            } catch (error) {
+                throw error;
+            }
+        });
+
     });
 
     return io;
