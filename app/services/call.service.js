@@ -6,7 +6,6 @@ const TwilioService = require('../services/twilio.service');
 const clientSocket = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const UserRepository = require('../repository/user.repository');
 
-
 class CallService {
     createOutboundCall(callParams, lead_id) {
         try {

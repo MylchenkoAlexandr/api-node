@@ -110,7 +110,10 @@ const LeadRepository = {
                 plain: true
             });
 
-            lead.property = JSON.parse(lead.property);
+            if(lead.property){
+                lead.property = JSON.parse(lead.property);
+            }
+            
             lead.price = JSON.parse(lead.price);
 
             lead = { ...lead, ...lead.property };
