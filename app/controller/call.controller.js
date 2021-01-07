@@ -132,9 +132,9 @@ async function inboundCall(req, res) {
                 toPhone = TransformationHelper.formatPhoneForCall(toPhone.phone);
             }
 
-            // if (toPhone) {
-            //     twiml.dial(toPhone);
-            // }
+            if (toPhone) {
+                twiml.dial(toPhone);
+            }
 
             res.type('text/xml');
             return res.status(200).send(twiml.toString());
