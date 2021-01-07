@@ -88,7 +88,7 @@ async function inboundCall(req, res) {
 
             twiml.say({
                 voice: 'alice'
-            }, 'Hello, welcome to Blueberry! Please wait connection with agent!');
+            }, 'Please wait connection with agent!');
 
             let lead = await models.Leads.findOne({
                 where: {
@@ -125,7 +125,7 @@ async function inboundCall(req, res) {
             } else {
                 client.emit("switch-inbound-status", { id: toPhone.id, status: false });
 
-                if (lead.user_id && lead.user_id != toPhone.id) {
+                if (lead) {
                     client.emit("assign-agent", lead.id, toPhone.id);
                 }
 
