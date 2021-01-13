@@ -21,7 +21,7 @@ class AuthFacade {
                         message: "Login success",
                         user: {
                             id: user.id,
-                            INBOUND_status: user.INBOUND_status,
+                            online: user.online,
                             email: user.email,
                             fname: user.fname,
                             lname: user.lname,
@@ -58,7 +58,7 @@ class AuthFacade {
                     message: "Verify success",
                     user: {
                         id: candidate.id,
-                        INBOUND_status: candidate.INBOUND_status,
+                        online: candidate.online,
                         email: candidate.email,
                         fname: candidate.fname,
                         lname: candidate.lname,

@@ -399,6 +399,23 @@ module.exports = server => {
             io.sockets.emit("RESTART_AD", user_id);
         });
 
+        socket.on("set_online_status", async ({ id, status }) => {
+            try {
+                await models.Users.update({
+                    online: status
+                }, {
+                    where: {
+                        id: id
+                    }
+                });
+
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        // TODO think about writing function for the switching in_call status.
+
         socket.on("switch-AD_status", async (lead_id, status) => {
             try {
                 await LeadRepository.updateADstatusFields(lead_id, "AD_status", status);
@@ -558,6 +575,17 @@ module.exports = server => {
             try {
                 let message = await SmsRepository.getOneByIdWebsocket(message_id);
                 io.sockets.to(message.lead_id).emit("UPDATE_SEND_STATUS", message);
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        /**
+         * Realtime lead_id sending 
+         */
+        socket.on("send-lead-id", (lead_id, user_id) => {
+            try {
+                io.sockets.to(user_id).emit("ADD_LEAD_ID", lead_id);
             } catch (error) {
                 throw error;
             }

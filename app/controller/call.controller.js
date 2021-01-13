@@ -8,6 +8,7 @@ const models = require('../../database/models');
 const TransformationHelper = require('../helpers/transformation.helper');
 const StateService = require('../services/state.service');
 const UserRepository = require('../repository/user.repository');
+const CallService = require('../services/call.service');
 
 function token(req, res) {
     const capability = new ClientCapability({
@@ -79,16 +80,12 @@ async function transcriptionCallback(req, res) {
 
 async function inboundCall(req, res) {
     try {
-        if ("CallSid" in req.body && "From" in req.body) {
-            let toPhone;
+        const data = req.body;
 
-            const twiml = new VoiceResponse();
+        if ("CallSid" in data && "From" in data) {
+            let agent;
 
-            const formatedPhone = TransformationHelper.phoneNumberForSearch(req.body.From);
-
-            twiml.say({
-                voice: 'alice'
-            }, 'Please wait connection with agent!');
+            const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
 
             let lead = await models.Leads.findOne({
                 where: {
@@ -98,50 +95,58 @@ async function inboundCall(req, res) {
 
             if (lead) {
                 if (lead.user_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(lead.user_id);
+                    agent = await UserRepository.findSuitableAgent(lead.user_id);
                 }
 
-                if (!toPhone && lead.state_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, lead.state_id);
+                if (!agent && lead.state_id) {
+                    agent = await UserRepository.findSuitableAgent(null, lead.state_id);
                 }
 
-                if (!toPhone && !lead.state_id) {
+                if (!agent && !lead.state_id) {
                     let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                     if (state_id) {
-                        toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, state_id);
+                        agent = await UserRepository.findSuitableAgent(null, state_id);
                     }
                 }
             } else {
                 let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                 if (state_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, state_id);
+                    agent = await UserRepository.findSuitableAgent(null, state_id);
                 }
             }
 
-            if (!toPhone) {
-                toPhone = "+13108769581";
+            const twiml = new VoiceResponse();
+
+            twiml.say({
+                voice: 'alice'
+            }, 'Please wait connection with agent!');
+
+            if (!agent) {
+                // twiml.dial("+13108769581");
             } else {
-                client.emit("switch-inbound-status", { id: toPhone.id, status: false });
-
                 if (lead) {
-                    client.emit("assign-agent", lead.id, toPhone.id);
+                    if (lead.user_id < agent.id) {
+                        client.emit("assign-agent", lead.id, agent.id);
+                    }
+
+                    if (lead.id) {
+                        client.emit("send-lead-id", lead.id, agent.id);
+                    }
                 }
 
-                toPhone = TransformationHelper.formatPhoneForCall(toPhone.phone);
-            }
+                const dial = twiml.dial();
 
-            if (toPhone) {
-                twiml.dial(toPhone);
+                dial.client(agent.id);
             }
 
             res.type('text/xml');
             return res.status(200).send(twiml.toString());
         }
+
         return res.status(400).json({ status: 'error', message: "Bad request!" });
     } catch (error) {
-        console.log("🚀 ~ file: call.controller.js ~ line 136 ~ inboundCall ~ error", error)
         res.status(500).json({ status: 'error', message: "Server Error!" });
         throw error;
     }
