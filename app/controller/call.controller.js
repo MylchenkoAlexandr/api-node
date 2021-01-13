@@ -127,10 +127,9 @@ async function inboundCall(req, res) {
                 twiml.dial("+13108769581");
             } else {
                 if (lead) {
-                    if (lead.user_id < agent.id) {
+                    if (lead.user_id != agent.id) {
                         client.emit("assign-agent", lead.id, agent.id);
                     }
-
                     if (lead.id) {
                         client.emit("send-lead-id", lead.id, agent.id);
                     }
