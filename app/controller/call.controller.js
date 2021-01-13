@@ -124,7 +124,7 @@ async function inboundCall(req, res) {
             }, 'Please wait connection with agent!');
 
             if (!agent) {
-                // twiml.dial("+13108769581");
+                twiml.dial("+13108769581");
             } else {
                 if (lead) {
                     if (lead.user_id < agent.id) {
