@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,
     },
+    online: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 0,
+    },
     in_call: {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,
