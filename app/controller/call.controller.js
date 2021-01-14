@@ -8,7 +8,7 @@ const models = require('../../database/models');
 const TransformationHelper = require('../helpers/transformation.helper');
 const StateService = require('../services/state.service');
 const UserRepository = require('../repository/user.repository');
-const CallService = require('../services/call.service');
+const MessageService = require('../twilio/message/message.service');
 
 function token(req, res) {
     const capability = new ClientCapability({
@@ -82,8 +82,11 @@ async function inboundCall(req, res) {
     try {
         const data = req.body;
 
-        if ("CallSid" in data && "From" in data) {
+        if ("CallSid" in dat & a & "From" in data) {
             let agent;
+
+            let callbackVoiseMailUrl = "";
+            let callbackTextMessage = "";
 
             const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
 
@@ -93,20 +96,28 @@ async function inboundCall(req, res) {
                 }
             });
 
+            const twiml = new VoiceResponse();
+
+            twiml.say({
+                voice: 'alice'
+            }, 'Please wait connection with agent!');
+
             if (lead) {
                 if (lead.user_id) {
                     agent = await UserRepository.findSuitableAgent(lead.user_id);
-                }
+                    if (!agent) {
+                        callbackVoiseMailUrl = "";
+                        callbackTextMessage = "";
+                    }
+                } else {
+                    if (lead.state_id) {
+                        agent = await UserRepository.findSuitableAgent(null, lead.state_id);
+                    } else {
+                        let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
-                if (!agent && lead.state_id) {
-                    agent = await UserRepository.findSuitableAgent(null, lead.state_id);
-                }
-
-                if (!agent && !lead.state_id) {
-                    let state_id = await StateService.getStateIdFromPhone(formatedPhone);
-
-                    if (state_id) {
-                        agent = await UserRepository.findSuitableAgent(null, state_id);
+                        if (state_id) {
+                            agent = await UserRepository.findSuitableAgent(null, state_id);
+                        }
                     }
                 }
             } else {
@@ -117,19 +128,12 @@ async function inboundCall(req, res) {
                 }
             }
 
-            const twiml = new VoiceResponse();
-
-            twiml.say({
-                voice: 'alice'
-            }, 'Please wait connection with agent!');
-
-            if (!agent) {
-                // twiml.dial("+13108769581");
-            } else {
+            if (agent) {
                 if (lead) {
                     if (lead.user_id != agent.id) {
                         client.emit("assign-agent", lead.id, agent.id);
                     }
+
                     if (lead.id) {
                         client.emit("send-lead-id", lead.id, agent.id);
                     }
@@ -138,6 +142,9 @@ async function inboundCall(req, res) {
                 const dial = twiml.dial();
 
                 dial.client(agent.id);
+            } else {
+                twiml.play(callbackVoiseMailUrl);
+                MessageService.sendMessage("", data.From, callbackTextMessage);
             }
 
             res.type('text/xml');
