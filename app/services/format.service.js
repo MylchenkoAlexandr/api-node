@@ -282,7 +282,7 @@ class FormatService {
     formatRawLead(rawLead, source, type) {
         rawLead.source = source;
         rawLead.type = type;
-        rawLead.empty = 1;
+        rawLead.empty = 0;
 
         if ('city' in rawLead) delete rawLead.city;
 
@@ -344,7 +344,16 @@ class FormatService {
         if ('coverage_length' in rawLead && 'product_type' in rawLead) {
             if (rawLead.coverage_length != 0 && rawLead.coverage_length != 'NULL') {
                 rawLead.term = rawLead.coverage_length;
+                delete rawLead.coverage_length;
+            } else {
+                rawLead.term = rawLead.product_type;
+                delete rawLead.product_type;
             }
+        }
+
+        if ("smoker" in rawLead) {
+            rawLead.tobacco = rawLead.smoker;
+            delete rawLead.smoker;
         }
 
         return rawLead;
