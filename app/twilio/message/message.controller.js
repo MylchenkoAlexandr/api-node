@@ -21,6 +21,51 @@ class MessageController {
         }
     }
 
+    async getUnreadMessages(req, res) {
+        try {
+            if ("user_id" in req.params) {
+                const messages = await SmsRepository.getUnreadMessages(req.params.user_id);
+
+                if (messages) {
+                    return res.status(200).json(messages);
+                }
+            }
+        } catch (err) {
+            res.status(500).json({ status: "error", message: "Server Error" });
+            throw err;
+        }
+    }
+
+    async getUnreadMessagesByLeadId(req, res) {
+        try {
+            if ("user_id" in req.params && "lead_id" in req.params) {
+                const messages = await SmsRepository.getUnreadMessagesByLeadId(req.params.user_id, req.params.lead_id);
+
+                if (messages) {
+                    return res.status(200).json(messages);
+                }
+            }
+        } catch (err) {
+            res.status(500).json({ status: "error", message: "Server Error" });
+            throw err;
+        }
+    }
+
+    async updateReadStatus(req, res) {
+        try {
+            if ("messages" in req.body) {
+                const result = SmsRepository.updateReadStatus(req.body.messages);
+
+                if (result) {
+                    return res.status(200).json({status: "success", message: "Messages updated"});
+                }
+            }
+        } catch (err) {
+            res.status(500).json({ status: "error", message: "Server Error" });
+            throw err;
+        }
+    }
+
     async saveAndSendMessage(req, res) {
         try {
             if ("lead_id" in req.body && "to" in req.body && "user_id" in req.body && "text" in req.body) {
@@ -116,10 +161,31 @@ class MessageController {
                 });
 
                 if (lead) {
-                    let message = await MessageService.create(lead.id, null, 1, 1, data.Body);
+                    let message = await MessageService.create(lead.id, lead.user_id, 1, 1, data.Body);
 
                     if (message.id) {
                         client.emit("add-message", message.id);
+                    }
+
+                    // Forwarding a message to the agent's phone
+                    if (lead.user_id) {
+                        let user = await models.Users.findOne({
+                            where: {
+                                id: lead.user_id
+                            }
+                        });
+
+                        if (user) {
+                            let to = TransformationHelper.formatPhoneForCall(user.phone);
+
+                            let from = formatedPhone;
+
+                            let sms = `Hey, you have an unread message from ${from}: ${data.Body}`;
+
+                            client.emit("receive-message", message.id, lead.user_id);
+
+                            await MessageService.sendMessage(from, to, sms);
+                        }
                     }
                 } else {
                     await MessageService.create(null, null, 1, 1, data.Body);
