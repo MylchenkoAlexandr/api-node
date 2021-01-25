@@ -31,8 +31,12 @@ class SmsRepository {
     }
 
     async getUnreadMessages(user_id) {
+        let sql = "SELECT sms.*, leads.fullname as lead_name FROM sms LEFT JOIN leads ON sms.lead_id = leads.id WHERE sms.read_status = 0";
+
+        if (parseInt(user_id) !== 1) sql += " AND sms.user_id = " + user_id;
+
         const messages = await db.sequelize.query(
-            "SELECT sms.*, leads.fullname as lead_name FROM sms LEFT JOIN leads ON sms.lead_id = leads.id WHERE sms.read_status = 0 AND sms.user_id = " + user_id, {
+            sql, {
                 type: db.sequelize.QueryTypes.SELECT
             }
         );
@@ -41,8 +45,12 @@ class SmsRepository {
     }
 
     async getUnreadMessagesByLeadId(user_id, lead_id) {
+        let sql = "SELECT sms.*, leads.fullname as lead_name FROM sms LEFT JOIN leads ON sms.lead_id = leads.id WHERE sms.read_status = 0 AND sms.lead_id = " + lead_id;
+
+        if (parseInt(user_id) !== 1) sql += " AND sms.user_id = " + user_id;
+
         const messages = await db.sequelize.query(
-            "SELECT sms.*, leads.fullname as lead_name FROM sms LEFT JOIN leads ON sms.lead_id = leads.id WHERE sms.read_status = 0 AND sms.user_id = " + user_id + " AND sms.lead_id = " + lead_id, {
+            sql, {
                 type: db.sequelize.QueryTypes.SELECT
             }
         );

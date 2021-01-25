@@ -182,7 +182,7 @@ class MessageController {
 
                             let sms = `Hey, you have an unread message from ${from}: ${data.Body}`;
 
-                            client.emit("receive-message", message.id, lead.user_id);
+                            client.emit("receive-message", message.id, user.id);
 
                             await MessageService.sendMessage(from, to, sms);
                         }
