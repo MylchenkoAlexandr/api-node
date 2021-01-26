@@ -10,6 +10,8 @@ const LeadFacade = require('../facades/lead.facade');
 const fetch = require('node-fetch');
 const MessageService = require('../twilio/message/message.service');
 const SmsRepository = require('../repository/sms.repository');
+const CustomersVMService = require('../twilio/voicemails/customers/customersVM.service');
+
 
 module.exports = server => {
     const io = require("socket.io")(server);
@@ -600,6 +602,15 @@ module.exports = server => {
             } catch (error) {
                 throw error;
             }
+        });
+
+        socket.on("create_customer_voice_mail", async (lead_id, url) => {
+            try {
+                const createdCustomerVM = await CustomersVMService.create(lead_id, url);
+                io.sockets.to(createdCustomerVM.lead_id).emit("CREATE_CUSTOMER_VOICE_MAIL", createdCustomerVM);
+            } catch (error) {
+                throw error;
+            };
         });
 
     });
