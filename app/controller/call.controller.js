@@ -173,6 +173,7 @@ async function inboundCall(req, res) {
                     twiml.record({
                         action: `${process.env.CALLBACK_TWILIO}/api/call/recieve-voicemail/${lead.id}`,
                         maxLength: 300,
+                        playBeep: true,
                         method: 'POST',
                         finishOnKey: '*'
                     });
