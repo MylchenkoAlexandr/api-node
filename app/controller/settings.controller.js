@@ -25,6 +25,20 @@ class SettingsController {
             throw error;
         }
     }
+    async updateFields(req, res) {
+        try {
+            const data = req.body;
+            console.log("🚀 ~ file: settings.controller.js ~ line 31 ~ SettingsController ~ updateFields ~ data", data)
+            if ("fields" in data) {
+                await SettingsService.updateFields(data.fields);
+                return res.status(200).json({ status: "success", message: "Success updated!"});
+            }
+            return res.status(400).json({ status: "error", message: "Bad request" });
+        } catch (error) {
+            res.status(500).json({ status: "error", message: "Server Error" });
+            throw error;
+        }
+    };
 }
 
 module.exports = new SettingsController;

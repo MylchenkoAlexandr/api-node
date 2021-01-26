@@ -33,6 +33,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,
     },
+    voice_mail: {
+      type: DataTypes.STRING,
+      defaultValue: null,
+    },
+    text_message: {
+      type: DataTypes.TEXT,
+      defaultValue: null
+    },
     online: {
       type: DataTypes.BOOLEAN,
       defaultValue: 0,

@@ -12,13 +12,17 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             defaultValue: 0,
         },
-        assignment: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: 0,
-        },
         default_phone: {
             type: DataTypes.STRING,
             defaultValue: 0,
+        },
+        default_voice_mail: {
+            type: DataTypes.STRING,
+            defaultValue: null
+        },
+        default_text_message: {
+            type: DataTypes.TEXT,
+            defaultValue: null
         }
     }, {
         sequelize,

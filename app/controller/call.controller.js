@@ -9,6 +9,8 @@ const TransformationHelper = require('../helpers/transformation.helper');
 const StateService = require('../services/state.service');
 const UserRepository = require('../repository/user.repository');
 const MessageService = require('../twilio/message/message.service');
+const SettingsService = require('../services/settings.service');
+const twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 function token(req, res) {
     const capability = new ClientCapability({
@@ -82,11 +84,15 @@ async function inboundCall(req, res) {
     try {
         const data = req.body;
 
-        if ("CallSid" in dat & a & "From" in data) {
+        if ("CallSid" in data && "From" in data) {
             let agent;
+            let recordCall = false;
 
-            let callbackVoiseMailUrl = "";
-            let callbackTextMessage = "";
+            const settings = await SettingsService.get();
+            const defaultPhone = TransformationHelper.formatPhoneForCall(settings.default_phone);
+
+            let callbackVoiseMailUrl = settings.default_voice_mail;
+            let callbackTextMessage = settings.default_text_message;
 
             const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
 
@@ -104,10 +110,28 @@ async function inboundCall(req, res) {
 
             if (lead) {
                 if (lead.user_id) {
-                    agent = await UserRepository.findSuitableAgent(lead.user_id);
-                    if (!agent) {
-                        callbackVoiseMailUrl = "";
-                        callbackTextMessage = "";
+                    const user = await models.Users.findOne({
+                        where: { id: lead.user_id }
+                    });
+
+                    if (user) {
+                        agent = await UserRepository.findSuitableAgent(lead.user_id);
+
+                        if (!agent) {
+                            callbackVoiseMailUrl = user.voice_mail;
+                            callbackTextMessage = user.text_message;
+                            recordCall = true;
+                        }
+                    } else {
+                        if (lead.state_id) {
+                            agent = await UserRepository.findSuitableAgent(null, lead.state_id);
+                        } else {
+                            let state_id = await StateService.getStateIdFromPhone(formatedPhone);
+
+                            if (state_id) {
+                                agent = await UserRepository.findSuitableAgent(null, state_id);
+                            }
+                        }
                     }
                 } else {
                     if (lead.state_id) {
@@ -143,10 +167,19 @@ async function inboundCall(req, res) {
 
                 dial.client(agent.id);
             } else {
-                twiml.play(callbackVoiseMailUrl);
-                MessageService.sendMessage("", data.From, callbackTextMessage);
-            }
+                twiml.play(process.env.WEBSOCKET_URL + '/' + callbackVoiseMailUrl);
 
+                if (recordCall) {
+                    twiml.record({
+                        action: `${process.env.CALLBACK_TWILIO}/api/call/recieve-voicemail/${lead.id}`,
+                        maxLength: 300,
+                        method: 'POST',
+                        finishOnKey: '*'
+                    });
+                }
+
+                MessageService.sendMessage(defaultPhone, data.From, callbackTextMessage);
+            }
             res.type('text/xml');
             return res.status(200).send(twiml.toString());
         }
@@ -159,10 +192,49 @@ async function inboundCall(req, res) {
 }
 
 
+async function recieveVoiceMail(req, res) {
+    try {
+        const data = req.body;
+        if ("RecordingUrl" in data && 'lead_id' in req.params) {
+            client.emit("create_customer_voice_mail", req.params.lead_id, data.RecordingUrl);
+            return res.sendStatus(200);
+        }
+        return res.status(400).send({ status: "error", message: "Bad request!" });
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Server error!" });
+        throw error;
+    }
+}
+
+async function playPreRecordedVM(req, res) {
+    try {
+        twilioClient.calls.create({
+            from: "+380632796212",
+            to: "+18339282583",
+            url: 'http://demo.twilio.com/docs/classic.mp3'
+        });
+
+        // twilioClient.calls(req.body.callSid)
+        //     .update({
+        //         from: "+380632796212",
+        //         to: "+18339282583",
+        //         url: 'http://demo.twilio.com/docs/classic.mp3'
+        //     });
+
+        // res.type('text/xml');url: 'http://demo.twilio.com/docs/classic.mp3',
+
+        return res.status(200).send({});
+    } catch (error) {
+        throw error;
+    }
+}
+
 module.exports = {
     token,
     voice,
     recordCallback,
     transcriptionCallback,
-    inboundCall
+    inboundCall,
+    recieveVoiceMail,
+    playPreRecordedVM
 }
