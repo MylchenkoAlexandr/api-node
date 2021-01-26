@@ -12,13 +12,13 @@ class SettingsService {
         }
     }
 
-    async update(updateSettings) {        
+    async update(updateSettings) {
         try {
             const settings = await models.Settings.findAll({
                 limit: 1
             });
 
-            await  settings[0].update({
+            await settings[0].update({
                 assignment: +updateSettings.assignment,
                 default_phone: updateSettings.default_phone
             });
@@ -28,6 +28,20 @@ class SettingsService {
                 message: "Settings updated",
                 status: 'success'
             };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateFields(fields) {
+        try {
+            await models.Settings.update(fields, { where: { id: 1 } }).then(() => {
+                return {
+                    code: 200,
+                    message: "Settings updated",
+                    status: 'success'
+                };
+            });
         } catch (error) {
             throw error;
         }
