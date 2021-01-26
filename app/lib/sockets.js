@@ -582,6 +582,17 @@ module.exports = server => {
             }
         });
 
+        // notification about new message for agent
+        socket.on("receive-message", async (message_id, user_id) => {
+            try {
+                let message = await SmsRepository.getOneById(message_id);
+                io.sockets.to(user_id).emit("RECEIVE_MESSAGE", message);
+                io.sockets.to(1).emit("RECEIVE_MESSAGE", message);
+            } catch (error) {
+                throw error;
+            }
+        });
+
         /**
          * Realtime lead_id sending 
          */
