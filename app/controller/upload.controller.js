@@ -102,8 +102,12 @@ class UploadController {
                                 voice_mail: newFilePath
                             }).then(() => {
                                 if (existVoiceMail) {
-                                    fs.unlink('public/' + existVoiceMail)
-                                    fs.unlink(process.env.VM_CUSTOM_PATH + existVoiceMail)
+                                    fs.unlink('public/' + existVoiceMail, (err) => {
+                                        if (err) throw err;
+                                    });
+                                    fs.unlink(process.env.VM_CUSTOM_PATH + existVoiceMail, (err) => {
+                                        if (err) throw err;
+                                    });
                                 };
                             });
                         } else if (user.role_id == 1) {
@@ -115,8 +119,12 @@ class UploadController {
                                 default_voice_mail: newFilePath
                             }).then(() => {
                                 if (existVoiceMail) {
-                                    fs.unlink('public/' + existVoiceMail)
-                                    fs.unlink(process.env.VM_CUSTOM_PATH + existVoiceMail)
+                                    fs.unlink('public/' + existVoiceMail, (err) => {
+                                        if (err) throw err;
+                                    });
+                                    fs.unlink(process.env.VM_CUSTOM_PATH + existVoiceMail, (err) => {
+                                        if (err) throw err;
+                                    });
                                 };
                             });
                         }
