@@ -53,8 +53,8 @@ class MessageController {
 
     async updateReadStatus(req, res) {
         try {
-            if ("messages" in req.body) {
-                const result = SmsRepository.updateReadStatus(req.body.messages);
+            if ("message_id" in req.body) {
+                const result = SmsRepository.updateReadStatus(req.body.message_id);
 
                 if (result) {
                     return res.status(200).json({status: "success", message: "Messages updated"});
@@ -180,9 +180,9 @@ class MessageController {
 
                             let from = formatedPhone;
 
-                            let sms = `Hey, you have an unread message from ${from}: ${data.Body}`;
+                            let sms = "Hey, you have an unread message from " + lead.fullname + " | " + from + ":\n\n" + data.Body;
 
-                            client.emit("receive-message", message.id, user.id);
+                            client.emit("receive-message", message.id, lead.user_id);
 
                             await MessageService.sendMessage(from, to, sms);
                         }

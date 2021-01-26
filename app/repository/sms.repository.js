@@ -58,17 +58,9 @@ class SmsRepository {
         return messages;
     }
 
-    async updateReadStatus(messages) {
-        let where = '';
-
-        messages.forEach(msg => {
-            where += `id = ${msg.id} OR `;
-        });
-
-        where = where.slice(0, -3);
-
+    async updateReadStatus(message_id) {
         const result = await db.sequelize.query(
-            "UPDATE sms SET read_status = 1 WHERE " + where, {
+            "UPDATE sms SET read_status = 1 WHERE id = " + message_id, {
                 type: db.sequelize.QueryTypes.UPDATE
             }
         );
