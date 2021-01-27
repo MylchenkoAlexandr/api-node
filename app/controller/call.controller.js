@@ -10,6 +10,7 @@ const StateService = require('../services/state.service');
 const UserRepository = require('../repository/user.repository');
 const MessageService = require('../twilio/message/message.service');
 const SettingsService = require('../services/settings.service');
+const { post } = require('../../routes/call.routes');
 const twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 function token(req, res) {
@@ -209,22 +210,46 @@ async function recieveVoiceMail(req, res) {
 
 async function playPreRecordedVM(req, res) {
     try {
-        twilioClient.calls.create({
-            from: "+380632796212",
-            to: "+18339282583",
-            url: 'http://demo.twilio.com/docs/classic.mp3'
-        });
+        // twilioClient.calls.create({
+        //     url: 'https://api.twilio.com/cowbell.mp3'
+        // });
 
-        // twilioClient.calls(req.body.callSid)
-        //     .update({
-        //         from: "+380632796212",
-        //         to: "+18339282583",
-        //         url: 'http://demo.twilio.com/docs/classic.mp3'
-        //     });
+        twilioClient.calls(req.body.callSid)
+            .update({
+                // from: "+380632796212",
+                // to: "+18339282583",
+                // url: 'http://demo.twilio.com/docs/classic.mp3'
+                method: "POST",
+                url: `${process.env.CALLBACK_TWILIO}/api/call/voicemail-response`,
+            });
 
-        // res.type('text/xml');url: 'http://demo.twilio.com/docs/classic.mp3',
+        // const response = new VoiceResponse();
+        // response.enqueue({
+        //     waitUrl: 'https://api.twilio.com/cowbell.mp3'
+        // }, 'support');
+
+        // const response = new VoiceResponse();
+        // response.play('https://api.twilio.com/cowbell.mp3');
+
+
+        // response.play({
+        //     loop: 10
+        // }, '');
+
+
+        // res.type('text/xml');
 
         return res.status(200).send({});
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function voiceMailResponce(req, res) {
+    try {
+        const response = new VoiceResponse();
+        response.play('https://api.twilio.com/cowbell.mp3');
+        return res.status(200).send(response.toString());
     } catch (error) {
         throw error;
     }
@@ -237,5 +262,6 @@ module.exports = {
     transcriptionCallback,
     inboundCall,
     recieveVoiceMail,
-    playPreRecordedVM
+    playPreRecordedVM,
+    voiceMailResponce
 }
