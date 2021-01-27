@@ -69,6 +69,18 @@ class UserRepository {
         return _.isEmpty(data) ? false : data[0];
     }
 
+    async findSuitableAgentByState(state_id) {
+        const data = await db.sequelize.query('SELECT users.id, users.phone FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id', {
+            replacements: { state_id: state_id },
+            type: db.sequelize.QueryTypes.SELECT,
+            plain: true
+        }).catch(e => {
+            throw e;
+        });
+
+        return _.isEmpty(data) ? false : data;
+    }
+
 }
 
 module.exports = new UserRepository

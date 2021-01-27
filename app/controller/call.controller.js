@@ -85,7 +85,7 @@ async function inboundCall(req, res) {
         const data = req.body;
 
         if ("CallSid" in data && "From" in data) {
-            let agent;
+            let agent, state_id;
             let recordCall = false;
 
             const settings = await SettingsService.get();
@@ -145,10 +145,18 @@ async function inboundCall(req, res) {
                     }
                 }
             } else {
-                let state_id = await StateService.getStateIdFromPhone(formatedPhone);
+                state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                 if (state_id) {
                     agent = await UserRepository.findSuitableAgent(null, state_id);
+
+                    lead = await models.Leads.create({
+                        state_id: state_id,
+                        source_id: 1,
+                        status_id: 1,
+                        type_id: 2,
+                        phone: TransformationHelper.phoneNumberForSearch(data.From)
+                    });
                 }
             }
 
@@ -167,6 +175,15 @@ async function inboundCall(req, res) {
 
                 dial.client(agent.id);
             } else {
+                if (!lead.user_id) {
+                    if (state_id) {
+                        agent = await UserRepository.findSuitableAgentByState(state_id);
+
+                        client.emit("assign-agent", lead.id, agent.id);
+                        recordCall = true;
+                    }
+                }
+
                 twiml.play(process.env.WEBSOCKET_URL + '/' + callbackVoiseMailUrl);
 
                 if (recordCall) {
