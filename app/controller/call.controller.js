@@ -109,6 +109,7 @@ async function inboundCall(req, res) {
             }, 'Please wait connection with agent!');
 
             if (lead) {
+                recordCall = true;
                 if (lead.user_id) {
                     const user = await models.Users.findOne({
                         where: { id: lead.user_id }
@@ -120,7 +121,6 @@ async function inboundCall(req, res) {
                         if (!agent) {
                             callbackVoiseMailUrl = user.voice_mail;
                             callbackTextMessage = user.text_message;
-                            recordCall = true;
                         }
                     } else {
                         if (lead.state_id) {
