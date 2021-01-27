@@ -37,14 +37,15 @@ const LeadRepository = {
             });
 
             data = data.map(lead => {
-                lead.property = JSON.parse(lead.property);
-                lead.price = JSON.parse(lead.price);
-                lead = { ...lead, ...lead.property };
+                if (lead.property) {
+                    lead.property = JSON.parse(lead.property)
+                    lead = { ...lead, ...lead.property };
+                };
+
+                if (lead.price) lead.price = JSON.parse(lead.price);
 
                 return lead;
             });
-
-            console.log("🚀 ~ file: lead.repository.js ~ line 53 ~ getAll ~ lead", lead)
 
             return data;
         } catch (error) {
@@ -148,8 +149,6 @@ const LeadRepository = {
 
                 return lead;
             });
-
-            console.log("🚀 ~ file: lead.repository.js ~ line 156 ~ getByUserId ~ data", data)
 
             return data;
         } catch (error) {

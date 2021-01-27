@@ -156,7 +156,10 @@ async function inboundCall(req, res) {
                         status_id: 1,
                         type_id: 2,
                         phone: TransformationHelper.phoneNumberForSearch(data.From)
-                    });
+                    })
+                    if (lead) {
+                        client.emit("send_lead", res.id);
+                    }
                 }
             }
 
@@ -175,6 +178,7 @@ async function inboundCall(req, res) {
 
                 dial.client(agent.id);
             } else {
+                console.log(lead);
                 if (!lead.user_id) {
                     if (state_id) {
                         agent = await UserRepository.findSuitableAgentByState(state_id);
