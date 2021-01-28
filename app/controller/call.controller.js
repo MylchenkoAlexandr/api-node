@@ -159,7 +159,7 @@ async function inboundCall(req, res) {
                         phone: TransformationHelper.phoneNumberForSearch(data.From)
                     })
                     if (lead) {
-                        client.emit("send_lead", res.id);
+                        client.emit("send_lead", lead.id);
                     }
                 }
             }
