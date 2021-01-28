@@ -155,6 +155,7 @@ async function inboundCall(req, res) {
                         source_id: 1,
                         status_id: 1,
                         type_id: 2,
+                        user_id: 1,
                         phone: TransformationHelper.phoneNumberForSearch(data.From)
                     })
                     if (lead) {
@@ -178,15 +179,14 @@ async function inboundCall(req, res) {
 
                 dial.client(agent.id);
             } else {
-                console.log(lead);
-                if (!lead.user_id) {
-                    if (state_id) {
-                        agent = await UserRepository.findSuitableAgentByState(state_id);
+                // if (!lead.user_id) {
+                //     if (state_id) {
+                //         agent = await UserRepository.findSuitableAgentByState(state_id);
 
-                        client.emit("assign-agent", lead.id, agent.id);
-                        recordCall = true;
-                    }
-                }
+                //         client.emit("assign-agent", lead.id, agent.id);
+                //         recordCall = true;
+                //     }
+                // }
 
                 twiml.play(process.env.WEBSOCKET_URL + '/' + callbackVoiseMailUrl);
 
