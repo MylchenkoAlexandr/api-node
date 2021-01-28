@@ -29,6 +29,10 @@ module.exports = server => {
                 socket.join(user.id);
             }
 
+            // if (role == 'admin') {
+            //     socket.join('admin');
+            // }
+
             if (role == 'agent') {
                 socket.join(user.id);
             }
@@ -615,6 +619,32 @@ module.exports = server => {
             } catch (error) {
                 throw error;
             };
+        });
+
+        socket.on("send_lead", async (lead_id) => {
+            try {
+                const lead = await LeadRepository.getOne(lead_id);
+
+                if (lead.source === 'blueberry') {
+                    io.sockets.to("blueberry_leads").emit("CREATE_LEAD", lead);
+                } else if (lead.source === 'mediaalpha') {
+                    io.sockets.to("media-alpha_leads").emit("CREATE_LEAD", lead);
+                }
+                else if (lead.source === 'manual') {
+                    io.sockets.to("manual_leads").emit("CREATE_LEAD", lead);
+                }
+                else if (lead.source === 'bulk') {
+                    io.sockets.to("bulk_leads").emit("CREATE_LEAD", lead);
+                }
+                else if (lead.source === 'clickListing') {
+                    io.sockets.to("click-listing_leads").emit("CREATE_LEAD", lead);
+                }
+                else if (lead.source === 'liveTransfer') {
+                    io.sockets.to("live-transfer_leads").emit("CREATE_LEAD", lead);
+                }
+            } catch (error) {
+                throw error;
+            }
         });
 
     });
