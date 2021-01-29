@@ -149,18 +149,19 @@ async function inboundCall(req, res) {
 
                 if (state_id) {
                     agent = await UserRepository.findSuitableAgent(null, state_id);
+                }
 
-                    lead = await models.Leads.create({
-                        state_id: state_id,
-                        source_id: 1,
-                        status_id: 1,
-                        type_id: 2,
-                        user_id: 1,
-                        phone: TransformationHelper.phoneNumberForSearch(data.From)
-                    })
-                    if (lead) {
-                        client.emit("send_lead", lead.id);
-                    }
+                lead = await models.Leads.create({
+                    state_id: state_id ? state_id : null,
+                    source_id: 1,
+                    status_id: 1,
+                    type_id: 2,
+                    user_id: 1,
+                    phone: TransformationHelper.phoneNumberForSearch(data.From)
+                });
+
+                if (lead) {
+                    client.emit("send_lead", lead.id);
                 }
             }
 
@@ -190,15 +191,15 @@ async function inboundCall(req, res) {
 
                 twiml.play(process.env.WEBSOCKET_URL + '/' + callbackVoiseMailUrl);
 
-                if (recordCall) {
-                    twiml.record({
-                        action: `${process.env.CALLBACK_TWILIO}/api/call/recieve-voicemail/${lead.id}`,
-                        maxLength: 300,
-                        playBeep: true,
-                        method: 'POST',
-                        finishOnKey: '*'
-                    });
-                }
+                // if (recordCall) {
+                twiml.record({
+                    action: `${process.env.CALLBACK_TWILIO}/api/call/recieve-voicemail/${lead.id}`,
+                    maxLength: 300,
+                    playBeep: true,
+                    method: 'POST',
+                    finishOnKey: '*'
+                });
+                // }
 
                 MessageService.sendMessage(defaultPhone, data.From, callbackTextMessage);
             }
