@@ -40,7 +40,7 @@ class NotificationsService {
     async getVoicemailsNotifications(user_id, lead_id) {
         let notifications = [];
 
-        const voicemails = await CustomersVMRepository.getNotListenedCustomerVM(user_id, lead_id);
+        const voicemails = await CustomersVMRepository.getNotListenedCustomerVMByLead(user_id, lead_id);
 
         voicemails.forEach(voicemail => {
             notifications.push({
