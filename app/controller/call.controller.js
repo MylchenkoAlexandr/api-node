@@ -31,16 +31,38 @@ class CallController {
     }
 
     voice(req, res) {
-        const voiceResponse = new VoiceResponse();
+        // const voiceResponse = new VoiceResponse();
 
-        voiceResponse.dial({
-            record: 'record-from-answer-dual',
-            recordingStatusCallbackEvent: "completed",
-            recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
-            callerId: process.env.TWILIO_NUMBER,
-        }, req.body.number);
+        // voiceResponse.dial({
+        //     record: 'record-from-answer-dual',
+        //     recordingStatusCallbackEvent: "completed",
+        //     recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
+        //     callerId: process.env.TWILIO_NUMBER,
+        // }, req.body.number);
 
-        return res.type('text/xml').send(voiceResponse.toString());
+        const twiml = new VoiceResponse();
+
+        const dial = twiml.dial();
+
+        dial.conference(req.body.lead_id, {
+            startConferenceOnEnter: true,
+            endConferenceOnExit: true,
+        });
+
+        // Connect participiant to the conference 
+        twilioClient.conferences(req.body.lead_id)
+            .participants
+            .create({
+                from: process.env.TWILIO_NUMBER,
+                to: req.body.number,
+                endConferenceOnExit: true
+            }).then(res => {
+                client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
+            }).catch((err) => {
+                console.log(err);
+            });
+
+        return res.type('text/xml').send(dial.toString());
     }
 
     async recordCallback(req, res) {
@@ -214,7 +236,6 @@ class CallController {
         }
     }
 
-
     async recieveVoiceMail(req, res) {
         try {
             const data = req.body;
@@ -275,17 +296,6 @@ class CallController {
             throw error;
         }
     }
-
 }
-// module.exports = {
-//     token,
-//     voice,
-//     recordCallback,
-//     transcriptionCallback,
-//     inboundCall,
-//     recieveVoiceMail,
-//     playPreRecordedVM,
-//     voiceMailResponce
-// }
 
 module.exports = new CallController;

@@ -647,6 +647,14 @@ module.exports = server => {
             }
         });
 
+        socket.on("send-conf-params", (confParams) => {
+            try {
+                io.sockets.emit("SET_CONF_PARAMS", confParams);
+            } catch (error) {
+                throw error;
+            }
+        });
+
     });
 
     return io;
