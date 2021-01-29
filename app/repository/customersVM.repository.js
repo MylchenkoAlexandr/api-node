@@ -38,6 +38,21 @@ class CustomersVMRepository {
             throw error;
         }
     }
+    async getNotListenedCustomerVMByLead(user_id, lead_id) {
+        try {
+            let sql = 'SELECT cvm.id, cvm.url, cvm.lead_id, cvm.createdAt as createdAt, leads.fullname as lead_name, leads.user_id FROM customers_voice_mails as cvm LEFT JOIN leads ON leads.id = cvm.lead_id WHERE listen_status = 0 AND lead_id = ' + lead_id;
+
+            if (parseInt(user_id) !== 1) sql += ' AND leads.user_id = ' + user_id;
+
+            let data = await db.sequelize.query(sql, {
+                type: db.sequelize.QueryTypes.SELECT,
+            });
+
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    }
     async updateListenStatus(voicemail_id) {
         const result = await db.sequelize.query(
             "UPDATE customers_voice_mails SET listen_status = 1 WHERE id = " + voicemail_id, {
