@@ -156,7 +156,6 @@ async function inboundCall(req, res) {
                     source_id: 1,
                     status_id: 1,
                     type_id: 2,
-                    user_id: 1,
                     phone: TransformationHelper.phoneNumberForSearch(data.From)
                 });
 
