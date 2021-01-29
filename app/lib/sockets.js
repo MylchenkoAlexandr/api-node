@@ -11,6 +11,8 @@ const fetch = require('node-fetch');
 const MessageService = require('../twilio/message/message.service');
 const SmsRepository = require('../repository/sms.repository');
 const CustomersVMService = require('../twilio/voicemails/customers/customersVM.service');
+const MailService = require('../services/mail.service');
+const TransformationHelper = require('../helpers/transformation.helper');
 
 
 module.exports = server => {
@@ -594,15 +596,23 @@ module.exports = server => {
         socket.on("receive-message", async (message_id, user_id) => {
             try {
                 let message = await SmsRepository.getOneById(message_id);
-                io.sockets.to(user_id).emit("RECEIVE_MESSAGE", message);
-                io.sockets.to(1).emit("RECEIVE_MESSAGE", message);
+                const notification = {
+                    id: message.id,
+                    lead_id: message.lead_id,
+                    lead_name: message.lead_name,
+                    type: 'message',
+                    body: message.text,
+                    create_date: message.createdAt,
+                }
+                io.sockets.to(user_id).emit("RECEIVE_MESSAGE", notification);
+                io.sockets.to(1).emit("RECEIVE_MESSAGE", notification);
             } catch (error) {
                 throw error;
             }
         });
 
         /**
-         * Realtime lead_id sending 
+         * Realtime lead_id sending
          */
         socket.on("send-lead-id", (lead_id, user_id) => {
             try {
@@ -614,8 +624,33 @@ module.exports = server => {
 
         socket.on("create_customer_voice_mail", async (lead_id, url) => {
             try {
-                const createdCustomerVM = await CustomersVMService.create(lead_id, url);
-                io.sockets.to(createdCustomerVM.lead_id).emit("CREATE_CUSTOMER_VOICE_MAIL", createdCustomerVM);
+                const voicemail = await CustomersVMService.create(lead_id, url);
+
+                const notification = {
+                    id: voicemail.id,
+                    lead_id: voicemail.lead_id,
+                    lead_name: voicemail.lead_name,
+                    type: 'voicemail',
+                    body: voicemail.url,
+                    create_date: voicemail.createdAt,
+                }
+
+                const mail_options = {
+                    from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                    to: voicemail.agent_email,
+                    subject: `New voicemail notification from ${voicemail.lead_name}`,
+                    text: `Hey, ${voicemail.agent_name}. You have new voicemail from ${voicemail.lead_name} | ${voicemail.lead_phone}.\nLink to voicemail: ${voicemail.url}.`
+                };
+
+                await MailService.sendNewsletter(mail_options);
+
+                io.sockets.to(voicemail.user_id).emit("CREATE_CUSTOMER_VOICE_MAIL", notification);
+                io.sockets.to(1).emit("CREATE_CUSTOMER_VOICE_MAIL", notification);
+
+                let to = TransformationHelper.formatPhoneForCall(voicemail.user_phone);
+                let from = TransformationHelper.formatPhoneForCall(voicemail.lead_phone);
+                let sms = "Hey, you have a new voicemail from " + voicemail.lead_name + " | " + from + ":\n\n" + voicemail.url;
+                await MessageService.sendMessage(from, to, sms);
             } catch (error) {
                 throw error;
             };

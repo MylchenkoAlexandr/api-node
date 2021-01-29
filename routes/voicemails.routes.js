@@ -6,6 +6,7 @@ const CustomersVMController = require('../app/twilio/voicemails/customers/custom
 
 router.get("/:user_id", authenticateToken, VoiceMailsController.get)
 router.get("/customers/:lead_id", authenticateToken, CustomersVMController.get)
+router.get("/not-listened/user/:user_id", authenticateToken, CustomersVMController.getNotListenedCustomerVM);
 router.post("/create", authenticateToken, VoiceMailsController.create);
 router.post("/delete", authenticateToken, VoiceMailsController.delete);
 
