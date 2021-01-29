@@ -15,6 +15,21 @@ class CustomersVMController {
             throw error;
         }
     }
+
+    async getNotListenedCustomerVM(req, res) {
+        try {
+            if ("user_id" in req.params) {
+                const voicemails = await CustomersVMRepository.getNotListenedCustomerVM(req.params.user_id);
+
+                if (voicemails) {
+                    return res.status(200).json(voicemails);
+                }
+            }
+        } catch (error) {
+            res.status(500).send({ status: "error", message: "Server error!" });
+            throw error;
+        }
+    }
 }
 
 module.exports = new CustomersVMController;
