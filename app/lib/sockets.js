@@ -27,9 +27,9 @@ module.exports = server => {
 
             const role = await AgentRepository.getRole(user.id);
 
-            if (role == 'admin') {
-                socket.join(user.id);
-            }
+            // if (role == 'admin') {
+            //     socket.join(user.id);
+            // }
 
             // if (role == 'admin') {
             //     socket.join('admin');
@@ -446,10 +446,10 @@ module.exports = server => {
                     });
 
                     if (candidate && users[socket.id]) {
-                        await candidate.update({
-                            busy: 1,
-                            busy_agent_id: users[socket.id].id
-                        });
+                        // await candidate.update({
+                        // busy: 1,
+                        // busy_agent_id: users[socket.id].id
+                        // });
 
                         const lead = await LeadRepository.getOne(candidate.id);
 
