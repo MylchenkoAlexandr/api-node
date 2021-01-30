@@ -325,7 +325,7 @@ class FormatService {
         if (rawLead.phone != 0 || rawLead.phone != 'NULL') {
             let clearPhone = String(rawLead.phone).length == 11 ? String(rawLead.phone).substring(1) : rawLead.phone;
 
-            rawLead.phone = TransformationHelper.phoneNumber(clearPhone).toString();
+            rawLead.phone = TransformationHelper.phoneNumber(clearPhone).toString().replace(' ', '');
         } else {
             delete rawLead.phone;
         }

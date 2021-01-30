@@ -40,6 +40,8 @@ app.use('/api/phone', require('./routes/phone.routes'));
 app.use('/api/status', require('./routes/status.routes'));
 app.use('/api/source', require('./routes/source.routes'));
 app.use('/api/message', require('./routes/messages.routes'));
+app.use('/api/voicemail', require('./routes/voicemails.routes'));
+app.use('/api/notifications', require('./routes/notifications.routes'));
 
 app.use('*', (req, res) => {
     res.sendStatus(404);

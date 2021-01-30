@@ -8,6 +8,9 @@ const models = require('../../database/models');
 const TransformationHelper = require('../helpers/transformation.helper');
 const StateService = require('../services/state.service');
 const UserRepository = require('../repository/user.repository');
+const MessageService = require('../twilio/message/message.service');
+const SettingsService = require('../services/settings.service');
+const twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 function token(req, res) {
     const capability = new ClientCapability({
@@ -79,16 +82,19 @@ async function transcriptionCallback(req, res) {
 
 async function inboundCall(req, res) {
     try {
-        if ("CallSid" in req.body && "From" in req.body) {
-            let toPhone;
+        const data = req.body;
 
-            const twiml = new VoiceResponse();
+        if ("CallSid" in data && "From" in data) {
+            let agent, state_id;
+            let recordCall = false;
 
-            const formatedPhone = TransformationHelper.phoneNumberForSearch(req.body.From);
+            const settings = await SettingsService.get();
+            const defaultPhone = TransformationHelper.formatPhoneForCall(settings.default_phone);
 
-            twiml.say({
-                voice: 'alice'
-            }, 'Please wait connection with agent!');
+            let callbackVoiseMailUrl = settings.default_voice_mail;
+            let callbackTextMessage = settings.default_text_message;
+
+            const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
 
             let lead = await models.Leads.findOne({
                 where: {
@@ -96,62 +102,161 @@ async function inboundCall(req, res) {
                 }
             });
 
+            const twiml = new VoiceResponse();
+
+            twiml.say({
+                voice: 'alice'
+            }, 'Please wait connection with agent!');
+
             if (lead) {
+                recordCall = true;
                 if (lead.user_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(lead.user_id);
-                }
+                    const user = await models.Users.findOne({
+                        where: { id: lead.user_id }
+                    });
 
-                if (!toPhone && lead.state_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, lead.state_id);
-                }
+                    if (user) {
+                        agent = await UserRepository.findSuitableAgent(lead.user_id);
 
-                if (!toPhone && !lead.state_id) {
-                    let state_id = await StateService.getStateIdFromPhone(formatedPhone);
+                        if (!agent) {
+                            callbackVoiseMailUrl = user.voice_mail;
+                            callbackTextMessage = user.text_message;
+                        }
+                    } else {
+                        if (lead.state_id) {
+                            agent = await UserRepository.findSuitableAgent(null, lead.state_id);
+                        } else {
+                            let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
-                    if (state_id) {
-                        toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, state_id);
+                            if (state_id) {
+                                agent = await UserRepository.findSuitableAgent(null, state_id);
+                            }
+                        }
+                    }
+                } else {
+                    if (lead.state_id) {
+                        agent = await UserRepository.findSuitableAgent(null, lead.state_id);
+                    } else {
+                        let state_id = await StateService.getStateIdFromPhone(formatedPhone);
+
+                        if (state_id) {
+                            agent = await UserRepository.findSuitableAgent(null, state_id);
+                        }
                     }
                 }
             } else {
-                let state_id = await StateService.getStateIdFromPhone(formatedPhone);
+                state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                 if (state_id) {
-                    toPhone = await UserRepository.findSuitableAgentWithPhoneNumber(null, state_id);
+                    agent = await UserRepository.findSuitableAgent(null, state_id);
                 }
-            }
 
-            if (!toPhone) {
-                toPhone = "+13108769581";
-            } else {
-                client.emit("switch-inbound-status", { id: toPhone.id, status: false });
+                lead = await models.Leads.create({
+                    state_id: state_id ? state_id : null,
+                    source_id: 1,
+                    status_id: 1,
+                    type_id: 2,
+                    phone: TransformationHelper.phoneNumberForSearch(data.From)
+                });
 
                 if (lead) {
-                    client.emit("assign-agent", lead.id, toPhone.id);
+                    client.emit("send_lead", lead.id);
+                }
+            }
+
+            if (agent) {
+                if (lead) {
+                    if (lead.user_id != agent.id) {
+                        client.emit("assign-agent", lead.id, agent.id);
+                    }
+
+                    if (lead.id) {
+                        client.emit("send-lead-id", lead.id, agent.id);
+                    }
                 }
 
-                toPhone = TransformationHelper.formatPhoneForCall(toPhone.phone);
-            }
+                const dial = twiml.dial();
 
-            if (toPhone) {
-                twiml.dial(toPhone);
-            }
+                dial.client(agent.id);
+            } else {
+                // if (!lead.user_id) {
+                //     if (state_id) {
+                //         agent = await UserRepository.findSuitableAgentByState(state_id);
 
+                //         client.emit("assign-agent", lead.id, agent.id);
+                //         recordCall = true;
+                //     }
+                // }
+
+                twiml.play(process.env.WEBSOCKET_URL + '/' + callbackVoiseMailUrl);
+
+                // if (recordCall) {
+                twiml.record({
+                    action: `${process.env.CALLBACK_TWILIO}/api/call/recieve-voicemail/${lead.id}`,
+                    maxLength: 300,
+                    playBeep: true,
+                    method: 'POST',
+                    finishOnKey: '*'
+                });
+                // }
+
+                MessageService.sendMessage(defaultPhone, data.From, callbackTextMessage);
+            }
             res.type('text/xml');
             return res.status(200).send(twiml.toString());
         }
+
         return res.status(400).json({ status: 'error', message: "Bad request!" });
     } catch (error) {
-        console.log("🚀 ~ file: call.controller.js ~ line 136 ~ inboundCall ~ error", error)
         res.status(500).json({ status: 'error', message: "Server Error!" });
         throw error;
     }
 }
 
 
+async function recieveVoiceMail(req, res) {
+    try {
+        const data = req.body;
+        if ("RecordingUrl" in data && 'lead_id' in req.params) {
+            client.emit("create_customer_voice_mail", req.params.lead_id, data.RecordingUrl);
+            return res.sendStatus(200);
+        }
+        return res.status(400).send({ status: "error", message: "Bad request!" });
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Server error!" });
+        throw error;
+    }
+}
+
+async function playPreRecordedVM(req, res) {
+    try {
+        twilioClient.calls.create({
+            from: "+380632796212",
+            to: "+18339282583",
+            url: 'http://demo.twilio.com/docs/classic.mp3'
+        });
+
+        // twilioClient.calls(req.body.callSid)
+        //     .update({
+        //         from: "+380632796212",
+        //         to: "+18339282583",
+        //         url: 'http://demo.twilio.com/docs/classic.mp3'
+        //     });
+
+        // res.type('text/xml');url: 'http://demo.twilio.com/docs/classic.mp3',
+
+        return res.status(200).send({});
+    } catch (error) {
+        throw error;
+    }
+}
+
 module.exports = {
     token,
     voice,
     recordCallback,
     transcriptionCallback,
-    inboundCall
+    inboundCall,
+    recieveVoiceMail,
+    playPreRecordedVM
 }

@@ -10,6 +10,10 @@ const LeadFacade = require('../facades/lead.facade');
 const fetch = require('node-fetch');
 const MessageService = require('../twilio/message/message.service');
 const SmsRepository = require('../repository/sms.repository');
+const CustomersVMService = require('../twilio/voicemails/customers/customersVM.service');
+const MailService = require('../services/mail.service');
+const TransformationHelper = require('../helpers/transformation.helper');
+
 
 module.exports = server => {
     const io = require("socket.io")(server);
@@ -22,6 +26,14 @@ module.exports = server => {
             console.log('User connected!', users[socket.id].email);
 
             const role = await AgentRepository.getRole(user.id);
+
+            if (role == 'admin') {
+                socket.join(user.id);
+            }
+
+            // if (role == 'admin') {
+            //     socket.join('admin');
+            // }
 
             if (role == 'agent') {
                 socket.join(user.id);
@@ -399,6 +411,23 @@ module.exports = server => {
             io.sockets.emit("RESTART_AD", user_id);
         });
 
+        socket.on("set_online_status", async ({ id, status }) => {
+            try {
+                await models.Users.update({
+                    online: status
+                }, {
+                    where: {
+                        id: id
+                    }
+                });
+
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        // TODO think about writing function for the switching in_call status.
+
         socket.on("switch-AD_status", async (lead_id, status) => {
             try {
                 await LeadRepository.updateADstatusFields(lead_id, "AD_status", status);
@@ -558,6 +587,96 @@ module.exports = server => {
             try {
                 let message = await SmsRepository.getOneByIdWebsocket(message_id);
                 io.sockets.to(message.lead_id).emit("UPDATE_SEND_STATUS", message);
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        // notification about new message for agent
+        socket.on("receive-message", async (message_id, user_id) => {
+            try {
+                let message = await SmsRepository.getOneById(message_id);
+                const notification = {
+                    id: message.id,
+                    lead_id: message.lead_id,
+                    lead_name: message.lead_name,
+                    type: 'message',
+                    body: message.text,
+                    create_date: message.createdAt,
+                }
+                io.sockets.to(user_id).emit("RECEIVE_MESSAGE", notification);
+                io.sockets.to(1).emit("RECEIVE_MESSAGE", notification);
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        /**
+         * Realtime lead_id sending
+         */
+        socket.on("send-lead-id", (lead_id, user_id) => {
+            try {
+                io.sockets.to(user_id).emit("ADD_LEAD_ID", lead_id);
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        socket.on("create_customer_voice_mail", async (lead_id, url) => {
+            try {
+                const voicemail = await CustomersVMService.create(lead_id, url);
+
+                const notification = {
+                    id: voicemail.id,
+                    lead_id: voicemail.lead_id,
+                    lead_name: voicemail.lead_name,
+                    type: 'voicemail',
+                    body: voicemail.url,
+                    create_date: voicemail.createdAt,
+                }
+
+                const mail_options = {
+                    from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                    to: voicemail.agent_email,
+                    subject: `New voicemail notification from ${voicemail.lead_name}`,
+                    text: `Hey, ${voicemail.agent_name}. You have new voicemail from ${voicemail.lead_name} | ${voicemail.lead_phone}.\nLink to voicemail: ${voicemail.url}.`
+                };
+
+                await MailService.sendNewsletter(mail_options);
+
+                io.sockets.to(voicemail.user_id).emit("CREATE_CUSTOMER_VOICE_MAIL", notification);
+                io.sockets.to(1).emit("CREATE_CUSTOMER_VOICE_MAIL", notification);
+
+                let to = TransformationHelper.formatPhoneForCall(voicemail.user_phone);
+                let from = TransformationHelper.formatPhoneForCall(voicemail.lead_phone);
+                let sms = "Hey, you have a new voicemail from " + voicemail.lead_name + " | " + from + ":\n\n" + voicemail.url;
+                await MessageService.sendMessage(from, to, sms);
+            } catch (error) {
+                throw error;
+            };
+        });
+
+        socket.on("send_lead", async (lead_id) => {
+            try {
+                const lead = await LeadRepository.getOne(lead_id);
+
+                if (lead.source === 'blueberry') {
+                    io.sockets.to("blueberry_leads").emit("CREATE_LEAD", lead);
+                } else if (lead.source === 'mediaalpha') {
+                    io.sockets.to("media-alpha_leads").emit("CREATE_LEAD", lead);
+                }
+                else if (lead.source === 'manual') {
+                    io.sockets.to("manual_leads").emit("CREATE_LEAD", lead);
+                }
+                else if (lead.source === 'bulk') {
+                    io.sockets.to("bulk_leads").emit("CREATE_LEAD", lead);
+                }
+                else if (lead.source === 'clickListing') {
+                    io.sockets.to("click-listing_leads").emit("CREATE_LEAD", lead);
+                }
+                else if (lead.source === 'liveTransfer') {
+                    io.sockets.to("live-transfer_leads").emit("CREATE_LEAD", lead);
+                }
             } catch (error) {
                 throw error;
             }
