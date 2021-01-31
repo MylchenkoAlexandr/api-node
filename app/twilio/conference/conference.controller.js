@@ -9,8 +9,7 @@ class ConferenceController {
                     .participants
                     .create({
                         from: process.env.TWILIO_NUMBER,
-                        to: req.body.number,
-                        endConferenceOnExit: true
+                        to: req.body.number
                     }).then(res => {
                         client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
                     }).catch((err) => {
@@ -23,6 +22,7 @@ class ConferenceController {
             throw error;
         }
     }
+
     handleParticipantHold(req, res) {
         try {
             if ("conferenceSid" in req.body && "callSid" in req.body && "hold" in req.body) {
