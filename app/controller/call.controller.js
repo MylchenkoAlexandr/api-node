@@ -173,17 +173,18 @@ class CallController {
 
                     if (state_id) {
                         agent = await UserRepository.findSuitableAgent(null, state_id);
+                    }
 
-                        lead = await models.Leads.create({
-                            state_id: state_id,
-                            source_id: 1,
-                            status_id: 1,
-                            type_id: 2,
-                            phone: TransformationHelper.phoneNumberForSearch(data.From)
-                        })
-                        if (lead) {
-                            client.emit("send_lead", res.id);
-                        }
+                    lead = await models.Leads.create({
+                        state_id: state_id ? state_id : null,
+                        source_id: 1,
+                        status_id: 1,
+                        type_id: 2,
+                        phone: TransformationHelper.phoneNumberForSearch(data.From)
+                    });
+
+                    if (lead) {
+                        client.emit("send_lead", lead.id);
                     }
                 }
 
@@ -202,27 +203,26 @@ class CallController {
 
                     dial.client(agent.id);
                 } else {
-                    console.log(lead);
-                    if (!lead.user_id) {
-                        if (state_id) {
-                            agent = await UserRepository.findSuitableAgentByState(state_id);
+                    // if (!lead.user_id) {
+                    //     if (state_id) {
+                    //         agent = await UserRepository.findSuitableAgentByState(state_id);
 
-                            client.emit("assign-agent", lead.id, agent.id);
-                            recordCall = true;
-                        }
-                    }
+                    //         client.emit("assign-agent", lead.id, agent.id);
+                    //         recordCall = true;
+                    //     }
+                    // }
 
                     twiml.play(process.env.WEBSOCKET_URL + '/' + callbackVoiseMailUrl);
 
-                    if (recordCall) {
-                        twiml.record({
-                            action: `${process.env.CALLBACK_TWILIO}/api/call/recieve-voicemail/${lead.id}`,
-                            maxLength: 300,
-                            playBeep: true,
-                            method: 'POST',
-                            finishOnKey: '*'
-                        });
-                    }
+                    // if (recordCall) {
+                    twiml.record({
+                        action: `${process.env.CALLBACK_TWILIO}/api/call/recieve-voicemail/${lead.id}`,
+                        maxLength: 300,
+                        playBeep: true,
+                        method: 'POST',
+                        finishOnKey: '*'
+                    });
+                    // }
 
                     MessageService.sendMessage(defaultPhone, data.From, callbackTextMessage);
                 }
