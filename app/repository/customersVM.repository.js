@@ -14,7 +14,7 @@ class CustomersVMRepository {
     }
     async getAllByLeadId(lead_id) {
         const voiceMail = await db.sequelize.query(
-            'SELECT cvm.id, cvm.lead_id, cvm.url, cvm.createdAt, cvm.listen_status FROM customers_voice_mails cvm WHERE cvm.lead_id = :lead_id'
+            'SELECT cvm.id, cvm.lead_id, cvm.url, cvm.createdAt, cvm.listen_status FROM customers_voice_mails cvm WHERE cvm.lead_id = :lead_id ORDER BY cvm.createdAt DESC'
             , {
                 replacements: { lead_id: lead_id },
                 type: db.sequelize.QueryTypes.SELECT,
