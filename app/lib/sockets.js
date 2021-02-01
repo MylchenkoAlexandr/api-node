@@ -28,12 +28,12 @@ module.exports = server => {
             const role = await AgentRepository.getRole(user.id);
 
             // if (role == 'admin') {
-            //     socket.join(user.id);
+            //     socket.join(1);
             // }
 
-            // if (role == 'admin') {
-            //     socket.join('admin');
-            // }
+            if (role == 'admin') {
+                socket.join('admin');
+            }
 
             if (role == 'agent') {
                 socket.join(user.id);
@@ -599,13 +599,15 @@ module.exports = server => {
                 const notification = {
                     id: message.id,
                     lead_id: message.lead_id,
+                    user_id: message.user_id,
                     lead_name: message.lead_name,
                     type: 'message',
                     body: message.text,
                     create_date: message.createdAt,
+                    time_passed: TransformationHelper.timePassed(message.createdAt),
                 }
                 io.sockets.to(user_id).emit("RECEIVE_MESSAGE", notification);
-                io.sockets.to(1).emit("RECEIVE_MESSAGE", notification);
+                io.sockets.to("admin").emit("RECEIVE_MESSAGE", notification);
             } catch (error) {
                 throw error;
             }
@@ -629,10 +631,12 @@ module.exports = server => {
                 const notification = {
                     id: voicemail.id,
                     lead_id: voicemail.lead_id,
+                    user_id: voicemail.user_id,
                     lead_name: voicemail.lead_name,
                     type: 'voicemail',
                     body: voicemail.url,
                     create_date: voicemail.createdAt,
+                    time_passed: TransformationHelper.timePassed(voicemail.createdAt),
                 }
 
                 const mail_options = {
@@ -645,7 +649,7 @@ module.exports = server => {
                 await MailService.sendNewsletter(mail_options);
 
                 io.sockets.to(voicemail.user_id).emit("CREATE_CUSTOMER_VOICE_MAIL", notification);
-                io.sockets.to(1).emit("CREATE_CUSTOMER_VOICE_MAIL", notification);
+                io.sockets.to('admin').emit("CREATE_CUSTOMER_VOICE_MAIL", notification);
 
                 let to = TransformationHelper.formatPhoneForCall(voicemail.user_phone);
                 let from = TransformationHelper.formatPhoneForCall(voicemail.lead_phone);
@@ -682,7 +686,14 @@ module.exports = server => {
             }
         });
 
-    });
+        socket.on("update-notification", async (id, type) => {
+            try {
+                io.sockets.to("admin").emit("NOTIFICATION_UPDATES", {id: id, type: type});
+            } catch (error) {
+                throw error;
+            }
+        });
 
     return io;
-};
+    });
+}
