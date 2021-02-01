@@ -426,8 +426,6 @@ module.exports = server => {
             }
         });
 
-        // TODO think about writing function for the switching in_call status.
-
         socket.on("switch-AD_status", async (lead_id, status) => {
             try {
                 await LeadRepository.updateADstatusFields(lead_id, "AD_status", status);
@@ -689,7 +687,7 @@ module.exports = server => {
                 throw error;
             }
         });
-
+  
         socket.on("send-second-part-params", (params) => {
             try {
                 io.sockets.emit("SET_SECOND_PARTICIPIANT_PARAMS", params);

@@ -9,13 +9,16 @@ class ConferenceController {
                     .participants
                     .create({
                         from: process.env.TWILIO_NUMBER,
-                        to: req.body.number
+                        // to: req.body.number
+                        to: "+13108769581"
                     }).then(res => {
-                        // client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
                         client.emit("send-second-part-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
                     }).catch((err) => {
                         console.log(err);
                     });
+
+                return res.status(200).send({ status: "success", message: "Calling second participiant!" });
+
             }
             return res.status(400).send({ status: "error", message: "Bad request!" });
         } catch (error) {
@@ -49,7 +52,9 @@ class ConferenceController {
             if ("conferenceSid" in req.body && "callSid" in req.body) {
                 twilioClient.conferences(req.body.conferenceSid)
                     .participants(req.body.callSid)
-                    .remove().catch((err) => {
+                    .remove().then(() => {
+                        client.emit("send-second-part-params", false);
+                    }).catch((err) => {
                         console.log(err);
                     });
 
