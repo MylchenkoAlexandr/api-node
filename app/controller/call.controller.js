@@ -54,7 +54,8 @@ class CallController {
             .participants
             .create({
                 from: process.env.TWILIO_NUMBER,
-                to: req.body.number,
+                // to: req.body.number,
+                to: "+380632796212",
                 endConferenceOnExit: true
             }).then(res => {
                 client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });

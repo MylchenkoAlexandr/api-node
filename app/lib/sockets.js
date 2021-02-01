@@ -655,6 +655,14 @@ module.exports = server => {
             }
         });
 
+        socket.on("send-second-part-params", (params) => {
+            try {
+                io.sockets.emit("SET_SECOND_PARTICIPIANT_PARAMS", params);
+            } catch (error) {
+                throw error;
+            }
+        });
+
     });
 
     return io;
