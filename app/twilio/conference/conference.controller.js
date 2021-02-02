@@ -9,8 +9,7 @@ class ConferenceController {
                     .participants
                     .create({
                         from: process.env.TWILIO_NUMBER,
-                        // to: req.body.number
-                        to: "+13108769581"
+                        to: req.body.number
                     }).then(res => {
                         client.emit("send-second-part-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
                     }).catch((err) => {
@@ -32,7 +31,7 @@ class ConferenceController {
             if ("conferenceSid" in req.body && "callSid" in req.body && "hold" in req.body) {
                 twilioClient.conferences(req.body.conferenceSid)
                     .participants(req.body.callSid)
-                    .update({ hold: req.body.hold, holdUrl: 'https://api.twilio.com/cowbell.mp3' }).catch((err) => {
+                    .update({ hold: req.body.hold, holdUrl: 'https://demo.twilio.com/docs/classic.mp3' }).catch((err) => {
                         console.log(err);
                     });
 

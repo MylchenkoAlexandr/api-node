@@ -47,6 +47,9 @@ class CallController {
         dial.conference(req.body.lead_id, {
             startConferenceOnEnter: true,
             endConferenceOnExit: true,
+            record: 'true',
+            recordingStatusCallbackEvent: "completed",
+            recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
         });
 
         // Connect participiant to the conference 
@@ -54,9 +57,8 @@ class CallController {
             .participants
             .create({
                 from: process.env.TWILIO_NUMBER,
-                // to: req.body.number,
-                to: "+380632796212",
-                endConferenceOnExit: true
+                to: req.body.number,
+                endConferenceOnExit: true,
             }).then(res => {
                 client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
             }).catch((err) => {
@@ -201,7 +203,29 @@ class CallController {
 
                     const dial = twiml.dial();
 
-                    dial.client(agent.id);
+                    // dial.client(agent.id);
+
+                    dial.conference(lead.id, {
+                        startConferenceOnEnter: true,
+                        endConferenceOnExit: true,
+                        record: 'true',
+                        participantLabel: lead.phone,
+                        recordingStatusCallbackEvent: "completed",
+                        recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
+                    });
+
+                    // Connect participiant to the conference 
+                    twilioClient.conferences(lead.id)
+                        .participants
+                        .create({
+                            from: process.env.TWILIO_NUMBER,
+                            to: `client:${agent.id}`,
+                            endConferenceOnExit: true,
+                        }).then(res => {
+                            client.emit("send-conf-params", { callSid: lead.phone, conferenceSid: res.conferenceSid });
+                        }).catch((err) => {
+                            console.log(err);
+                        });
                 } else {
                     // if (!lead.user_id) {
                     //     if (state_id) {
@@ -226,7 +250,7 @@ class CallController {
 
                     MessageService.sendMessage(defaultPhone, data.From, callbackTextMessage);
                 }
-                res.type('text/xml');
+
                 return res.status(200).send(twiml.toString());
             }
 
