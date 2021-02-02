@@ -31,7 +31,7 @@ class SmsRepository {
     }
 
     async getUnreadMessages(user_id) {
-        let sql = "SELECT sms.*, leads.fullname as lead_name FROM sms LEFT JOIN leads ON sms.lead_id = leads.id WHERE sms.read_status = 0";
+        let sql = "SELECT sms.*, leads.fullname as lead_name FROM sms LEFT JOIN leads ON sms.lead_id = leads.id WHERE sms.read_status = 0 AND sms.is_client_message = 1";
 
         if (parseInt(user_id) !== 1) sql += " AND sms.user_id = " + user_id;
 
@@ -45,7 +45,7 @@ class SmsRepository {
     }
 
     async getUnreadMessagesByLeadId(user_id, lead_id) {
-        let sql = "SELECT sms.*, leads.fullname as lead_name FROM sms LEFT JOIN leads ON sms.lead_id = leads.id WHERE sms.read_status = 0 AND sms.lead_id = " + lead_id;
+        let sql = "SELECT sms.*, leads.fullname as lead_name FROM sms LEFT JOIN leads ON sms.lead_id = leads.id WHERE sms.read_status = 0 AND sms.is_client_message = 1 AND sms.lead_id = " + lead_id;
 
         if (parseInt(user_id) !== 1) sql += " AND sms.user_id = " + user_id;
 

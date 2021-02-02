@@ -1,5 +1,6 @@
 const SmsRepository = require('../repository/sms.repository');
 const CustomersVMRepository = require('../repository/customersVM.repository');
+const TransformationHelper = require('../helpers/transformation.helper');
 
 class NotificationsService {
     async getNotifications(user_id) {
@@ -13,10 +14,12 @@ class NotificationsService {
                 notifications.push({
                     id: message.id,
                     lead_id: message.lead_id,
+                    user_id: message.user_id,
                     lead_name: message.lead_name,
                     type: 'message',
                     body: message.text,
                     create_date: message.createdAt,
+                    time_passed: TransformationHelper.timePassed(message.createdAt),
                 });
             });
 
@@ -24,12 +27,16 @@ class NotificationsService {
                 notifications.push({
                     id: voicemail.id,
                     lead_id: voicemail.lead_id,
+                    user_id: voicemail.user_id,
                     lead_name: voicemail.lead_name,
-                    type: 'message',
+                    type: 'voicemail',
                     body: voicemail.url,
                     create_date: voicemail.createdAt,
+                    time_passed: TransformationHelper.timePassed(voicemail.createdAt),
                 });
             });
+
+            notifications.sort((a, b) => b.create_date.getTime() - a.create_date.getTime());
 
             return notifications;
         } catch (error) {
@@ -46,10 +53,12 @@ class NotificationsService {
             notifications.push({
                 id: voicemail.id,
                 lead_id: voicemail.lead_id,
+                user_id: voicemail.user_id,
                 lead_name: voicemail.lead_name,
                 type: 'message',
                 body: voicemail.url,
                 create_date: voicemail.createdAt,
+                time_passed: TransformationHelper.timePassed(voicemail.createdAt),
             });
         });
 
@@ -65,10 +74,12 @@ class NotificationsService {
             notifications.push({
                 id: message.id,
                 lead_id: message.lead_id,
+                user_id: message.user_id,
                 lead_name: message.lead_name,
                 type: 'message',
                 body: message.text,
                 create_date: message.createdAt,
+                time_passed: TransformationHelper.timePassed(message.createdAt),
             });
         });
 

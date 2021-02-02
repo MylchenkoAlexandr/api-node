@@ -73,6 +73,34 @@ class TransformationHelper {
     calculateBMI(weight, height) {
         return (703 * (weight / (height * height))).toFixed(1);
     }
+
+    timePassed(date) {
+        let time_passed = 0;
+
+        date = this.formatDate(date, true);
+
+        const today = new Date().getTime();
+        
+        date = new Date(date).getTime();
+
+        const different = today - date;
+
+        let minutes = Math.floor(different / 60000);
+        let hours = Math.floor(different / 3600000);
+        let days = Math.floor(different / (3600000 * 24));
+
+        if (minutes === 0) {
+            time_passed = "new";
+        } else if (minutes < 60) {
+            time_passed = minutes + 'm';
+        } else if (hours < 24) {
+            time_passed = hours + 'h';
+        } else {
+            time_passed = days + 'd';
+        }
+
+        return time_passed;
+    }
 }
 
 module.exports = new TransformationHelper;

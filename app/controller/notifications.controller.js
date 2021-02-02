@@ -1,6 +1,7 @@
 const NotificationsService = require('../services/notifications.service');
 const SmsRepository = require('../repository/sms.repository');
 const CustomerVMRepository = require('../repository/customersVM.repository');
+const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 
 class NotificationsController {
     async getNotifications(req, res) {
@@ -49,6 +50,7 @@ class NotificationsController {
                 
                 
                 if (result) {
+                    client.emit('update-notification', req.body.message_id, 'message');
                     return res.status(200).json({status: "success", message: "Messages updated"});
                 }
             }
@@ -64,6 +66,7 @@ class NotificationsController {
                 const result = CustomerVMRepository.updateListenStatus(req.body.voicemail_id);
 
                 if (result) {
+                    client.emit('update-notification', req.body.voicemail_id, 'voicemail');
                     return res.status(200).json({status: "success", message: "Voicemail updated"});
                 }
             }
