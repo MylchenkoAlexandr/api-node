@@ -47,7 +47,8 @@ class NotificationsController {
         try {
             if ("message_id" in req.body) {
                 const result = SmsRepository.updateReadStatus(req.body.message_id);
-
+                
+                
                 if (result) {
                     client.emit('update-notification', req.body.message_id, 'message');
                     return res.status(200).json({status: "success", message: "Messages updated"});
