@@ -14,7 +14,6 @@ const CustomersVMService = require('../twilio/voicemails/customers/customersVM.s
 const MailService = require('../services/mail.service');
 const TransformationHelper = require('../helpers/transformation.helper');
 
-
 module.exports = server => {
     const io = require("socket.io")(server);
     const users = {};
@@ -426,8 +425,6 @@ module.exports = server => {
             }
         });
 
-        // TODO think about writing function for the switching in_call status.
-
         socket.on("switch-AD_status", async (lead_id, status) => {
             try {
                 await LeadRepository.updateADstatusFields(lead_id, "AD_status", status);
@@ -686,14 +683,31 @@ module.exports = server => {
             }
         });
 
-        socket.on("update-notification", async (id, type) => {
+        socket.on("send-conf-params", (confParams) => {
             try {
-                io.sockets.to("admin").emit("NOTIFICATION_UPDATES", {id: id, type: type});
+                io.sockets.emit("SET_CONF_PARAMS", confParams);
             } catch (error) {
                 throw error;
             }
         });
 
-    return io;
+        socket.on("update-notification", async (id, type) => {
+            try {
+                io.sockets.to("admin").emit("NOTIFICATION_UPDATES", { id: id, type: type });
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        socket.on("send-second-part-params", (params) => {
+            try {
+                io.sockets.emit("SET_SECOND_PARTICIPIANT_PARAMS", params);
+            } catch (error) {
+                throw error;
+            }
+        });
+
     });
-}
+
+    return io;
+};
