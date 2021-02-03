@@ -41,7 +41,7 @@ class CallController {
                 recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
                 callerId: process.env.TWILIO_NUMBER,
             }, req.body.number);
-        } else if (req.body.callType =='conf') {
+        } else if (req.body.callType == 'conf') {
             const twiml = new VoiceResponse();
 
             voiceResponse = twiml.dial();
@@ -207,8 +207,9 @@ class CallController {
                     const dial = twiml.dial();
 
                     // dial.client(agent.id);
+                    const confName = lead.id + (+new Date());
 
-                    dial.conference(lead.id, {
+                    dial.conference(confName, {
                         startConferenceOnEnter: true,
                         endConferenceOnExit: true,
                         record: 'true',
@@ -218,7 +219,7 @@ class CallController {
                     });
 
                     // Connect participiant to the conference 
-                    twilioClient.conferences(lead.id)
+                    twilioClient.conferences(confName)
                         .participants
                         .create({
                             from: process.env.TWILIO_NUMBER,
