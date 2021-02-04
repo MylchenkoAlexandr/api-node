@@ -2,6 +2,7 @@ const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const FormatService = require('../services/format.service');
 const LeadFacade = require('../facades/lead.facade');
 const LeadService = require('../services/lead.service');
+const models = require('../../database/models');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
@@ -162,8 +163,25 @@ async function getLeadsByFilters(req, res) {
     try {
         const response = await LeadFacade.getLeadsByFilters(req.body);
 
-        return res.status(response.code).json({status: response.status, leads: response.leads});
+        return res.status(response.code).json({ status: response.status, leads: response.leads });
     } catch (error) {
+        throw error;
+    }
+}
+
+async function deteleLead(req, res) {
+    try {
+        if ("lead_id" in req.body) {
+            await models.Leads.destroy({
+                where: {
+                    id: req.body.lead_id
+                }
+            });
+            return res.status(200).send({ status: "success", message: "Lead deleted" });
+        }
+        return res.status(400).send({ status: "error", message: "Bad request" });
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Server error" });
         throw error;
     }
 }
@@ -180,4 +198,5 @@ module.exports = {
     getLeadsBySource,
     getAllLeadsForGuide,
     getLeadsByFilters,
+    deteleLead
 }   
