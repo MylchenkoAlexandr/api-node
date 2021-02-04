@@ -300,7 +300,9 @@ module.exports = server => {
 
         socket.on("assign-agent", async (lead_id, user_id) => {
             try {
-                const updatedLead = await LeadService.assignAgent(lead_id, user_id);
+                let userId = user_id == 0 ? null : user_id;
+
+                const updatedLead = await LeadService.assignAgent(lead_id, userId);
 
                 io.sockets.to(updatedLead.id).emit("UPDATE_LEAD", updatedLead);
                 io.sockets.to(updatedLead.user_id).emit("UPDATE_LEADS", updatedLead);
