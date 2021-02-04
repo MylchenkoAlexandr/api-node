@@ -120,7 +120,7 @@ class FormatService {
                 delete lead.agent;
             }
 
-            if (formatedLead.source_id == 1) {
+            if (formatedLead.source_id == 1 && !formatedLead.user_id && !lead.user_id) {
                 let agent = { id: 1 };
 
                 if (formatedLead.state_id) {
