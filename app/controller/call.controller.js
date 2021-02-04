@@ -215,7 +215,7 @@ class CallController {
                         record: 'true',
                         participantLabel: lead.phone,
                         recordingStatusCallbackEvent: "completed",
-                        recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
+                        recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${lead.id}/${agent.id}`,
                     });
 
                     // Connect participiant to the conference 
