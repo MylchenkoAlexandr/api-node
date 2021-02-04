@@ -33,6 +33,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             type: DataTypes.BIGINT.UNSIGNED,
         },
+        read_status: {
+            allowNull: false,
+            defaultValue: false,
+            type: DataTypes.BOOLEAN
+        },
         is_client_message: {
             allowNull: false,
             defaultValue: false,
