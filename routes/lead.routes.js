@@ -24,7 +24,7 @@ router.post('/upload/bulk-csv', authenticateToken, UploadController.uploadCSV)
 router.post('/upload/media-alpha', uploadLeadFromMediaAlpha);
 router.post('/upload/media-alpha/url', uploadLeadFromUrl);
 router.post('/filter', getLeadsByFilters);
-router.post('/deteleLead', getLeadsByFilters);
+router.post('/delete', authenticateToken, deteleLead);
 
 router.post('/upload/voice-mail-audio', authenticateToken, UploadController.uploadVoiceMailAudio);
 

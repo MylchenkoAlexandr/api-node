@@ -172,11 +172,55 @@ async function getLeadsByFilters(req, res) {
 async function deteleLead(req, res) {
     try {
         if ("lead_id" in req.body) {
+            await models.Records.destroy({
+                force: true,
+                where: {
+                    lead_id: req.body.lead_id
+                }
+            });
+
+            await models.Sms.destroy({
+                force: true,
+                where: {
+                    lead_id: req.body.lead_id
+                }
+            });
+
+            await models.Beneficiaries.destroy({
+                force: true,
+                where: {
+                    lead_id: req.body.lead_id
+                }
+            });
+
+            await models.CustomersVoiceMails.destroy({
+                force: true,
+                where: {
+                    lead_id: req.body.lead_id
+                }
+            });
+
+            await models.Prices.destroy({
+                force: true,
+                where: {
+                    lead_id: req.body.lead_id
+                }
+            });
+
+            await models.Notes.destroy({
+                force: true,
+                where: {
+                    lead_id: req.body.lead_id
+                }
+            });
+
             await models.Leads.destroy({
+                force: true,
                 where: {
                     id: req.body.lead_id
                 }
             });
+
             return res.status(200).send({ status: "success", message: "Lead deleted" });
         }
         return res.status(400).send({ status: "error", message: "Bad request" });
