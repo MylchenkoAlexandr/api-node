@@ -81,6 +81,19 @@ class UserRepository {
         return _.isEmpty(data) ? false : data;
     }
 
+    async findSuitableAgentByCountOfBlueberryLeads(state_id) {
+        const currentDate = new Date().toISOString().slice(0, 10);
+        const start = currentDate + ' ' + '00:00:00';
+        const end = currentDate + ' ' + '23:59:59';
+
+        const data = await db.sequelize.query("SELECT users.id,(SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id = 1 AND leads.createdAt BETWEEN :start AND :end) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id AND users.in_call = 0 AND users.online = 1 GROUP BY users.id ORDER BY `count` ASC  LIMIT 1", {
+            replacements: { state_id: state_id, start: start, end: end },
+            type: db.sequelize.QueryTypes.SELECT,
+            plain: true,
+        }).catch(e => { throw e })
+
+        return data;
+    }
 }
 
 module.exports = new UserRepository

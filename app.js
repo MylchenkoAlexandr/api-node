@@ -43,6 +43,7 @@ app.use('/api/message', require('./routes/messages.routes'));
 app.use('/api/voicemail', require('./routes/voicemails.routes'));
 app.use('/api/conference', require('./routes/conference.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
+app.use('/api/templates', require('./routes/templates.routes'));
 
 app.use('*', (req, res) => {
     res.sendStatus(404);

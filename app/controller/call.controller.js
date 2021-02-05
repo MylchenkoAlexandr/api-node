@@ -153,23 +153,23 @@ class CallController {
                             }
                         } else {
                             if (lead.state_id) {
-                                agent = await UserRepository.findSuitableAgent(null, lead.state_id);
+                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id);
                             } else {
                                 let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                                 if (state_id) {
-                                    agent = await UserRepository.findSuitableAgent(null, state_id);
+                                    agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                                 }
                             }
                         }
                     } else {
                         if (lead.state_id) {
-                            agent = await UserRepository.findSuitableAgent(null, lead.state_id);
+                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id);
                         } else {
                             let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                             if (state_id) {
-                                agent = await UserRepository.findSuitableAgent(null, state_id);
+                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                             }
                         }
                     }
@@ -177,7 +177,7 @@ class CallController {
                     state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                     if (state_id) {
-                        agent = await UserRepository.findSuitableAgent(null, state_id);
+                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                     }
 
                     lead = await models.Leads.create({
@@ -215,7 +215,7 @@ class CallController {
                         record: 'true',
                         participantLabel: lead.phone,
                         recordingStatusCallbackEvent: "completed",
-                        recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
+                        recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${lead.id}/${agent.id}`,
                     });
 
                     // Connect participiant to the conference 
