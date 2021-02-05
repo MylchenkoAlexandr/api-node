@@ -124,14 +124,14 @@ class FormatService {
                 let agent = { id: 1 };
 
                 if (formatedLead.state_id) {
-                    agent = await UserRepository.findSuitableAgent(null, formatedLead.state_id);
+                    agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(formatedLead.state_id);
                 } else if (formatedLead.phone) {
                     let formatedPhone = TransformationHelper.formatPhoneForCall(formatedLead.phone);
 
                     let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                     if (state_id) {
-                        agent = await UserRepository.findSuitableAgent(null, state_id);
+                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                     }
                 }
 
