@@ -135,7 +135,7 @@ class FormatService {
                     }
                 }
 
-                formatedLead.user_id = agent ? agent.id : 1;
+                formatedLead.user_id = agent ? agent.id : null;
             }
 
             // TODO commented out for that stage
