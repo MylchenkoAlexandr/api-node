@@ -121,7 +121,7 @@ class FormatService {
             }
 
             if (formatedLead.source_id == 1 && !formatedLead.user_id && !lead.user_id) {
-                let agent = { id: 1 };
+                let agent;
 
                 if (formatedLead.state_id) {
                     agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(formatedLead.state_id);
@@ -135,7 +135,7 @@ class FormatService {
                     }
                 }
 
-                formatedLead.user_id = !agent.id ? 1 : agent.id;
+                formatedLead.user_id = !agent ? 1 : agent.id;
             }
 
             // TODO commented out for that stage
