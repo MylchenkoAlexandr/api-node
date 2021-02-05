@@ -153,23 +153,23 @@ class CallController {
                             }
                         } else {
                             if (lead.state_id) {
-                                agent = await UserRepository.findSuitableAgent(null, lead.state_id);
+                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id);
                             } else {
                                 let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                                 if (state_id) {
-                                    agent = await UserRepository.findSuitableAgent(null, state_id);
+                                    agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                                 }
                             }
                         }
                     } else {
                         if (lead.state_id) {
-                            agent = await UserRepository.findSuitableAgent(null, lead.state_id);
+                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id);
                         } else {
                             let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                             if (state_id) {
-                                agent = await UserRepository.findSuitableAgent(null, state_id);
+                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                             }
                         }
                     }
@@ -177,7 +177,7 @@ class CallController {
                     state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                     if (state_id) {
-                        agent = await UserRepository.findSuitableAgent(null, state_id);
+                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                     }
 
                     lead = await models.Leads.create({
