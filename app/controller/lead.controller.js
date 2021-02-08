@@ -3,6 +3,7 @@ const FormatService = require('../services/format.service');
 const LeadFacade = require('../facades/lead.facade');
 const LeadService = require('../services/lead.service');
 const models = require('../../database/models');
+const leadService = require('../services/lead.service');
 
 async function test(req, res) {
     const lead = await FormatService.formatLead(req.body);
@@ -172,60 +173,30 @@ async function getLeadsByFilters(req, res) {
 async function deteleLead(req, res) {
     try {
         if ("lead_id" in req.body) {
-            await models.Records.destroy({
-                force: true,
-                where: {
-                    lead_id: req.body.lead_id
-                }
-            });
-
-            await models.Sms.destroy({
-                force: true,
-                where: {
-                    lead_id: req.body.lead_id
-                }
-            });
-
-            await models.Beneficiaries.destroy({
-                force: true,
-                where: {
-                    lead_id: req.body.lead_id
-                }
-            });
-
-            await models.CustomersVoiceMails.destroy({
-                force: true,
-                where: {
-                    lead_id: req.body.lead_id
-                }
-            });
-
-            await models.Prices.destroy({
-                force: true,
-                where: {
-                    lead_id: req.body.lead_id
-                }
-            });
-
-            await models.Notes.destroy({
-                force: true,
-                where: {
-                    lead_id: req.body.lead_id
-                }
-            });
-
-            await models.Leads.destroy({
-                force: true,
-                where: {
-                    id: req.body.lead_id
-                }
-            });
-
+            const lead_id = req.body.lead_id;
+            await LeadService.deleteLead(lead_id);
+            client.emit("delete_lead", lead_id);
             return res.status(200).send({ status: "success", message: "Lead deleted" });
         }
         return res.status(400).send({ status: "error", message: "Bad request" });
     } catch (error) {
         res.status(500).send({ status: "error", message: "Server error" });
+        throw error;
+    }
+}
+
+function deleteSelectedLeads(req, res) {
+    try {
+        if (req.body.leads) {
+            req.body.leads.forEach(async (item) => {
+                await LeadService.deleteLead(item.id);
+                client.emit("delete_lead", item.id);
+            });
+            return res.status(200).send({ status: "success", message: "Leads Deleted!" });
+        }
+        return res.status(400).send({ status: "error", message: "Bad request!" });
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Server error!" });
         throw error;
     }
 }
@@ -242,5 +213,6 @@ module.exports = {
     getLeadsBySource,
     getAllLeadsForGuide,
     getLeadsByFilters,
-    deteleLead
+    deteleLead,
+    deleteSelectedLeads
 }   
