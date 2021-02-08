@@ -8,9 +8,10 @@ const checkedAdminRole = AuthMiddleware.checkedAdminRole;
 // const checkAssignAgentLead = LeadMiddleware.checkAssignAgentLead;
 const findUncompletedLead = LeadMiddleware.findUncompletedLead;
 
-const { test, getLeads, getAll, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRawLeads, uploadLeadFromUrl, getLeadsBySource, getAllLeadsForGuide, getLeadsByFilters } = require('../app/controller/lead.controller');
+const { deleteSelectedLeads, deteleLead, test, getLeads, getAll, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRawLeads, uploadLeadFromUrl, getLeadsBySource, getAllLeadsForGuide, getLeadsByFilters } = require('../app/controller/lead.controller');
 const { uploadCSV, uploadVoiceMailAudio } = require('../app/controller/upload.controller');
 const UploadController = require('../app/controller/upload.controller');
+
 router.post('/test', test);
 router.get('/raws', authenticateToken, getRawLeads);
 router.get('/all', authenticateToken, findUncompletedLead, getAll);
@@ -23,6 +24,8 @@ router.post('/upload/bulk-csv', authenticateToken, UploadController.uploadCSV)
 router.post('/upload/media-alpha', uploadLeadFromMediaAlpha);
 router.post('/upload/media-alpha/url', uploadLeadFromUrl);
 router.post('/filter', getLeadsByFilters);
+router.post('/delete', authenticateToken, deteleLead);
+router.post('/delete-selected', authenticateToken, deleteSelectedLeads);
 
 router.post('/upload/voice-mail-audio', authenticateToken, UploadController.uploadVoiceMailAudio);
 
