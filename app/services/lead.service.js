@@ -340,6 +340,68 @@ class LeadService {
             throw error;
         }
     }
+
+    async deleteLead(lead_id) {
+        try {
+            await models.Records.destroy({
+                force: true,
+                where: {
+                    lead_id: lead_id
+                }
+            });
+
+            await models.Emails.destroy({
+                force: true,
+                where: {
+                    lead_id: lead_id
+                }
+            });
+
+            await models.Sms.destroy({
+                force: true,
+                where: {
+                    lead_id: lead_id
+                }
+            });
+
+            await models.Beneficiaries.destroy({
+                force: true,
+                where: {
+                    lead_id: lead_id
+                }
+            });
+
+            await models.CustomersVoiceMails.destroy({
+                force: true,
+                where: {
+                    lead_id: lead_id
+                }
+            });
+
+            await models.Prices.destroy({
+                force: true,
+                where: {
+                    lead_id: lead_id
+                }
+            });
+
+            await models.Notes.destroy({
+                force: true,
+                where: {
+                    lead_id: lead_id
+                }
+            });
+
+            await models.Leads.destroy({
+                force: true,
+                where: {
+                    id: lead_id
+                }
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new LeadService;

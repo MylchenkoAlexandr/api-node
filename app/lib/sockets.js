@@ -709,6 +709,14 @@ module.exports = server => {
             }
         });
 
+        socket.on("delete_lead", (lead_id) => {
+            try {
+                io.sockets.emit("DELETE_LEAD", lead_id);
+            } catch (error) {
+                throw error;
+            }
+        });
+
     });
 
     return io;
