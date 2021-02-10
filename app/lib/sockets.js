@@ -709,6 +709,31 @@ module.exports = server => {
             }
         });
 
+        socket.on("create_followup", async (followup) => {
+            try {
+                const createdFollowup = await models.Followups.create(followup);
+
+                io.sockets.emit("FOLLOWUP_CREATE", createdFollowup);
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        socket.on("update_followup", (followup) => {
+            try {
+                io.sockets.emit("FOLLOWUP_UPDATE", followup);
+            } catch (error) {
+                throw error;
+            }
+        });
+        socket.on("delete_followup", async (id) => {
+            try {
+                io.sockets.emit("FOLLOWUP_DELETE", id);
+            } catch (error) {
+                throw error;
+            }
+        });
+
     });
 
     return io;
