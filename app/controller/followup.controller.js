@@ -63,7 +63,8 @@ class FollowUpController {
                 });
 
                 if (req.body.followup.completed) {
-                    client.emit("delete_followup", updatedFollowup.id);
+                    client.emit("delete_followup", { id: updatedFollowup.id, remove: 0 });
+                    client.emit("update_followup", updatedFollowup);
                 } else {
                     client.emit("update_followup", updatedFollowup);
                 }
@@ -83,7 +84,7 @@ class FollowUpController {
                 await models.Followups.destroy({
                     where: { id: req.body.id }
                 });
-                client.emit("delete_followup", req.body.id);
+                client.emit("delete_followup", { id: req.body.id, remove: 1 });
                 return res.status(200).send({ status: "success", message: "Success deleted!" });
             }
             return res.status(400).send({ status: "error", message: "Bad request" });

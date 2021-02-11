@@ -6,7 +6,7 @@ class FollowUpsRepository {
             let data = await db.sequelize.query("SELECT followups.id, leads.fullname, followups.lead_id, followups.priority, followups.datetime, followups.description, followups.completed FROM followups INNER JOIN leads ON leads.id = followups.lead_id WHERE followups.id = :id", {
                 type: db.sequelize.QueryTypes.SELECT,
                 replacements: {
-                    user_id: id
+                    id: id
                 },
                 plain: true
             });
