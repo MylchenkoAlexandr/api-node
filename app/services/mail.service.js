@@ -47,7 +47,7 @@ class MailService {
 
     /**
      * Send email for client
-     * @param {object} mail_options
+     * @param email_options
      * @param {object} email_params
      */
     async send(email_options, email_params) {
@@ -74,12 +74,41 @@ class MailService {
         }
     }
 
+    async sendFromAgent(email_options, email_params, user) {
+        const credentials = JSON.parse( user.email_credentials );
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: user.email,
+                clientId: credentials.clientId,
+                clientSecret: credentials.clientSecret,
+                refreshToken: credentials.refreshToken,
+                accessToken: credentials.accessToken,
+            },
+        });
+
+        await MailRepository.create(email_params);
+
+        return await transporter.sendMail(email_options);
+    }
+
     /**
      * The function for create accessToken on 2000 years
      */
-    async createToken() {
+    async createToken(authCode, clientId, clientSecret) {
         try {
-            const { tokens } = await this.oauth2Client.getToken(process.env.MAIL_SERVICE_AUTH_CODE);
+            const client = new OAuth2(
+                clientId,
+                clientSecret,
+                process.env.MAIL_SERVICE_REDIRECT_URI
+            );
+
+            const { tokens } = await client.getToken(authCode);
+
+            console.log(tokens);
+
             return tokens;
         } catch (error) {
             throw error;
@@ -89,19 +118,30 @@ class MailService {
     /**
      * The function for generate url which get authorization code for need to be create access token
      */
-    generateAuthUrl() {
-        const GMAIL_SCOPES = [
-            'https://mail.google.com/',
-            'https://www.googleapis.com/auth/gmail.modify',
-            'https://www.googleapis.com/auth/gmail.compose',
-            'https://www.googleapis.com/auth/gmail.send',
-        ];
+    generateAuthUrl(clientId, clientSecret) {
+        try {
+            const client = new OAuth2(
+                clientId,
+                clientSecret,
+                process.env.MAIL_SERVICE_REDIRECT_URI
+            );
 
-        const auth_url = this.oauth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: GMAIL_SCOPES,
-        });
-        console.log(auth_url);
+            const GMAIL_SCOPES = [
+                'https://mail.google.com/',
+                'https://www.googleapis.com/auth/gmail.modify',
+                'https://www.googleapis.com/auth/gmail.compose',
+                'https://www.googleapis.com/auth/gmail.send',
+            ];
+
+            const auth_url = client.generateAuthUrl({
+                access_type: 'offline',
+                scope: GMAIL_SCOPES,
+            });
+
+            return auth_url;
+        } catch (error) {
+            throw error;
+        }
     }
 
     /**

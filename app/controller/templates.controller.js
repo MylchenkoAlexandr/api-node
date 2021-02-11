@@ -2,6 +2,7 @@ const models = require('../../database/models');
 const MessageService = require('../twilio/message/message.service');
 const MailService = require('../services/mail.service');
 const TransformationHelper = require('../helpers/transformation.helper');
+const nodemailer = require('nodemailer');
 
 class TemplatesController {
     async getSmsTemplates(req, res) {
@@ -193,23 +194,24 @@ class TemplatesController {
         try {
             if ("id" in req.body && "lead" in req.body && "user" in req.body) {
                 const template = await models.email_tmp.findByPk(req.body.id);
+                const user = await models.Users.findByPk(req.body.user.id);
 
-                const email_options = {
-                    from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                const mailOptions = {
+                    from: `${user.fname} ${user.lname} <${user.email}>`,
                     to: req.body.lead.email,
                     subject: `To: ${req.body.lead.fullname}, From: ❤️ @ Blueberry`,
-                    text: template.text
+                    text: template.text,
                 };
-    
-                const email_params = {
+
+                const emailParams = {
                     lead_id: req.body.lead.id,
                     user_id: req.body.user.id,
                     text: template.text
                 }
-    
-                const email = await MailService.send(email_options, email_params);
 
-                return res.status(200).json({ message: 'Message sended', email: email });
+                const result = await MailService.sendFromAgent(mailOptions, emailParams, user);
+
+                return res.status(200).json({ message: 'Message sent' });
             }
             return res.status(400).json({ status: 'error', message: 'Bad Request' });
         } catch (error) {
