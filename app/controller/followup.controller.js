@@ -1,7 +1,20 @@
 const models = require("../../database/models");
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
-
+const FollowUpsRepository = require("../repository/followups.repository");
 class FollowUpController {
+    async getByUserId(req, res) {
+        try {
+            if ("user_id" in req.params) {
+                const followups = await FollowUpsRepository.getByUserId(req.params.user_id);
+                return res.status(200).send({ status: "success", message: "Success", followups: followups });
+            }
+            return res.status(400).send({ status: "error", message: "Bad request!" })
+        } catch (error) {
+            res.status(500).send({ status: "error", message: "Server error!" })
+            throw error;
+        }
+    }
+
     async get(req, res) {
         try {
             if ("lead_id" in req.params) {
@@ -24,9 +37,7 @@ class FollowUpController {
     async create(req, res) {
         try {
             if ("user_id" in req.body && "lead_id" in req.body && "datetime" in req.body) {
-
                 client.emit("create_followup", req.body);
-
                 return res.status(200).send({ status: "success", message: "Success created!" });
             }
             return res.status(400).send({ status: "error", message: "Bad request" });

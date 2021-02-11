@@ -52,9 +52,9 @@ app.use('*', (req, res) => {
     res.sendStatus(404);
 });
 
-cron.schedule("* * * * *", () => {
-    CronService.test();
-})
+// cron.schedule("* * * * *", () => {
+//     CronService.test();
+// })
 
 // Start server
 require("./app/lib/sockets")(server); //Socket init

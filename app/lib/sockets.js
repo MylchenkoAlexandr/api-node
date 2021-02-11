@@ -13,6 +13,7 @@ const SmsRepository = require('../repository/sms.repository');
 const CustomersVMService = require('../twilio/voicemails/customers/customersVM.service');
 const MailService = require('../services/mail.service');
 const TransformationHelper = require('../helpers/transformation.helper');
+const FollowUpRepository = require('../repository/followups.repository');
 
 module.exports = server => {
     const io = require("socket.io")(server);
@@ -721,7 +722,8 @@ module.exports = server => {
 
         socket.on("update_followup", (followup) => {
             try {
-                io.sockets.emit("FOLLOWUP_UPDATE", followup);
+                const user_followup = FollowUpRepository.getOneByID(followup.id);
+                io.sockets.emit("FOLLOWUP_UPDATE", { followup, user_followup });
             } catch (error) {
                 throw error;
             }
