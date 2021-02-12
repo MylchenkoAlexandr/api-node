@@ -93,6 +93,32 @@ class FollowUpController {
             throw error;
         }
     }
+
+    async filter(req, res) {
+        try {
+            if ("params" in req.body && req.body.params.length > 0) {
+                const followups = await FollowUpsRepository.filter(req.body.params);
+                return res.status().send({ status: "success", message: "Success", followups: followups });
+            }
+            return res.status(400).send({ status: "error", message: "Bad request!" });
+        } catch (error) {
+            res.status(500).send({ status: "error", message: "Server Error!" });
+            throw error;
+        }
+    }
+
+    async filterParams(req, res) {
+        try {
+            if ("user_id" in req.params) {
+                const filterParams = await FollowUpsRepository.filterParams(req.params.user_id);
+                return res.status(200).send({ status: "success", message: "Success", params: filterParams });
+            }
+            return res.status(400).send({ status: "error", message: "Bad request!" });
+        } catch (error) {
+            res.status(500).send({ status: "error", message: "Server Error!" });
+            throw error;
+        }
+    }
 }
 
 module.exports = new FollowUpController;

@@ -66,6 +66,46 @@ class FollowUpsRepository {
             throw error;
         }
     }
+    async filter(params) {
+
+    }
+
+    async filterParams(user_id) {
+        let fullnames = await db.sequelize.query("SELECT leads.fullname FROM followups INNER JOIN leads ON leads.id = followups.lead_id WHERE followups.user_id = :user_id GROUP BY leads.fullname ORDER BY leads.fullname", {
+            type: db.sequelize.QueryTypes.SELECT,
+            replacements: {
+                user_id: user_id
+            },
+        });
+        let fullnamesParams = [];
+
+        fullnames.forEach(item => {
+            if (item.fullname) {
+                fullnamesParams.push(item.fullname);
+            }
+        });
+
+        let datetimeParams = [];
+        const datetime = await db.sequelize.query("SELECT followups.datetime FROM followups WHERE followups.user_id = :user_id", {
+            type: db.sequelize.QueryTypes.SELECT,
+            replacements: {
+                user_id: user_id
+            },
+        });
+
+        datetime.forEach(item => {
+            datetimeParams.push(item.datetime);
+        });
+
+        return {
+            fullnamesParams,
+            datetimeParams,
+            status: [
+                "Not Completed",
+                "Completed"
+            ]
+        }
+    }
 }
 
 module.exports = new FollowUpsRepository;
