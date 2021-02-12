@@ -728,6 +728,7 @@ module.exports = server => {
                 throw error;
             }
         });
+
         socket.on("delete_followup", async (id) => {
             try {
                 io.sockets.emit("FOLLOWUP_DELETE", id);
@@ -736,6 +737,16 @@ module.exports = server => {
             }
         });
 
+        socket.on("remove_lock_from_agent", async (user_id, value) => {
+            try {
+                if (value == null) {
+                    await AgentService.completedLead(user_id);
+                }
+                io.sockets.to(user_id).emit("SET_UNCOMPLETED_LEAD", value);
+            } catch (error) {
+                throw error;
+            }
+        });
     });
 
     return io;

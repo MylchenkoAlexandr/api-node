@@ -11,5 +11,6 @@ router.post('/recieve-voicemail/:lead_id', CallController.recieveVoiceMail);
 router.post('/transcription-callback', CallController.transcriptionCallback);
 router.post('/inbound-call', CallController.inboundCall);
 router.post('/voicemail-response', CallController.voiceMailResponce);
+router.post('/customer-status-callback/:user_id', CallController.customerStatusCallback);
 
 module.exports = router;
