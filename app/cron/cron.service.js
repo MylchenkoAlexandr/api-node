@@ -15,8 +15,7 @@ class CronService {
             });
 
             if (user) {
-                // const agentPhone = TransformationHelper.formatPhoneForCall(user.phone);
-                const agentPhone = "+380632796212";
+                const agentPhone = TransformationHelper.formatPhoneForCall(user.phone);
                 // Sending sms to customer numbers
                 MessageService.sendMessage(defaultPhone, agentPhone, nfText);
                 // Sending notification 
