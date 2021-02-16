@@ -723,7 +723,7 @@ module.exports = server => {
         socket.on("update_followup", async (followup) => {
             try {
                 const user_followup = await FollowUpRepository.getOneByID(followup.id);
-                io.sockets.emit("FOLLOWUP_UPDATE", { followup, user_followup });
+            io.sockets.emit("FOLLOWUP_UPDATE", { followup, user_followup });
             } catch (error) {
                 throw error;
             }

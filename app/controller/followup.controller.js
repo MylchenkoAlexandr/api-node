@@ -66,12 +66,12 @@ class FollowUpController {
                     }
                 });
 
-                // if (req.body.followup.completed) {
-                //     client.emit("delete_followup", { id: updatedFollowup.id, remove: 0 });
-                //     client.emit("update_followup", updatedFollowup);
-                // } else {
-                //     client.emit("update_followup", updatedFollowup);
-                // }
+                if (req.body.followup.completed) {
+                    client.emit("delete_followup", { id: updatedFollowup.id, remove: 0 });
+                    client.emit("update_followup", updatedFollowup);
+                } else {
+                    client.emit("update_followup", updatedFollowup);
+                }
 
                 return res.status(200).send({ status: "success", message: "Success edited!", followup: updatedFollowup });
             }
