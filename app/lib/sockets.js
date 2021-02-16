@@ -13,6 +13,7 @@ const SmsRepository = require('../repository/sms.repository');
 const CustomersVMService = require('../twilio/voicemails/customers/customersVM.service');
 const MailService = require('../services/mail.service');
 const TransformationHelper = require('../helpers/transformation.helper');
+const FollowUpRepository = require('../repository/followups.repository');
 
 module.exports = server => {
     const io = require("socket.io")(server);
@@ -709,6 +710,43 @@ module.exports = server => {
             }
         });
 
+        socket.on("create_followup", async (followup) => {
+            try {
+                const createdFollowup = await models.Followups.create(followup);
+
+                io.sockets.emit("FOLLOWUP_CREATE", createdFollowup);
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        socket.on("update_followup", async (followup) => {
+            try {
+                const user_followup = await FollowUpRepository.getOneByID(followup.id);
+            io.sockets.emit("FOLLOWUP_UPDATE", { followup, user_followup });
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        socket.on("delete_followup", async (id) => {
+            try {
+                io.sockets.emit("FOLLOWUP_DELETE", id);
+            } catch (error) {
+                throw error;
+            }
+        });
+
+        socket.on("remove_lock_from_agent", async (user_id, value) => {
+            try {
+                if (value == null) {
+                    await AgentService.completedLead(user_id);
+                }
+                io.sockets.to(user_id).emit("SET_UNCOMPLETED_LEAD", value);
+            } catch (error) {
+                throw error;
+            }
+        });
         socket.on("delete_lead", (lead_id) => {
             try {
                 io.sockets.emit("DELETE_LEAD", lead_id);
@@ -717,6 +755,14 @@ module.exports = server => {
             }
         });
 
+        socket.on("send_follow_up_notification", async (user_id, text) => {
+            try {
+                // Send notification
+                io.sockets.to(user_id).emit("FOLLOWUP_NOTIFICATION", text);
+            } catch (error) {
+                throw error;
+            }
+        });
     });
 
     return io;
