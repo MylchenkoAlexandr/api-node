@@ -747,6 +747,15 @@ module.exports = server => {
                 throw error;
             }
         });
+
+        socket.on("send_follow_up_notification", async (user_id, text) => {
+            try {
+                // Send notification
+                io.sockets.to(user_id).emit("FOLLOWUP_NOTIFICATION", text);
+            } catch (error) {
+                throw error;
+            }
+        });
     });
 
     return io;

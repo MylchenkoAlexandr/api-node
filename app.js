@@ -52,16 +52,19 @@ app.use('*', (req, res) => {
     res.sendStatus(404);
 });
 
-// cron.schedule("* * * * *", () => {
-//     CronService.test();
-// })
+cron.schedule("* * * * *", async () => {
+    await CronService.followUpsNotification();
+});
+
+cron.schedule("0 * * * *", async () => {
+    await CronService.expiredFollowUpNotification();
+});
 
 // Start server
 require("./app/lib/sockets")(server); //Socket init
 
 server.listen(PORT, async () => {
     console.log(`Server listening on port: ${PORT}`);
-
     try {
         await db.sequelize.authenticate();
         console.log('Connection has been established successfully.');
