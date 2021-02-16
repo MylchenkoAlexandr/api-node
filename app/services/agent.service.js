@@ -259,9 +259,9 @@ class AgentService {
                 where: { id: agent_id }
             });
 
-            // await agent_candidate.update({
-            //     uncompleted_lead: lead_id
-            // });
+            await agent_candidate.update({
+                uncompleted_lead: lead_id
+            });
         } catch (error) {
             throw error;
         }
