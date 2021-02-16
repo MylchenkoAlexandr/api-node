@@ -1,11 +1,14 @@
 const models = require("../../database/models");
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const FollowUpsRepository = require("../repository/followups.repository");
+
 class FollowUpController {
     async getByUserId(req, res) {
         try {
             if ("user_id" in req.params) {
-                const followups = await FollowUpsRepository.getByUserId(req.params.user_id);
+                const user = await models.Users.findByPk(req.params.user_id);
+
+                const followups = await FollowUpsRepository.getByUserId(user);
                 return res.status(200).send({ status: "success", message: "Success", followups: followups });
             }
             return res.status(400).send({ status: "error", message: "Bad request!" })
@@ -50,6 +53,7 @@ class FollowUpController {
     async update(req, res) {
         try {
             if ("id" in req.body && "followup" in req.body) {
+                console.log('body', req.body);
                 await models.Followups.update(req.body.followup, {
                     where: {
                         id: req.body.id
@@ -62,14 +66,14 @@ class FollowUpController {
                     }
                 });
 
-                if (req.body.followup.completed) {
-                    client.emit("delete_followup", { id: updatedFollowup.id, remove: 0 });
-                    client.emit("update_followup", updatedFollowup);
-                } else {
-                    client.emit("update_followup", updatedFollowup);
-                }
+                // if (req.body.followup.completed) {
+                //     client.emit("delete_followup", { id: updatedFollowup.id, remove: 0 });
+                //     client.emit("update_followup", updatedFollowup);
+                // } else {
+                //     client.emit("update_followup", updatedFollowup);
+                // }
 
-                return res.status(200).send({ status: "success", message: "Success edited!" });
+                return res.status(200).send({ status: "success", message: "Success edited!", followup: updatedFollowup });
             }
             return res.status(400).send({ status: "error", message: "Bad request" });
         } catch (error) {
@@ -96,9 +100,14 @@ class FollowUpController {
 
     async filter(req, res) {
         try {
-            if ("params" in req.body && req.body.params.length > 0) {
+            if ("params" in req.body) {
+
+                console.log('params', req.body.params);
+
                 const followups = await FollowUpsRepository.filter(req.body.params);
-                return res.status().send({ status: "success", message: "Success", followups: followups });
+
+                console.log('followups', followups);
+                return res.status(200).send({ status: "success", message: "Success", followups: followups });
             }
             return res.status(400).send({ status: "error", message: "Bad request!" });
         } catch (error) {
