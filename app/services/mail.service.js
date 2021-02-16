@@ -107,8 +107,6 @@ class MailService {
 
             const { tokens } = await client.getToken(authCode);
 
-            console.log(tokens);
-
             return tokens;
         } catch (error) {
             throw error;

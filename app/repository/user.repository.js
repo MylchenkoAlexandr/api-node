@@ -6,7 +6,7 @@ class UserRepository {
         try {
             const data = await db.sequelize.query(`SELECT users.${field} FROM users WHERE users.id = ${user_id}`, {
                 type: db.sequelize.QueryTypes.SELECT
-            }).catch(e => console.log("🚀 ~ file: user.repository.js ~ line 10 ~ UserRepository ~ getStatus ~ e", e));
+            }).catch(e => console.log(e));
 
             return data[0][field];
         } catch (error) {
@@ -86,7 +86,7 @@ class UserRepository {
         const start = currentDate + ' ' + '00:00:00';
         const end = currentDate + ' ' + '23:59:59';
 
-        const data = await db.sequelize.query("SELECT users.id,(SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id != 12 AND leads.status_id = 12 OR leads.status_id = 13 OR leads.status_id = 14 AND leads.createdAt BETWEEN :start AND :end) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id AND users.in_call = 0 AND users.online = 1 GROUP BY users.id ORDER BY `count` ASC  LIMIT 1", {
+        const data = await db.sequelize.query("SELECT users.id,(SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id != 12 AND leads.status_id = 12 OR leads.status_id = 13 OR leads.status_id = 14 AND leads.createdAt BETWEEN :start AND :end) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id AND users.in_call = 0 AND users.online = 1 GROUP BY users.id ORDER BY `count` DESC LIMIT 1", {
             replacements: { state_id: state_id, start: start, end: end },
             type: db.sequelize.QueryTypes.SELECT,
             plain: true,

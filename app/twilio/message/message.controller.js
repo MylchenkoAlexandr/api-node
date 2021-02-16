@@ -150,7 +150,6 @@ class MessageController {
         try {
             if (req.body) {
                 let data = req.body;
-                console.log("🚀 ~ file: message.controller.js ~ line 108 ~ MessageController ~ receiveMessage ~  data", data)
 
                 const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
 

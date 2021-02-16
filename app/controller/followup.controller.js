@@ -53,7 +53,6 @@ class FollowUpController {
     async update(req, res) {
         try {
             if ("id" in req.body && "followup" in req.body) {
-                console.log('body', req.body);
                 await models.Followups.update(req.body.followup, {
                     where: {
                         id: req.body.id
@@ -102,11 +101,9 @@ class FollowUpController {
         try {
             if ("params" in req.body) {
 
-                console.log('params', req.body.params);
 
                 const followups = await FollowUpsRepository.filter(req.body.params);
 
-                console.log('followups', followups);
                 return res.status(200).send({ status: "success", message: "Success", followups: followups });
             }
             return res.status(400).send({ status: "error", message: "Bad request!" });

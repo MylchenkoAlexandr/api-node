@@ -28,7 +28,6 @@ class SettingsController {
     async updateFields(req, res) {
         try {
             const data = req.body;
-            console.log("🚀 ~ file: settings.controller.js ~ line 31 ~ SettingsController ~ updateFields ~ data", data)
             if ("fields" in data) {
                 await SettingsService.updateFields(data.fields);
                 return res.status(200).json({ status: "success", message: "Success updated!"});

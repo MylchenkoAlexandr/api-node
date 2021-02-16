@@ -61,7 +61,6 @@ class VoiceMailsController {
 
     async delete(req, res) {
         try {
-            console.log(req.body);
             if ("recordId" in req.body) {
                 await models.AgentsVoiceMails.destroy({
                     where: {
