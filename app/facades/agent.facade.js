@@ -16,6 +16,7 @@ class AgentFacade {
 
             agent.password = await bcrypt.hash(agent.password, 10);
             agent.states = JSON.stringify(agent.states);
+            agent.email_credentials = JSON.stringify(agent.email_credentials);
 
             await AgentService.create(agent);
 
@@ -40,6 +41,7 @@ class AgentFacade {
 
                 agent.id = agent_id;
                 agent.states = JSON.stringify(agent.states);
+                agent.email_credentials = JSON.stringify(agent.email_credentials);
                 if (agent_params.password != null && agent_params != '') agent_params.new_password = await bcrypt.hash(agent.password, 10);
                 delete agent.password;
 

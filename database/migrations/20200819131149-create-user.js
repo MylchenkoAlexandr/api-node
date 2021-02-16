@@ -28,6 +28,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      email_credentials: {
+        type: Sequelize.TEXT
+      },
       password: {
         allowNull: false,
         type: Sequelize.STRING

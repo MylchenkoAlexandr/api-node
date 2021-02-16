@@ -747,6 +747,13 @@ module.exports = server => {
                 throw error;
             }
         });
+        socket.on("delete_lead", (lead_id) => {
+            try {
+                io.sockets.emit("DELETE_LEAD", lead_id);
+            } catch (error) {
+                throw error;
+            }
+        });
 
         socket.on("send_follow_up_notification", async (user_id, text) => {
             try {
