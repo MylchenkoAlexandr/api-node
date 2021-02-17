@@ -114,7 +114,7 @@ const LeadRepository = {
                 plain: true
             });
 
-            if (lead.property) {
+            if (lead.property != null) {
                 lead.property = JSON.parse(lead.property);
             }
 

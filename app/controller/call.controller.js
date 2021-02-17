@@ -153,16 +153,6 @@ class CallController {
                                 callbackVoiseMailUrl = user.voice_mail;
                                 callbackTextMessage = user.text_message;
                             }
-                        } else {
-                            if (lead.state_id) {
-                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id);
-                            } else {
-                                let state_id = await StateService.getStateIdFromPhone(formatedPhone);
-
-                                if (state_id) {
-                                    agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
-                                }
-                            }
                         }
                     } else {
                         if (lead.state_id) {
