@@ -105,7 +105,7 @@ class CronService {
                 });
 
                 if (lead) {
-                    const nfText = "The followup for the " + lead.fullname.toUpperCase() + " was expired, please check it as soon as posible!";
+                    const nfText = "Your follow-up with " + lead.fullname.toUpperCase() + " was expired. Please follow up asap!";
                     if (current > followup) {
                         this.sendNotification(record, nfText);
                     }
