@@ -54,16 +54,22 @@ class CronService {
                     }
                 });
 
+                const user = await models.Users.findOne({
+                    where: {
+                        id: record.user_id
+                    }
+                });
+
                 if (lead) {
-                    let nfText = "The follow-up date/time which you have setted to this lead " + lead.fullname.toUpperCase() + " came!";
+                    let nfText = "Your appointment with " + lead.fullname.toUpperCase() + " starts now!";
 
                     if (current == followup) {
                         this.sendNotification(record, nfText);
                     } else if (current == b1Hour) {
-                        nfText = "Left one hour before follow-up date/time for this lead " + lead.fullname.toUpperCase() + " came!";
+                        nfText = "Hi " + user.fname + ", your appointment with " + lead.fullname.toUpperCase() + " starts in 1 hour!";
                         this.sendNotification(record, nfText);
                     } else if (current == b10Min) {
-                        nfText = "Left 10 minutes before follow-up date/time for this lead " + lead.fullname.toUpperCase() + " came!";
+                        nfText = "Hi " + user.fname + ", your appointment with " + lead.fullname.toUpperCase() + " starts in 10 mins!";
                         this.sendNotification(record, nfText);
                     }
                 }

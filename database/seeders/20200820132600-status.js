@@ -53,7 +53,7 @@ module.exports = {
       },
       {
         name: "followUp",
-        title: "Follow up",
+        title: "Call Back",
         createdAt: new Date(),
         updatedAt: new Date()
       },
