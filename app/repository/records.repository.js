@@ -4,7 +4,7 @@ const TransformationHelper = require('../helpers/transformation.helper');
 const RecordsRepository = {
     async getAll() {
         try {
-            let records = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id`, {
+            let records = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.lead_id, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id`, {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
@@ -20,7 +20,7 @@ const RecordsRepository = {
 
     async getByLeadId(lead_id) {
         try {
-            let records = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.lead_id = ${lead_id}`, {
+            let records = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.lead_id, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.lead_id = ${lead_id}`, {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
@@ -36,7 +36,7 @@ const RecordsRepository = {
 
     async getRecordById(id) {
         try {
-            let record = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.id = ${id}`, {
+            let record = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.lead_id, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.id = ${id}`, {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
@@ -50,7 +50,7 @@ const RecordsRepository = {
 
     async getRecordsByMinDuration(duration) {
         try {
-            let records = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.duration > ${duration} ORDER BY records.createdAt DESC`, {
+            let records = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.lead_id, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.duration > ${duration} ORDER BY records.createdAt DESC`, {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
@@ -65,7 +65,7 @@ const RecordsRepository = {
     },
     async getOne(record_id) {
         try {
-            let record = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.id = ${record_id}`, {
+            let record = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.lead_id, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.id = ${record_id}`, {
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             });
