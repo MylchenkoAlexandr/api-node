@@ -37,6 +37,24 @@ class FollowUpController {
         }
     }
 
+    async getById(req, res) {
+        try {
+            if ("id" in req.params) {
+                const followups = await models.Followups.findOne({
+                    where: {
+                        id: req.params.id
+                    }
+                });
+
+                return res.status(200).send({ status: "success", message: "Success created!", followup: followups });
+            }
+            return res.status(400).send({ status: "error", message: "Bad request" });
+        } catch (error) {
+            res.status(500).send({ status: "error", message: "Server error!" });
+            throw error;
+        }
+    }
+
     async create(req, res) {
         try {
             if ("user_id" in req.body && "lead_id" in req.body && "datetime" in req.body) {
