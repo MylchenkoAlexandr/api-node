@@ -10,6 +10,7 @@ async function createAgent(req, res) {
             && ("email" in req.body)
             && ("password" in req.body)
             && ("states" in req.body)
+            && ("email_credentials" in req.body)
         ) {
             const agent = req.body;
             const response = await AgentFacade.createAgent(agent);

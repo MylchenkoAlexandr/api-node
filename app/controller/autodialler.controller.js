@@ -59,7 +59,6 @@ class AutoDiallerController {
                     }
 
                     if (agent_id) {
-                        console.log(lead.id);
                         suitableLead = lead;
                         break;
                     }
@@ -105,7 +104,6 @@ class AutoDiallerController {
                     await CallService.transferCallToGuide(req.body, req.params.user_id);
                     clientSocket.emit("switch-AD_status", req.params.id, 1);
                 } else {
-                    console.log(req.body.CallStatus);
                     let status = 3;
                     switch (req.body.CallStatus) {
                         case "completed":

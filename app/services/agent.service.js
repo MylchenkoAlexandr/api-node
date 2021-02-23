@@ -14,6 +14,7 @@ class AgentService {
                 fname: agent.fname,
                 lname: agent.lname,
                 email: agent.email,
+                email_credentials: agent.email_credentials,
                 twilio_phone: agent.twilio_phone,
                 password: agent.password,
                 states: agent.states,
@@ -52,6 +53,7 @@ class AgentService {
                     fname: agent_options.fname,
                     lname: agent_options.lname,
                     email: agent_options.email,
+                    email_credentials: agent_options.email_credentials,
                     twilio_phone: agent_options.twilio_phone,
                     password: agent_options.new_password,
                     states: agent_options.states,
@@ -63,6 +65,7 @@ class AgentService {
                     fname: agent_options.fname,
                     lname: agent_options.lname,
                     email: agent_options.email,
+                    email_credentials: agent_options.email_credentials,
                     twilio_phone: agent_options.twilio_phone,
                     states: agent_options.states,
                     banned: agent_options.banned,
@@ -126,6 +129,7 @@ class AgentService {
             agents.forEach(agent => {
                 delete agent.dataValues.password;
                 agent.dataValues.states = JSON.parse(agent.dataValues.states);
+                agent.dataValues.email_credentials = JSON.parse(agent.dataValues.email_credentials);
                 agent.dataValues.fullname = agent.dataValues.fname + ' ' + agent.dataValues.lname;
             });
 
@@ -255,9 +259,9 @@ class AgentService {
                 where: { id: agent_id }
             });
 
-            // await agent_candidate.update({
-            //     uncompleted_lead: lead_id
-            // });
+            await agent_candidate.update({
+                uncompleted_lead: lead_id
+            });
         } catch (error) {
             throw error;
         }

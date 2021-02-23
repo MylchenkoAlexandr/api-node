@@ -18,7 +18,6 @@ class FileHelper {
                 console.log('Saved!');
             });
 
-            console.log("🚀 ~ file: file.helper.js ~ line 20 ~ FileHelper ~ createFile ~ pathToFile", pathToFile)
             return pathToFile;
         } catch (error) {
             throw error;

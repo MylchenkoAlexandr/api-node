@@ -7,7 +7,7 @@ async function sendMailToClient(req, res) {
                 from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
                 to: req.body.emailClient,
                 subject: `To: ${req.body.fullnameClient}, From: ❤️ @ Blueberry`,
-                text: req.body.text
+                text: req.body.text,
             };
 
             const email_params = {
@@ -46,15 +46,32 @@ async function getMails(req, res) {
     }
 }
 
-function generateAuthUrl(req, res) {
-    const url = MailService.generateAuthUrl();
-    res.status(201).json({ status: "success", message: "Url generate", url });
+function getAuthCode(req, res) {
+    try {
+        if ("clientId" in req.body && "clientSecret" in req.body){
+            const link = MailService.generateAuthUrl(req.body.clientId, req.body.clientSecret);
+            res.status(201).json({ status: "success", message: "Url generate", link: link });
+        }
+
+        return res.status(400).json({ status: "error", message: "Bad request" });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: "Server Error" });
+        throw error;
+    }
 }
 
 async function createToken(req, res) {
     try {
-        const tokens = await MailService.createToken();
-        res.status(201).json({ status: 'success', message: "Token created", tokens });
+        if ("authCode" in req.body && "clientId" in req.body && "clientSecret" in req.body) {
+            const tokens = await MailService.createToken(
+                req.body.authCode,
+                req.body.clientId,
+                req.body.clientSecret,
+            );
+            res.status(201).json({ status: 'success', message: "Token created", tokens });
+        }
+
+        return res.status(400).json({ status: "error", message: "Bad request" });
     } catch (error) {
         res.status(500).json({ status: "error", message: "Server Error" });
         throw error;
@@ -64,5 +81,6 @@ async function createToken(req, res) {
 module.exports = {
     sendMailToClient,
     createToken,
-    getAllMailsByLead
+    getAllMailsByLead,
+    getAuthCode
 };

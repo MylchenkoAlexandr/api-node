@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
       get() {
         return JSON.parse(this.getDataValue('price'));
       }
-    }
+    },
+    premium_carrier: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Prices',

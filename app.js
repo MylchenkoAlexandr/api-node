@@ -7,6 +7,8 @@ const db = require('./database/models');
 const app = express();
 const cors = require('cors');
 const helmet = require('helmet');
+const cron = require('node-cron');
+const CronService = require('./app/cron/cron.service')
 
 require('dotenv').config();
 
@@ -44,9 +46,18 @@ app.use('/api/voicemail', require('./routes/voicemails.routes'));
 app.use('/api/conference', require('./routes/conference.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
 app.use('/api/templates', require('./routes/templates.routes'));
+app.use('/api/followup', require('./routes/followup.routes'));
 
 app.use('*', (req, res) => {
     res.sendStatus(404);
+});
+
+cron.schedule("* * * * *", async () => {
+    await CronService.followUpsNotification();
+});
+
+cron.schedule("0 * * * *", async () => {
+    await CronService.expiredFollowUpNotification();
 });
 
 // Start server
@@ -54,7 +65,6 @@ require("./app/lib/sockets")(server); //Socket init
 
 server.listen(PORT, async () => {
     console.log(`Server listening on port: ${PORT}`);
-
     try {
         await db.sequelize.authenticate();
         console.log('Connection has been established successfully.');

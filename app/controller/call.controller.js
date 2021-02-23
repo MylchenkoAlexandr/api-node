@@ -47,7 +47,6 @@ class CallController {
             voiceResponse = twiml.dial();
 
             voiceResponse.conference(req.body.lead_id, {
-                startConferenceOnEnter: true,
                 endConferenceOnExit: true,
                 record: 'true',
                 recordingStatusCallbackEvent: "completed",
@@ -60,6 +59,9 @@ class CallController {
                 .create({
                     from: process.env.TWILIO_NUMBER,
                     to: req.body.number,
+                    statusCallback: `${process.env.CALLBACK_TWILIO}/api/call/customer-status-callback/${req.body.user_id}`,
+                    statusCallbackEvent: ["completed"],
+                    startConferenceOnEnter: true,
                     endConferenceOnExit: true,
                 }).then(res => {
                     client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
@@ -311,6 +313,17 @@ class CallController {
             const response = new VoiceResponse();
             response.play('https://api.twilio.com/cowbell.mp3');
             return res.status(200).send(response.toString());
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async customerStatusCallback(req, res) {
+        try {
+            const data = req.body;
+            if (data.CallStatus === "cancelled" || data.CallStatus === 'busy' || data.CallStatus === "failed" || data.CallStatus === "no-answer") {
+                client.emit("remove_lock_from_agent", req.params.user_id, null);
+            }
         } catch (error) {
             throw error;
         }
