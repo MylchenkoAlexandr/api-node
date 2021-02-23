@@ -27,7 +27,7 @@ class FollowUpsRepository {
 
             data.priority = prior;
 
-            data.completed = data.completed ? "Completed" : "Not Completed";
+            data.completed = data.completed ? "Completed" : "In Progress";
 
             return data;
         } catch (error) {
@@ -59,7 +59,7 @@ class FollowUpsRepository {
                 }
                 item.priority = prior;
 
-                item.completed = item.completed ? "Completed" : "Not Completed";
+                item.completed = item.completed ? "Completed" : "In Progress";
             });
 
             return data;
@@ -74,7 +74,7 @@ class FollowUpsRepository {
         if (params.status.length) {
             where += '('
             params.status.forEach((status, idx) => {
-                where += idx !== params.status.length - 1 ? 'followups.completed=' + status + ' OR ' : 'followups.completed=' + status;
+                where += idx !== params.status.length - 1 ? 'leads.status_id=' + status + ' OR ' : 'leads.status_id=' + status;
             });
             where += ') AND ';
         } else {
@@ -111,7 +111,7 @@ class FollowUpsRepository {
             where += 'followups.datetime="" AND ';
         }
 
-        let sql = "SELECT followups.id, leads.fullname, followups.user_id, CONCAT(users.fname, ' ', users.lname) as agentName, followups.lead_id, followups.priority, followups.datetime, followups.description, followups.completed FROM followups INNER JOIN leads ON leads.id = followups.lead_id LEFT JOIN users on followups.user_id = users.id WHERE " + where;
+        let sql = "SELECT followups.id, leads.fullname, leads.status_id, followups.user_id, CONCAT(users.fname, ' ', users.lname) as agentName, followups.lead_id, status.id as status_id, status.title as s_title, followups.priority, followups.datetime, followups.description, followups.completed FROM followups INNER JOIN leads ON leads.id = followups.lead_id LEFT JOIN users on followups.user_id = users.id INNER JOIN status on status.id = leads.status_id WHERE " + where;
 
         sql = sql.substr(0, sql.length - 5);
 
@@ -134,7 +134,7 @@ class FollowUpsRepository {
             }
             item.priority = prior;
 
-            item.completed = item.completed ? "Completed" : "Not Completed";
+            item.completed = item.completed ? "Completed" : "In Progress";
         });
 
         return data;
@@ -171,7 +171,7 @@ class FollowUpsRepository {
             fullnamesParams,
             datetimeParams,
             status: [
-                "Not Completed",
+                "In Progress",
                 "Completed"
             ]
         }

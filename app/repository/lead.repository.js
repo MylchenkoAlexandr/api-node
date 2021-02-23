@@ -55,7 +55,7 @@ const LeadRepository = {
 
     async getOne(id) {
         try {
-            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_procced, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, states.title AS state_title, prices.price, leads.updatedAt AS updated, sources.name AS source, sources.name AS source_title FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
+            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_procced, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, states.title AS state_title, prices.price, prices.premium_carrier as pc, leads.updatedAt AS updated, sources.name AS source, sources.name AS source_title FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             });
@@ -283,7 +283,7 @@ const LeadRepository = {
                 where += 'leads.source_id=' + params.source + ' AND ';
             }
 
-            let data = await db.sequelize.query(`SELECT leads.id, leads.empty, leads.fullname, users.fname, users.lname, users.email as agent_email, leads.phone, CONCAT(users.fname, ' ', users.lname) as agent_fullname, leads.email, leads.property, leads.busy, sources.title AS source_title, sources.name AS source, status.name AS status, status.title AS status_title, states.name AS state, prices.price, leads.updatedAt FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN sources ON leads.source_id = sources.id INNER JOIN status ON leads.status_id = status.id INNER JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE ${where} leads.empty = 0 ORDER BY leads.id DESC;`, {
+            let data = await db.sequelize.query(`SELECT leads.id, leads.empty, leads.fullname, users.fname, users.lname, users.email as agent_email, leads.phone, CONCAT(users.fname, ' ', users.lname) as agent_fullname, leads.email, leads.property, leads.busy, sources.title AS source_title, sources.name AS source, status.name AS status, status.title AS status_title, states.name AS state, prices.price, prices.premium_carrier as pc, leads.updatedAt FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN sources ON leads.source_id = sources.id INNER JOIN status ON leads.status_id = status.id INNER JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE ${where} leads.empty = 0 ORDER BY leads.id DESC;`, {
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
