@@ -201,6 +201,33 @@ function deleteSelectedLeads(req, res) {
     }
 }
 
+async function selectCarrier(req, res) {
+    try {
+        if (req.body.lead_id && req.body.carrier) {
+            const price = await models.Prices.findOne({
+                where: {
+                    lead_id: req.body.lead_id
+                }
+            });
+            let updatedCarrier = {};
+
+            updatedCarrier[req.body.carrier] = price.price[req.body.carrier];
+
+            console.log(updatedCarrier);
+
+            price.update({
+                premium_carrier: JSON.stringify(updatedCarrier)
+            });
+
+            return res.status(200).send({ status: "status", message: "Success!" });
+        }
+        return res.status(400).send({ status: "error", message: "Bad request!" });
+    } catch (error) {
+        res.status(500).send({ status: "error", message: "Server error!" });
+        throw error;
+    }
+}
+
 module.exports = {
     test,
     getLead,
@@ -214,5 +241,6 @@ module.exports = {
     getAllLeadsForGuide,
     getLeadsByFilters,
     deteleLead,
-    deleteSelectedLeads
-}   
+    deleteSelectedLeads,
+    selectCarrier
+}
