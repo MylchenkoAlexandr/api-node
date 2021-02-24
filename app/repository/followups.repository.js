@@ -36,9 +36,9 @@ class FollowUpsRepository {
     }
     async getByUserId(user) {
         try {
-            let sql = "SELECT followups.id, leads.fullname, followups.lead_id, followups.user_id, CONCAT(users.fname, ' ', users.lname) as agentName, followups.priority, followups.datetime, followups.description, followups.completed FROM followups INNER JOIN leads ON leads.id = followups.lead_id LEFT JOIN users on followups.user_id = users.id";
+            let sql = "SELECT followups.id, leads.fullname, followups.lead_id, followups.user_id, CONCAT(users.fname, ' ', users.lname) as agentName, followups.priority, followups.datetime, followups.description, followups.completed FROM followups INNER JOIN leads ON leads.id = followups.lead_id LEFT JOIN users on followups.user_id = users.id WHERE followups.completed = 0";
 
-            sql += user.role_id !== 1 ? " WHERE followups.user_id = " + user.id : "";
+            sql += user.role_id !== 1 ? " AND followups.user_id = " + user.id : "";
 
             let data = await db.sequelize.query(sql, {
                 type: db.sequelize.QueryTypes.SELECT,
@@ -156,7 +156,7 @@ class FollowUpsRepository {
         });
 
         let datetimeParams = [];
-        const datetime = await db.sequelize.query("SELECT followups.datetime FROM followups WHERE followups.user_id = :user_id", {
+        const datetime = await db.sequelize.query("SELECT followups.datetime FROM followups WHERE followups.user_id = :user_id AND followups.completed = 0", {
             type: db.sequelize.QueryTypes.SELECT,
             replacements: {
                 user_id: user_id
