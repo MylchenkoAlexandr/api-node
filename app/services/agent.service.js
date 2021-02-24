@@ -123,7 +123,10 @@ class AgentService {
     async getAll() {
         try {
             const agents = await models.Users.findAll({
-                where: { role_id: 2 }
+                where: { role_id: 2 },
+                order: [
+                    ['fname', 'ASC']
+                ],
             });
 
             agents.forEach(agent => {
