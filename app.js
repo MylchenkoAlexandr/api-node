@@ -56,10 +56,6 @@ cron.schedule("* * * * *", async () => {
     await CronService.followUpsNotification();
 });
 
-cron.schedule("0 * * * *", async () => {
-    await CronService.expiredFollowUpNotification();
-});
-
 // Start server
 require("./app/lib/sockets")(server); //Socket init
 

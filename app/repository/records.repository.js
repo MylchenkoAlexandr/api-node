@@ -8,9 +8,9 @@ const RecordsRepository = {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
-            records.forEach(record => {
-                record.createdAt = TransformationHelper.formatDate(record.createdAt, true);
-            });
+            // records.forEach(record => {
+            //     record.createdAt = TransformationHelper.formatDate(record.createdAt, true);
+            // });
 
             return records;
         } catch (error) {
@@ -24,9 +24,9 @@ const RecordsRepository = {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
-            records.forEach(record => {
-                record.createdAt = TransformationHelper.formatDate(record.createdAt, true);
-            });
+            // records.forEach(record => {
+            //     record.createdAt = TransformationHelper.formatDate(record.createdAt, true);
+            // });
 
             return records;
         } catch (error) {
@@ -40,7 +40,7 @@ const RecordsRepository = {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
-            record[0].createdAt = TransformationHelper.formatDate(record[0].createdAt, true);
+            // record[0].createdAt = TransformationHelper.formatDate(record[0].createdAt, true);
 
             return record[0];
         } catch (error) {
@@ -54,9 +54,9 @@ const RecordsRepository = {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
-            records.forEach(record => {
-                record.createdAt = TransformationHelper.formatDate(record.createdAt, true);
-            });
+            // records.forEach(record => {
+            //     record.createdAt = TransformationHelper.formatDate(record.createdAt, true);
+            // });
 
             return records;
         } catch (error) {
@@ -70,7 +70,7 @@ const RecordsRepository = {
                 plain: true
             });
 
-            record.createdAt = TransformationHelper.formatDate(record.createdAt, true);
+            // record.createdAt = TransformationHelper.formatDate(record.createdAt, true);
 
             return record;
         } catch (error) {
