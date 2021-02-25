@@ -19,6 +19,7 @@ class NinjaQuoterService {
             liberty_bankers: 0,
             prosperity_life: 0,
             americo: 0,
+            accendo_life: 0,
             american_general: 0
         };
 
