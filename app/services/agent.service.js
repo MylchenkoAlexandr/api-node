@@ -34,6 +34,23 @@ class AgentService {
                         });
                     }
                 });
+                const subroles = agent.subroles;
+
+                if (subroles) {
+                    await models.UsersSubroles.destroy({
+                        where: {
+                            user_id: createdAgent.id
+                        }
+                    });
+
+                    subroles.forEach(async (id) => {
+                        await models.UsersSubroles.create({
+                            user_id: createdAgent.id,
+                            subrole_id: id
+                        });
+                    });
+                }
+
             }
 
         } catch (error) {
@@ -122,12 +139,13 @@ class AgentService {
      */
     async getAll() {
         try {
-            const agents = await models.Users.findAll({
+            let agents = [];
+            const agentsNotFormated = await models.Users.findAll({
                 where: { role_id: 2 }
             });
 
-            agents.forEach(async (agent) => {
-                delete agent.dataValues.password;
+            for (let agent of agentsNotFormated) {
+                delete agent.password;
                 agent.dataValues.states = JSON.parse(agent.dataValues.states);
                 agent.dataValues.email_credentials = JSON.parse(agent.dataValues.email_credentials);
                 agent.dataValues.fullname = agent.dataValues.fname + ' ' + agent.dataValues.lname;
@@ -138,10 +156,10 @@ class AgentService {
                     }
                 });
 
-                agent.dataValues.subroles = subroles.length >= 1 ? subroles.map((item) => item.subrole_id) : [];
-                // console.log(agent);
-            });
+                agent.dataValues.subroles = subroles.length >= 1 ? subroles.map(subrole => subrole.subrole_id) : [];
 
+                agents.push(agent);
+            };
 
             return agents;
         } catch (error) {
