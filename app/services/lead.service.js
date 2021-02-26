@@ -292,6 +292,16 @@ class LeadService {
                 }
             });
 
+            let post_sale = 0;
+
+            if (statusName === 'purchased' ||
+                statusName === 'in-force'
+            ) {
+                post_sale = 1;
+            }
+
+            await LeadRepository.updatePostSale(lead_id, post_sale);
+
             if (updatedLead) {
                 const status = await models.Status.findOne({
                     attributes: ['id'],
@@ -309,6 +319,14 @@ class LeadService {
                 }
             }
 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updatePrice(lead_id, price) {
+        try {
+            return await LeadRepository.updatePrice(lead_id, price);
         } catch (error) {
             throw error;
         }

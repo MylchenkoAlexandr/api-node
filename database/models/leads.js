@@ -44,6 +44,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Leads.init({
+    id: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      primaryKey: true,
+    },
     AD_status: DataTypes.BOOLEAN,
     AD_procced: DataTypes.BOOLEAN,
     CRON_hours: DataTypes.INTEGER,
@@ -59,6 +63,7 @@ module.exports = (sequelize, DataTypes) => {
     fullname: DataTypes.STRING,
     busy: DataTypes.BOOLEAN,
     busy_agent_id: DataTypes.BIGINT.UNSIGNED,
+    post_sale: DataTypes.BOOLEAN,
 
     property: {
       type: DataTypes.TEXT,

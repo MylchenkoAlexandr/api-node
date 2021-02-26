@@ -55,7 +55,7 @@ const LeadRepository = {
 
     async getOne(id) {
         try {
-            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_procced, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, status.name AS status, status.title AS status_title, states.name AS state, states.title AS state_title, prices.price, prices.premium_carrier as pc, leads.updatedAt AS updated, sources.name AS source, sources.name AS source_title FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
+            let lead = await db.sequelize.query("SELECT leads.id, leads.AD_procced, leads.AD_status, leads.user_id, leads.state_id, leads.phone, leads.empty, leads.fullname, CONCAT(users.fname, ' ', users.lname) as agent_fullname, users.email as agent_email, leads.email, leads.property, leads.busy, leads.post_sale, status.name AS status, status.title AS status_title, states.name AS state, states.title AS state_title, prices.price, prices.premium_carrier as pc, leads.updatedAt AS updated, sources.name AS source, sources.name AS source_title FROM leads INNER JOIN sources ON sources.id = leads.source_id LEFT JOIN users ON leads.user_id = users.id LEFT JOIN status ON leads.status_id = status.id LEFT JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE leads.id = " + id, {
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             });
@@ -232,6 +232,30 @@ const LeadRepository = {
     async updateADstatusFields(lead_id, field, status) {
         try {
             let data = await db.sequelize.query(`UPDATE leads SET leads.${field} = ${status} WHERE leads.id = ${lead_id};`, {
+                type: db.sequelize.QueryTypes.UPDATE,
+            });
+
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async updatePostSale(lead_id, post_sale = 0) {
+        try {
+            let data = await db.sequelize.query(`UPDATE leads SET leads.post_sale = ${post_sale} WHERE leads.id = ${lead_id};`, {
+                type: db.sequelize.QueryTypes.UPDATE,
+            });
+
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async updatePrice(lead_id, price) {
+        try {
+            let data = await db.sequelize.query(`UPDATE prices SET prices.price = '${price}' WHERE prices.lead_id = ${lead_id};`, {
                 type: db.sequelize.QueryTypes.UPDATE,
             });
 

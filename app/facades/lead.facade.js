@@ -83,43 +83,46 @@ class LeadFacade {
 
             if (updatedLead.empty == 0) {
                 const leadProperty = JSON.parse(updatedLead.property);
-                const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
-                const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
-                const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
-                const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
-                const priceFromQuoter = ninjaQuoterService.getPrice(companies);
 
-                await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
+                if (!updatedLead.post_sale) {
+                    const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
+                    const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
+                    const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
+                    const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
+                    const priceFromQuoter = ninjaQuoterService.getPrice(companies);
 
-                if (companiesInfo.length !== 0) {
-                    const email_sended = await LeadService.checkLeadAtSendedEmail(updatedLead.email);
+                    await PriceService.processPrice(updatedLead.id, priceFromQuoter, quoter);
 
-                    if (!email_sended) {
-                        const email_params = {
-                            companies: companiesInfo,
-                            email: updatedLead.email,
-                            coverage_amount: leadProperty.coverage_amount,
-                            term: leadProperty.term,
-                            fullname: updatedLead.fullname
+                    if (companiesInfo.length !== 0) {
+                        const email_sended = await LeadService.checkLeadAtSendedEmail(updatedLead.email);
+
+                        if (!email_sended) {
+                            const email_params = {
+                                companies: companiesInfo,
+                                email: updatedLead.email,
+                                coverage_amount: leadProperty.coverage_amount,
+                                term: leadProperty.term,
+                                fullname: updatedLead.fullname
+                            }
+
+                            email_params.term = email_params.term === 'fex' ? 'final expense' : email_params.term + ' year term';
+
+                            if (typeof email_params.companiesInfo == 'string') {
+                                email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
+                            }
+
+                            const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
+
+                            const mail_options = {
+                                from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                                to: email_params.email,
+                                subject: `We saved your quote for ${email_params.term} life insurance of $${email_params.coverage_amount}`,
+                                html
+                            };
+
+                            await MailService.sendNewsletter(mail_options);
+                            await LeadService.updateLeadAtSendedEmail(email_params.email, true);
                         }
-
-                        email_params.term = email_params.term === 'fex' ? 'final expense' : email_params.term + ' year term';
-
-                        if (typeof email_params.companiesInfo == 'string') {
-                            email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
-                        }
-
-                        const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
-
-                        const mail_options = {
-                            from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
-                            to: email_params.email,
-                            subject: `We saved your quote for ${email_params.term} life insurance of $${email_params.coverage_amount}`,
-                            html
-                        };
-
-                        await MailService.sendNewsletter(mail_options);
-                        await LeadService.updateLeadAtSendedEmail(email_params.email, true);
                     }
                 }
 
