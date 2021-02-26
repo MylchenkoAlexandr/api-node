@@ -38,11 +38,13 @@ class CronService {
                 let current = new Date();
                 current.setSeconds(0);
                 current.setMilliseconds(0);
+                const cTime = `${current.getHours()}:${current.getMinutes().length == 1 ? "0" + current.getMinutes() : current.getMinutes()}:0${current.getSeconds()}`;
                 current = +current;
 
                 let followup = new Date(record.datetime);
                 followup.setSeconds(0);
                 followup.setMilliseconds(0);
+                const fTime = `${followup.getHours()}:${followup.getMinutes().length == 1 ? "0" + followup.getMinutes() : followup.getMinutes()}:0${followup.getSeconds()}`;
                 followup = +followup;
 
                 const b10Min = followup - 10 * 60000;
@@ -71,42 +73,8 @@ class CronService {
                     } else if (current == b10Min) {
                         nfText = "Hi " + user.fname + ", your appointment with " + lead.fullname.toUpperCase() + " starts in 10 mins!";
                         this.sendNotification(record, nfText);
-                    }
-                }
-            });
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async expiredFollowUpNotification() {
-        try {
-            const followups = await models.Followups.findAll({
-                where: {
-                    completed: 0
-                }
-            });
-
-            followups.forEach(async (record) => {
-                let current = new Date();
-                current.setSeconds(0);
-                current.setMilliseconds(0);
-                current = +current;
-
-                let followup = record.datetime;
-                followup.setSeconds(0);
-                followup.setMilliseconds(0);
-                followup = +followup;
-
-                const lead = await models.Leads.findOne({
-                    where: {
-                        id: record.lead_id
-                    }
-                });
-
-                if (lead) {
-                    const nfText = "Your follow-up with " + lead.fullname.toUpperCase() + " was expired. Please follow up asap!";
-                    if (current > followup) {
+                    } else if (cTime == fTime) {
+                        nfText = "Your follow-up with " + lead.fullname.toUpperCase() + " was expired. Please follow up asap!";
                         this.sendNotification(record, nfText);
                     }
                 }

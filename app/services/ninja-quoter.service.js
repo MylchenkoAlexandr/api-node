@@ -14,6 +14,7 @@ class NinjaQuoterService {
 
         const preferedCompaniesFEX = {
             mutual_omaha: 0,
+            accendo_life: 0,
             foresters: 0,
             royal_neighbors: 0,
             liberty_bankers: 0,
