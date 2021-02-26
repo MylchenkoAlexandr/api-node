@@ -1,5 +1,7 @@
 const AgentService = require('../services/agent.service');
+const models = require('../../database/models');
 const bcrypt = require('bcrypt');
+
 
 class AgentFacade {
 
@@ -28,7 +30,7 @@ class AgentFacade {
 
     /**
      * The function for update agent
-     * @param {object} agent_params this object with agenet params
+     * @param {object} agent_params this object with agent params
      * @param {number} agent_id
      * @return {object} this object with response params
      */
@@ -44,6 +46,21 @@ class AgentFacade {
                 agent.email_credentials = JSON.stringify(agent.email_credentials);
                 if (agent_params.password != null && agent_params != '') agent_params.new_password = await bcrypt.hash(agent.password, 10);
                 delete agent.password;
+
+                if (agent.subroles) {
+                    await models.UsersSubroles.destroy({
+                        where: {
+                            user_id: agent.id
+                        }
+                    });
+
+                    agent.subroles.forEach(async (id) => {
+                        await models.UsersSubroles.create({
+                            user_id: agent.id,
+                            subrole_id: id
+                        });
+                    });
+                }
 
                 await AgentService.update(candidate, agent);
                 return { code: 200, status: 'success', message: 'Agent successfully updated' };

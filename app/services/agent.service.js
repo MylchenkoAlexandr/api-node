@@ -126,12 +126,22 @@ class AgentService {
                 where: { role_id: 2 }
             });
 
-            agents.forEach(agent => {
+            agents.forEach(async (agent) => {
                 delete agent.dataValues.password;
                 agent.dataValues.states = JSON.parse(agent.dataValues.states);
                 agent.dataValues.email_credentials = JSON.parse(agent.dataValues.email_credentials);
                 agent.dataValues.fullname = agent.dataValues.fname + ' ' + agent.dataValues.lname;
+
+                const subroles = await models.UsersSubroles.findAll({
+                    where: {
+                        user_id: agent.dataValues.id
+                    }
+                });
+
+                agent.dataValues.subroles = subroles.length >= 1 ? subroles.map((item) => item.subrole_id) : [];
+                // console.log(agent);
             });
+
 
             return agents;
         } catch (error) {
