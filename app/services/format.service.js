@@ -228,13 +228,15 @@ class FormatService {
             }
 
             if ("type" in lead || "coverage_type" in lead) {
-                lead.term = this.formatTerms(lead);
-                if ("coverage_type" in lead) {
-                    delete lead.coverage_type;
+                if (formatedLead.type_id == 2) {
+                    lead.term = this.formatTerms(lead);
+                    if ("coverage_type" in lead) {
+                        delete lead.coverage_type;
+                    }
                 }
             }
 
-            if ("term" in lead && !("rate_class" in lead)) {
+            if ("term" in lead && !("rate_class" in lead) && formatedLead.type_id == 2) {
                 lead.rate_class = lead.term == 'fex' ? 'lb' : 's';
             }
 
