@@ -354,6 +354,14 @@ module.exports = server => {
             }
         });
 
+        socket.on("update-price", async (lead_id, price) => {
+            try {
+                const result = await LeadService.updatePrice(lead_id, JSON.stringify(price));
+            } catch (err) {
+                throw err;
+            }
+        });
+
         socket.on("update-status", async (lead_id, status) => {
             try {
                 const updatedLead = await LeadService.updateStatus(lead_id, status);
