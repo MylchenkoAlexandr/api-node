@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const models = require('../../database/models');
 
 const AgentService = require('../services/agent.service');
 
@@ -15,6 +16,13 @@ class AuthFacade {
                 if (password_mathes) {
                     const acces_token = jwt.sign({ data: email }, process.env.SECRET_KEY, { expiresIn: "365d" });
 
+                    let subroles = [];
+
+                    const userSubroles = await models.UsersSubroles.findAll({
+                        where: { user_id: user.id }
+                    });
+
+                    userSubroles.map(item => subroles.push(item.subrole_id));
                     return {
                         code: 200,
                         status: "success",
@@ -31,7 +39,8 @@ class AuthFacade {
                             twilio_phone: user.twilio_phone,
                             states: JSON.parse(user.states),
                             role_id: user.role_id,
-                            uncompleted_lead: user.uncompleted_lead
+                            uncompleted_lead: user.uncompleted_lead,
+                            subroles: subroles
                         },
                         token: acces_token
                     }
@@ -54,6 +63,14 @@ class AuthFacade {
 
             const candidate = await AgentService.find(email);
             if (candidate) {
+                let subroles = [];
+
+                const userSubroles = await models.UsersSubroles.findAll({
+                    where: { user_id: candidate.id }
+                });
+
+                userSubroles.map(item => subroles.push(item.subrole_id));
+            
                 return {
                     code: 200,
                     status: "success",
@@ -70,7 +87,8 @@ class AuthFacade {
                         twilio_phone: candidate.twilio_phone,
                         states: JSON.parse(candidate.states),
                         role_id: candidate.role_id,
-                        uncompleted_lead: candidate.uncompleted_lead
+                        uncompleted_lead: candidate.uncompleted_lead,
+                        subroles: subroles
                     }
                 };
             }

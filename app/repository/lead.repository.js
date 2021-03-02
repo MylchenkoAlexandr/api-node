@@ -307,7 +307,8 @@ const LeadRepository = {
                 where += 'leads.source_id=' + params.source + ' AND ';
             }
 
-            let data = await db.sequelize.query(`SELECT leads.id, leads.empty, leads.fullname, users.fname, users.lname, users.email as agent_email, leads.phone, CONCAT(users.fname, ' ', users.lname) as agent_fullname, leads.email, leads.property, leads.busy, sources.title AS source_title, sources.name AS source, status.name AS status, status.title AS status_title, states.name AS state, prices.price, prices.premium_carrier as pc, leads.updatedAt FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN sources ON leads.source_id = sources.id INNER JOIN status ON leads.status_id = status.id INNER JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE ${where} leads.empty = 0 ORDER BY leads.id DESC;`, {
+            let data = await db.sequelize.query(`SELECT leads.id, leads.empty, leads.fullname, users.fname, users.lname, users.email as agent_email, leads.phone, CONCAT(users.fname, ' ', users.lname) as agent_fullname, leads.email, leads.property, leads.busy, sources.title AS source_title, sources.name AS source, status.name AS status, status.title AS status_title, states.name AS state, prices.price, prices.premium_carrier as pc, leads.updatedAt FROM leads LEFT JOIN users ON leads.user_id = users.id INNER JOIN sources ON leads.source_id = sources.id INNER JOIN status ON leads.status_id = status.id INNER JOIN states ON leads.state_id = states.id LEFT JOIN prices ON leads.id = prices.lead_id WHERE ${where} leads.empty = 0 AND leads.type_id = :type_id ORDER BY leads.id DESC;`, {
+                replacements: { type_id: params.type },
                 type: db.sequelize.QueryTypes.SELECT,
             });
 
