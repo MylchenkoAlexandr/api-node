@@ -94,12 +94,33 @@ class FormatService {
                 delete lead.phone;
             }
 
-            if ("zip" in lead) {
+            if ("zip" in lead && formatedLead.type_id === 2) {
                 lead.zipcode = lead.zip;
                 delete lead.zip;
             }
 
-            if (!("state" in lead) && "zipcode" in lead) {
+            if ("primary" in lead && formatedLead.type_id === 4) {
+                formatedLead.fullname = lead.primary.name;
+                lead.fullname = lead.primary.name;
+            }
+
+            if ("medications" in lead && formatedLead.type_id === 4) {
+                delete lead.medications;
+            }
+
+            if ("primary" in lead && formatedLead.type_id === 4) {
+                delete lead.primary.birth_year;
+            }
+
+            if ("primary" in lead && formatedLead.type_id === 4) {
+                delete lead.primary.birth_month;
+            }
+
+            if ("primary" in lead && formatedLead.type_id === 4) {
+                delete lead.primary.birth_day;
+            }
+
+            if (!("state" in lead) && ("zipcode" in lead || "zip" in lead)) {
                 lead.state = zipcodes.lookup(lead.zip || lead.zipcode).state;
             }
 
@@ -194,37 +215,39 @@ class FormatService {
                 delete lead.empty;
             }
 
-            let medications = [];
-            const key_med = 'major_condition_';
+            if (lead.type_id === 2) {
+                let medications = [];
+                const key_med = 'major_condition_';
 
-            Object.keys(lead).forEach(key => {
-                if (key == `${key_med}aids_hiv`) medications.push("1");
-                if (key == `${key_med}alcohol_drug_abuse`) medications.push("2");
-                if (key == `${key_med}alzheimers_dementia`) medications.push("3");
-                if (key == `${key_med}asthma`) medications.push("4");
-                if (key == `${key_med}cancer`) medications.push("5");
-                if (key == `${key_med}clinical_depression`) medications.push("6");
-                if (key == `${key_med}diabetes`) medications.push("7");
-                if (key == `${key_med}emphysema`) medications.push("8");
-                if (key == `${key_med}epilepsy`) medications.push("9");
-                if (key == `${key_med}heart_attack`) medications.push("10");
-                if (key == `${key_med}heart_disease`) medications.push("11");
-                if (key == `${key_med}hepatitis_liver`) medications.push("12");
-                if (key == `${key_med}high_blood_pressure`) medications.push("13");
-                if (key == `${key_med}high_cholesterol`) medications.push("14");
-                if (key == `${key_med}high_kidney_disease`) medications.push("15");
-                if (key == `${key_med}mental_illness`) medications.push("16");
-                if (key == `${key_med}multiple_sclerosis`) medications.push("17");
-                if (key == `${key_med}pulmonary_disease`) medications.push("18");
-                if (key == `${key_med}stroke`) medications.push("19");
-                if (key == `${key_med}ulcers`) medications.push("20");
-                if (key == `${key_med}vascular_disease`) medications.push("21");
-                if (key == `${key_med}other`) medications.push("22");
-                if (key.includes(key_med)) delete lead[key];
-            });
+                Object.keys(lead).forEach(key => {
+                    if (key == `${key_med}aids_hiv`) medications.push("1");
+                    if (key == `${key_med}alcohol_drug_abuse`) medications.push("2");
+                    if (key == `${key_med}alzheimers_dementia`) medications.push("3");
+                    if (key == `${key_med}asthma`) medications.push("4");
+                    if (key == `${key_med}cancer`) medications.push("5");
+                    if (key == `${key_med}clinical_depression`) medications.push("6");
+                    if (key == `${key_med}diabetes`) medications.push("7");
+                    if (key == `${key_med}emphysema`) medications.push("8");
+                    if (key == `${key_med}epilepsy`) medications.push("9");
+                    if (key == `${key_med}heart_attack`) medications.push("10");
+                    if (key == `${key_med}heart_disease`) medications.push("11");
+                    if (key == `${key_med}hepatitis_liver`) medications.push("12");
+                    if (key == `${key_med}high_blood_pressure`) medications.push("13");
+                    if (key == `${key_med}high_cholesterol`) medications.push("14");
+                    if (key == `${key_med}high_kidney_disease`) medications.push("15");
+                    if (key == `${key_med}mental_illness`) medications.push("16");
+                    if (key == `${key_med}multiple_sclerosis`) medications.push("17");
+                    if (key == `${key_med}pulmonary_disease`) medications.push("18");
+                    if (key == `${key_med}stroke`) medications.push("19");
+                    if (key == `${key_med}ulcers`) medications.push("20");
+                    if (key == `${key_med}vascular_disease`) medications.push("21");
+                    if (key == `${key_med}other`) medications.push("22");
+                    if (key.includes(key_med)) delete lead[key];
+                });
+            }
 
-            if (medications.length > 0) {
-                lead.medications = medications;
+            if ("medications" in lead && lead.type_id === 4) {
+                delete lead.medications;
             }
 
             if ("type" in lead || "coverage_type" in lead) {
@@ -265,6 +288,10 @@ class FormatService {
             if ("premium_carrier" in lead) {
                 delete lead.premium_carrier;
             }
+            if ("type_id" in lead) {
+                delete lead.type_id;
+            }
+
 
             formatedLead.property = {
                 ...lead

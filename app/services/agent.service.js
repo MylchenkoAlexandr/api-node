@@ -141,8 +141,10 @@ class AgentService {
         try {
             let agents = [];
             const agentsNotFormated = await models.Users.findAll({
-                where: { role_id: 2 }
-            const agents = await models.Users.findAll({
+                where: {role_id: 2}
+            });
+
+            agents = await models.Users.findAll({
                 where: { role_id: 2 },
                 order: [
                     ['fname', 'ASC']

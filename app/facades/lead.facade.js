@@ -23,7 +23,6 @@ class LeadFacade {
                         // await AutoDiallerService.outboundCall(phone, createdLead.id);
                     }
                 }
-
                 const leadProperty = JSON.parse(createdLead.property);
                 const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
                 const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
@@ -84,7 +83,7 @@ class LeadFacade {
             if (updatedLead.empty == 0) {
                 const leadProperty = JSON.parse(updatedLead.property);
 
-                if (!updatedLead.post_sale) {
+                if (!updatedLead.post_sale && updatedLead.type_id === 2) {
                     const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
                     const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
                     const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
