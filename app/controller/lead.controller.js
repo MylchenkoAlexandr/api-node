@@ -141,7 +141,7 @@ async function uploadLeadFromMediaAlpha(req, res) {
             ...rawLead.lead
         };
 
-        if(preparedLead.type == "health"){
+        if (preparedLead.type == "health") {
             client.emit("upload-lead", preparedLead);
         } else {
             client.emit("process-lead", preparedLead);
@@ -216,11 +216,11 @@ async function selectCarrier(req, res) {
 
             updatedCarrier[req.body.carrier] = price.price[req.body.carrier];
 
-            console.log(updatedCarrier);
-
             price.update({
                 premium_carrier: JSON.stringify(updatedCarrier)
             });
+
+            client.emit("update_carrier", req.body.lead_id, updatedCarrier);
 
             return res.status(200).send({ status: "status", message: "Success!" });
         }
