@@ -14,15 +14,15 @@ class LeadFacade {
             const createdLead = await LeadService.createLead(formatedLead);
 
             if (createdLead.empty == 0) {
-                if ("phone" in createdLead) {
-                    let guides = await UserRepository.findSuitableWorker("guide");
-
-                    if (guides) {
-                        const phone = TransformationHelper.formatPhoneForCall(createdLead.phone);
-
-                        // await AutoDiallerService.outboundCall(phone, createdLead.id);
-                    }
-                }
+                // if ("phone" in createdLead) {
+                //     let guides = await UserRepository.findSuitableWorker("guide");
+                //
+                //     if (guides) {
+                //         const phone = TransformationHelper.formatPhoneForCall(createdLead.phone);
+                //
+                //         // await AutoDiallerService.outboundCall(phone, createdLead.id);
+                //     }
+                // }
                 const leadProperty = JSON.parse(createdLead.property);
                 const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
                 const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
