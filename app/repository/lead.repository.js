@@ -59,7 +59,7 @@ const LeadRepository = {
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             });
-
+            
             if (lead.property) {
                 lead.property = JSON.parse(lead.property);
                 if (lead.property.state) delete lead.property.state;
