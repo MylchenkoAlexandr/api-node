@@ -772,6 +772,14 @@ module.exports = server => {
                 throw error;
             }
         });
+
+        socket.on("update_carrier", async (lead_id, premium_carrier) => {
+            try {
+                io.sockets.to(lead_id).emit("UPDATE_PREMIUM_CARRIER", { premium_carrier });
+            } catch (error) {
+                throw error;
+            }
+        });
     });
 
     return io;

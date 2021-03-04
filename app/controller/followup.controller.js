@@ -36,7 +36,7 @@ class FollowUpController {
             throw error;
         }
     }
-
+     
     async getById(req, res) {
         try {
             if ("id" in req.params) {
@@ -58,6 +58,24 @@ class FollowUpController {
     async create(req, res) {
         try {
             if ("user_id" in req.body && "lead_id" in req.body && "datetime" in req.body) {
+                const user = await models.Users.findOne({
+                    where: {
+                        id: req.body.user_id
+                    }
+                });
+
+                if (user && user.role_id == 1) {
+                    const lead = await models.Leads.findOne({
+                        where: {
+                            id: req.body.lead_id
+                        }
+                    });
+
+                    if(lead && lead.user_id){
+                        req.body.user_id = lead.user_id;
+                    }
+                }
+
                 client.emit("create_followup", req.body);
                 return res.status(200).send({ status: "success", message: "Success created!" });
             }
