@@ -47,6 +47,7 @@ module.exports = (sequelize, DataTypes) => {
     id: {
       type: DataTypes.BIGINT.UNSIGNED,
       primaryKey: true,
+      autoIncrement: true
     },
     AD_status: DataTypes.BOOLEAN,
     AD_procced: DataTypes.BOOLEAN,

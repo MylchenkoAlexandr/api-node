@@ -141,11 +141,7 @@ async function uploadLeadFromMediaAlpha(req, res) {
             ...rawLead.lead
         };
 
-        if (preparedLead.type == "health") {
-            client.emit("upload-lead", preparedLead);
-        } else {
-            client.emit("process-lead", preparedLead);
-        }
+        client.emit("process-lead", preparedLead);
 
         return res.status(200).json({ status: "success", message: "Success Uploaded!" });
     } catch (err) {
