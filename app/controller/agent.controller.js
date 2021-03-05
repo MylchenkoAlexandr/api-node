@@ -1,5 +1,6 @@
 const AgentFacade = require('../facades/agent.facade');
 const CustomScriptsFacade = require('../facades/custom-scripts.facade');
+const models = require('../../database/models');
 
 async function createAgent(req, res) {
     try {
@@ -132,7 +133,7 @@ async function getAllScripts(req, res) {
         };
 
         const response = await CustomScriptsFacade.getCustomScripts(script_options);
-        
+
         return res.status(response.code).json({ status: response.status, scripts: response.scripts });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Server Error' });
@@ -203,6 +204,16 @@ async function getOnlineAgents(req, res) {
     }
 }
 
+async function getSubroles(req, res) {
+    try {
+        const subroles = await models.Subroles.findAll();
+        return res.status(200).send({ status: 'success', message: 'Success!', subroles });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Server Error' });
+        throw error;
+    }
+}
+
 module.exports = {
     getAgents,
     createAgent,
@@ -216,5 +227,6 @@ module.exports = {
     getAllScripts,
     deleteScript,
     updateScript,
-    getOnlineAgents
+    getOnlineAgents,
+    getSubroles
 }
