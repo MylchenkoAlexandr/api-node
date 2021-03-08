@@ -1,13 +1,13 @@
 class StatisticRepository {
     async getStatistic(role, filters) {
         try {
-            const types = filters.types ? '' : '';
-            const sources = filters.sources ? '' : '';
-            const agents = filters.agents ? '' : '';
+            const types = filters.types ? ' AND l.type_id IN (' + filters.types.join(', ') + ')' : '';
+            const sources = filters.sources ? 'AND l.sources_id IN (' + filters.sources.join(', ') + ')' : '';
+            const agents = filters.agents ? 'AND l.user_id IN (' + filters.agents.join(', ') + ')' : '';
 
             const startEnd = () => {
                 if (filters.start && filters.end) {
-                    query = ' AND (l.createdAt BETWEEN ' + filters.start + ' AND ' + filters.end + ')';
+                    query = ' AND ( l.createdAt BETWEEN ' + filters.start + ' AND ' + filters.end + ' )';
                 } else if (filters.end) {
                     query = ' AND l.createdAt > ' + filters.end;
                 } else if (filters.start) {
