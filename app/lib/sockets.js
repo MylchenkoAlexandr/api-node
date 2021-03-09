@@ -108,7 +108,6 @@ module.exports = server => {
         });
 
         socket.on("join_media-alpha_leads", (type) => {
-            console.log("media-alpha_leads" + type);
             socket.join("media-alpha_leads" + type);
             socket.leave("blueberry_leads" + type);
             socket.leave("manual_leads" + type);
@@ -274,7 +273,6 @@ module.exports = server => {
                             if (uploadedLead.source === 'blueberry') {
                                 io.sockets.to("blueberry_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
                             } else if (uploadedLead.source === 'mediaalpha') {
-                                console.log("media-alpha_leads" + uploadedLead.type_id);
                                 io.sockets.to("media-alpha_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
                             }
                             else if (uploadedLead.source === 'manual') {

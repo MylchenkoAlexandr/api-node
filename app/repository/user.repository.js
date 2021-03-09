@@ -60,7 +60,7 @@ class UserRepository {
             state = " users_states.state_id = '" + state_id + "' AND ";
         }
 
-        const data = await db.sequelize.query('SELECT users.id, users.phone FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE' + state + query + ' users.online = 1 AND users.in_call = 0;', {
+        const data = await db.sequelize.query('SELECT users.id FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE' + state + query + ' users.online = 1 AND users.in_call = 0;', {
             type: db.sequelize.QueryTypes.SELECT,
         }).catch(e => {
             throw e;
@@ -81,19 +81,61 @@ class UserRepository {
         return _.isEmpty(data) ? false : data;
     }
 
+    // async findSuitableAgentByCountOfBlueberryLeads(state_id) {
+    //     const currentDate = new Date().toISOString().slice(0, 10);
+    //     const start = currentDate + ' ' + '00:00:00';
+    //     const end = currentDate + ' ' + '23:59:59';
+
+    //     const data = await db.sequelize.query("SELECT users.id,(SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id != 12 AND leads.status_id = 12 OR leads.status_id = 13 OR leads.status_id = 14 AND leads.createdAt BETWEEN :start AND :end) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id AND users.in_call = 0 AND users.online = 1 GROUP BY users.id ORDER BY `count` DESC LIMIT 1", {
+    //         replacements: { state_id: state_id, start: start, end: end },
+    //         type: db.sequelize.QueryTypes.SELECT,
+    //         plain: true,
+    //     }).catch(e => { throw e })
+
+    //     return data;
+    // }
+
     async findSuitableAgentByCountOfBlueberryLeads(state_id) {
-        const currentDate = new Date().toISOString().slice(0, 10);
-        const start = currentDate + ' ' + '00:00:00';
-        const end = currentDate + ' ' + '23:59:59';
+        // Last 7 days start and end datetime
+        const l7d = new Date();
+        l7d.setDate(l7d.getDate() - 7);
+        const l7dStart = l7d.toISOString().slice(0, 10) + ' ' + '00:00:00';
+        const l7dEnd = new Date().toISOString().slice(0, 10) + ' ' + '23:59:59';
 
-        const data = await db.sequelize.query("SELECT users.id,(SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id != 12 AND leads.status_id = 12 OR leads.status_id = 13 OR leads.status_id = 14 AND leads.createdAt BETWEEN :start AND :end) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id AND users.in_call = 0 AND users.online = 1 GROUP BY users.id ORDER BY `count` DESC LIMIT 1", {
-            replacements: { state_id: state_id, start: start, end: end },
+        // Current date start and end datetime
+        const cd = new Date().toISOString().slice(0, 10);
+        const cdStart = cd + ' ' + '00:00:00';
+        const cdEnd = cd + ' ' + '23:59:59';
+
+        let agentsList = await db.sequelize.query("SELECT users.id,(SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id = 1 AND leads.createdAt BETWEEN :start AND :end) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id AND users.in_call = 0 AND users.online = 1 GROUP BY users.id ORDER BY `count` ASC", {
+            replacements: { state_id: state_id, start: cdStart, end: cdEnd },
             type: db.sequelize.QueryTypes.SELECT,
-            plain: true,
-        }).catch(e => { throw e })
+        }).catch(e => { throw e });
 
-        return data;
-    }
+        let agents = [];
+
+        for (const [index, agent] of Object.entries(agentsList)) {
+            let count = await db.sequelize.query("SELECT users.id, (SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id = 1 AND leads.status_id = 15 OR leads.status_id = 16 OR leads.status_id = 17 OR leads.status_id = 18 OR leads.status_id = 19 OR leads.status_id = 20 OR leads.status_id = 21 OR leads.status_id = 22 AND leads.createdAt BETWEEN :start AND :end ) AS `count` FROM users WHERE users.in_call = 0 AND users.online = 1 AND users.id = :user_id ORDER BY users.id", {
+                replacements: { user_id: agent.id, start: l7dStart, end: l7dEnd },
+                type: db.sequelize.QueryTypes.SELECT,
+                plain: true
+            }).catch(e => { throw e });
+
+            agents.push({ ...agent, l7d: count.count });
+
+        }
+        agents.sort((a, b) => (a.l7d < b.l7d) ? 1 : -1);
+
+        if (agents[0]) {
+            agents[0].count -= 2;
+        }
+
+        if (agents[1]) {
+            agents[1].count -= 1;
+        }
+
+        return agents[0];
+d    }
 }
 
 module.exports = new UserRepository

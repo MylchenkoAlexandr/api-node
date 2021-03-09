@@ -2,7 +2,6 @@ const models = require('../../database/models');
 const MessageService = require('../twilio/message/message.service');
 const MailService = require('../services/mail.service');
 const TransformationHelper = require('../helpers/transformation.helper');
-const nodemailer = require('nodemailer');
 
 class TemplatesController {
     async getSmsTemplates(req, res) {
