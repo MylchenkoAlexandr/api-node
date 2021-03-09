@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const StatisticController = require('../app/controller/statistic.controller');
 
-router.get('/', StatisticController.getStatistic());
+router.post('/', StatisticController.getStatistic);
 
 module.exports = router;

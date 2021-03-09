@@ -1,8 +1,8 @@
 const StatisticRepository = require("../repository/statistic.repository.js");
 class StatisticService {
-    async getStatistic(role, filters){
+    async getStatistic(user_id, filters){
         try{
-            return await StatisticRepository.getStatistic(role, filters);
+            return await StatisticRepository.getStatistic(user_id, filters);
         }catch(error){
             throw error;
         }
