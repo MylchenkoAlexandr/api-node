@@ -4,10 +4,12 @@ const LeadFacade = require('../facades/lead.facade');
 const LeadService = require('../services/lead.service');
 const models = require('../../database/models');
 const leadService = require('../services/lead.service');
-
+const LeadRepository = require('../repository/user.repository');
 async function test(req, res) {
-    const lead = await FormatService.formatLead(req.body);
-    return res.status(200).send(lead);
+    // const lead = await FormatService.formatLead(req.body);
+    await LeadRepository.findSuitableAgentByCountOfBlueberryLeads(6);
+    return res.status(200);
+
 }
 
 async function getAll(req, res) {

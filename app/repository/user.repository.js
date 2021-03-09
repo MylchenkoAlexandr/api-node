@@ -94,6 +94,41 @@ class UserRepository {
 
         return data;
     }
+
+    async findSuitableAgentByCountOfBlueberryLeads(state_id) {
+        // Last 7 days start and end datetime
+        const l7d = new Date();
+        l7d.setDate(l7d.getDate() - 7);
+        const l7dStart = l7d.toISOString().slice(0, 10) + ' ' + '00:00:00';
+        const l7dEnd = new Date().toISOString().slice(0, 10) + ' ' + '23:59:59';
+
+        // Current date start and end datetime
+        const cd = new Date().toISOString().slice(0, 10);
+        const cdStart = cd + ' ' + '00:00:00';
+        const cdEnd = cd + ' ' + '23:59:59';
+
+        let agentList = await db.sequelize.query("SELECT users.id,(SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id != 12 AND leads.createdAt BETWEEN :start AND :end) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id AND users.in_call = 0 AND users.online = 1 GROUP BY users.id ORDER BY `count` ASC", {
+            replacements: { state_id: state_id, start: cdStart, end: cdEnd },
+            type: db.sequelize.QueryTypes.SELECT,
+        }).catch(e => { throw e });
+
+        agentList.forEach( async (agent) => {
+            count = await db.sequelize.query("SELECT users.id, (SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id != 12 AND leads.status IN (12, 13, 14) AND leads.createdAt BETWEEN :start AND :end) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id AND users.in_call = 0 AND users.online = 1 AND users.id = :user_id", {
+                replacements: { user_id: agent.id, start: l7dStart, end: l7dEnd },
+                type: db.sequelize.QueryTypes.SELECT,
+            }).catch(e => { throw e });
+            
+            console.log(count);
+            
+            agent.l7dC = count.count;
+        });
+
+        // agentList[0].count -= 2;
+        // agentList[0].count -= 1;
+        console.log()
+
+        return "";
+    }
 }
 
 module.exports = new UserRepository
