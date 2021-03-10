@@ -18,7 +18,8 @@ const {
     getAllScripts,
     deleteScript,
     updateScript,
-    getOnlineAgents
+    getOnlineAgents,
+    getSubroles
 } = require('../app/controller/agent.controller');
 
 router.get('/', authenticateToken, checkedAdminRole, getAgents);
@@ -34,5 +35,5 @@ router.post('/scripts/create', authenticateToken, createScript);
 router.patch('/scripts/:script_id', authenticateToken, updateScript);
 router.delete('/scripts/:script_id', authenticateToken, deleteScript);
 router.get('/online', authenticateToken, getOnlineAgents);
-
+router.get('/subroles', authenticateToken, getSubroles);
 module.exports = router;

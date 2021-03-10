@@ -14,59 +14,52 @@ class LeadFacade {
             const createdLead = await LeadService.createLead(formatedLead);
 
             if (createdLead.empty == 0) {
-                if ("phone" in createdLead) {
-                    let guides = await UserRepository.findSuitableWorker("guide");
-
-                    if (guides) {
-                        const phone = TransformationHelper.formatPhoneForCall(createdLead.phone);
-
-                        // await AutoDiallerService.outboundCall(phone, createdLead.id);
-                    }
-                }
-
                 const leadProperty = JSON.parse(createdLead.property);
-                const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
-                const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
-                const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
-                const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
-                const priceFromQuoter = ninjaQuoterService.getPrice(companies);
-                await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
+                if (quoter == "ninjaQuoter") {
+                    const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
+                    const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
+                    const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
+                    const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
+                    const priceFromQuoter = ninjaQuoterService.getPrice(companies);
+                    await PriceService.processPrice(createdLead.id, priceFromQuoter, quoter);
 
-                if (companiesInfo.length !== 0) {
-                    const email_sended = await LeadService.checkLeadAtSendedEmail(createdLead.email);
+                    if (companiesInfo.length !== 0) {
+                        const email_sended = await LeadService.checkLeadAtSendedEmail(createdLead.email);
 
-                    if (!email_sended) {
-                        try {
-                            const email_params = {
-                                companies: companiesInfo,
-                                email: createdLead.email,
-                                coverage_amount: leadProperty.coverage_amount,
-                                term: leadProperty.term,
-                                fullname: createdLead.fullname
+                        if (!email_sended) {
+                            try {
+                                const email_params = {
+                                    companies: companiesInfo,
+                                    email: createdLead.email,
+                                    coverage_amount: leadProperty.coverage_amount,
+                                    term: leadProperty.term,
+                                    fullname: createdLead.fullname
+                                }
+
+                                email_params.term = email_params.term === 'fex' ? 'final expense' : email_params.term + ' year term';
+
+                                if (typeof email_params.companiesInfo == 'string') {
+                                    email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
+                                }
+
+                                const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
+
+                                const mail_options = {
+                                    from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                                    to: email_params.email,
+                                    subject: `We saved your quote for ${email_params.term} life insurance of $${email_params.coverage_amount}`,
+                                    html
+                                };
+
+                                await MailService.sendNewsletter(mail_options);
+                                await LeadService.updateLeadAtSendedEmail(email_params.email, true);
+                            } catch (error) {
+                                throw error;
                             }
-
-                            email_params.term = email_params.term === 'fex' ? 'final expense' : email_params.term + ' year term';
-
-                            if (typeof email_params.companiesInfo == 'string') {
-                                email_params.companiesInfo = JSON.parse(email_params.companiesInfo);
-                            }
-
-                            const html = MailService.generateQuotesHtmlTemplate('quote.ejs', email_params);
-
-                            const mail_options = {
-                                from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
-                                to: email_params.email,
-                                subject: `We saved your quote for ${email_params.term} life insurance of $${email_params.coverage_amount}`,
-                                html
-                            };
-
-                            await MailService.sendNewsletter(mail_options);
-                            await LeadService.updateLeadAtSendedEmail(email_params.email, true);
-                        } catch (error) {
-                            throw error;
                         }
                     }
                 }
+
 
                 return await LeadService.getOne(createdLead.id);
             }
@@ -84,7 +77,7 @@ class LeadFacade {
             if (updatedLead.empty == 0) {
                 const leadProperty = JSON.parse(updatedLead.property);
 
-                if (!updatedLead.post_sale) {
+                if (!updatedLead.post_sale && updatedLead.type_id === 2) {
                     const formatedLeadForQuote = FormatService.formatLeadForQuote(leadProperty);
                     const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
                     const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();

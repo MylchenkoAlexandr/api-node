@@ -89,9 +89,10 @@ class MailService {
             },
         });
 
-        await MailRepository.create(email_params);
+        await transporter.sendMail(email_options);
+        const { dataValues: savedEmail } = await MailRepository.create(email_params);
 
-        return await transporter.sendMail(email_options);
+        return await MailRepository.getOne(savedEmail.id);
     }
 
     /**

@@ -1,12 +1,21 @@
+const models = require('../../database/models');
 const MailService = require('../services/mail.service');
 
 async function sendMailToClient(req, res) {
     try {
         if (("emailClient" in req.body) && ("fullnameClient" in req.body) && ("text" in req.body) && req.body.text.trim() != '') {
+            const user = await models.Users.findByPk(req.params.user_id);
+
+            let title = `To: ${req.body.fullnameClient}, From: ❤️ @ Blueberry`;
+
+            if ("title" in req.body && req.body.title !== "") {
+                title = req.body.title;
+            }
+
             const email_options = {
-                from: `Blueberry Insurance <${process.env.MAIL_SERVICE_USER_EMAIL}>`,
+                from: `${user.fname} ${user.lname} <${user.email}>`,
                 to: req.body.emailClient,
-                subject: `To: ${req.body.fullnameClient}, From: ❤️ @ Blueberry`,
+                subject: title,
                 text: req.body.text,
             };
 
@@ -16,7 +25,7 @@ async function sendMailToClient(req, res) {
                 text: req.body.text
             }
 
-            const email = await MailService.send(email_options, email_params);
+            const email = await MailService.sendFromAgent(email_options, email_params, user);
             return res.status(200).json({ status: "success", message: "Mail send", email });
         }
 
