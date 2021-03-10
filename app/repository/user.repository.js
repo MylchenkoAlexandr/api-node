@@ -101,8 +101,8 @@ class UserRepository {
         const eT = '23:59:59';
         const l7d = new Date();
         l7d.setDate(l7d.getDate() - 7);
-        const l7dStart = `${l7d.toISOString().slice(0, 10)} ${st}`;
-        const l7dEnd = `${new Date().toISOString().slice(0, 10)} ${et}`;
+        const l7dStart = `${l7d.toISOString().slice(0, 10)} ${sT}`;
+        const l7dEnd = `${new Date().toISOString().slice(0, 10)} ${eT}`;
 
         // Current date start and end datetime
         const cd = new Date().toISOString().slice(0, 10);
