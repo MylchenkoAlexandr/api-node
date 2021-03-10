@@ -63,18 +63,19 @@ class CronService {
                 });
 
                 if (lead) {
-                    let nfText = "Your appointment with " + lead.fullname.toUpperCase() + " starts now!";
+                    let leadInfo = lead.fullname ? lead.fullname.toUpperCase() : lead.phone;
+                    let nfText = "Your appointment with " + leadInfo + " starts now!";
 
                     if (current == followup) {
                         this.sendNotification(record, nfText);
                     } else if (current == b1Hour) {
-                        nfText = "Hi " + user.fname + ", your appointment with " + lead.fullname.toUpperCase() + " starts in 1 hour!";
+                        nfText = "Hi " + user.fname + ", your appointment with " + leadInfo + " starts in 1 hour!";
                         this.sendNotification(record, nfText);
                     } else if (current == b10Min) {
-                        nfText = "Hi " + user.fname + ", your appointment with " + lead.fullname.toUpperCase() + " starts in 10 mins!";
+                        nfText = "Hi " + user.fname + ", your appointment with " + leadInfo + " starts in 10 mins!";
                         this.sendNotification(record, nfText);
                     } else if (cTime == fTime) {
-                        nfText = "Your follow-up with " + lead.fullname.toUpperCase() + " was expired. Please follow up asap!";
+                        nfText = "Your follow-up with " + leadInfo + " was expired. Please follow up asap!";
                         this.sendNotification(record, nfText);
                     }
                 }

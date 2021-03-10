@@ -6,10 +6,16 @@ async function sendMailToClient(req, res) {
         if (("emailClient" in req.body) && ("fullnameClient" in req.body) && ("text" in req.body) && req.body.text.trim() != '') {
             const user = await models.Users.findByPk(req.params.user_id);
 
+            let title = `To: ${req.body.fullnameClient}, From: ❤️ @ Blueberry`;
+
+            if ("title" in req.body && req.body.title !== "") {
+                title = req.body.title;
+            }
+
             const email_options = {
                 from: `${user.fname} ${user.lname} <${user.email}>`,
                 to: req.body.emailClient,
-                subject: `To: ${req.body.fullnameClient}, From: ❤️ @ Blueberry`,
+                subject: title,
                 text: req.body.text,
             };
 

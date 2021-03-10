@@ -47,6 +47,7 @@ app.use('/api/conference', require('./routes/conference.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
 app.use('/api/templates', require('./routes/templates.routes'));
 app.use('/api/followup', require('./routes/followup.routes'));
+app.use('/api/statistic', require('./routes/statistic.routes'));
 
 app.use('*', (req, res) => {
     res.sendStatus(404);
