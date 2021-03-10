@@ -65,6 +65,7 @@ class TemplatesController {
             if ("user_id" in req.body) {
                 const template = await models.email_tmp.create({
                     user_id: req.body.user_id,
+                    name: req.body.name,
                     title: req.body.title,
                     text: req.body.text,
                     createdAt: new Date(),
@@ -84,6 +85,7 @@ class TemplatesController {
         try {
             if ("id" in req.body) {
                 const result = await models.email_tmp.update({
+                    name: req.body.name,
                     title: req.body.title,
                     text: req.body.text,
                     updatedAt: new Date(),
@@ -195,10 +197,16 @@ class TemplatesController {
                 const template = await models.email_tmp.findByPk(req.body.id);
                 const user = await models.Users.findByPk(req.body.user.id);
 
+                let title = `To: ${req.body.lead.fullname}, From: ❤️ @ Blueberry`;
+
+                if (template.title !== "") {
+                    title = template.title;
+                }
+
                 const mailOptions = {
                     from: `${user.fname} ${user.lname} <${user.email}>`,
                     to: req.body.lead.email,
-                    subject: `To: ${req.body.lead.fullname}, From: ❤️ @ Blueberry`,
+                    subject: title,
                     text: template.text,
                 };
 
