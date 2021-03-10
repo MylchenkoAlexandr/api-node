@@ -97,15 +97,17 @@ class UserRepository {
 
     async findSuitableAgentByCountOfBlueberryLeads(state_id) {
         // Last 7 days start and end datetime
+        const sT = '00:00:00';
+        const eT = '23:59:59';
         const l7d = new Date();
         l7d.setDate(l7d.getDate() - 7);
-        const l7dStart = l7d.toISOString().slice(0, 10) + ' ' + '00:00:00';
-        const l7dEnd = new Date().toISOString().slice(0, 10) + ' ' + '23:59:59';
+        const l7dStart = `${l7d.toISOString().slice(0, 10)} ${st}`;
+        const l7dEnd = `${new Date().toISOString().slice(0, 10)} ${et}`;
 
         // Current date start and end datetime
         const cd = new Date().toISOString().slice(0, 10);
-        const cdStart = cd + ' ' + '00:00:00';
-        const cdEnd = cd + ' ' + '23:59:59';
+        const cdStart = `${cd} ${sT}`;
+        const cdEnd = `${cd} ${eT}`;
 
         let agentsList = await db.sequelize.query("SELECT users.id,(SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id = 1 AND leads.createdAt BETWEEN :start AND :end) AS `count` FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE users_states.state_id = :state_id AND users.in_call = 0 AND users.online = 1 GROUP BY users.id ORDER BY `count` ASC", {
             replacements: { state_id: state_id, start: cdStart, end: cdEnd },
@@ -135,7 +137,8 @@ class UserRepository {
         }
 
         return agents[0];
-d    }
+        d
+    }
 }
 
 module.exports = new UserRepository
