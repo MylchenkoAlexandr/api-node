@@ -3,6 +3,7 @@ const ejs = require('ejs');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
 
+const models = require('../../database/models');
 const TransformationHelper = require('../helpers/transformation.helper');
 const MailRepository = require('../repository/mail.repository');
 
@@ -78,15 +79,15 @@ class MailService {
         const credentials = JSON.parse( user.email_credentials );
 
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                type: 'OAuth2',
-                user: user.email,
-                clientId: credentials.clientId,
-                clientSecret: credentials.clientSecret,
-                refreshToken: credentials.refreshToken,
-                accessToken: credentials.accessToken,
-            },
+           service: 'gmail',
+           auth: {
+               type: 'OAuth2',
+               user: user.email,
+               clientId: credentials.clientId,
+               clientSecret: credentials.clientSecret,
+               refreshToken: credentials.refreshToken,
+               accessToken: credentials.accessToken,
+           },
         });
 
         await transporter.sendMail(email_options);
