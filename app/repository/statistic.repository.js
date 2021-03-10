@@ -1,44 +1,34 @@
 const db = require('../../database/models');
 
 class StatisticRepository {
-    async getStatistic(user_id, filters) {
+    async getStatistic(filters) {
         try {
-            let typeQuery = ' AND l.type_id = 0 ';
-            let sourcesQuery = ' AND l.source_id = 0 ';
-            let agentsQuery = ' AND u.id = 0 ';
+            let typeQuery = filters.types.length ? ' AND l.type_id IN (' + filters.types.join(', ') + ')' : " AND l.type_id = 0 ";
+            let sourcesQuery = filters.sources.length ? ' AND l.source_id IN (' + filters.sources.join(', ') + ')' : " AND l.source_id = 0 ";
+            let agentsQuery = filters.agents.length ? ' AND u.id IN (' + filters.agents.join(', ') + ')' : " AND l.id = 0 ";
 
-            if (filters.types.length) {
-                typeQuery = ' AND l.type_id = ' + filters.types.join(' OR l.type_id = ');
-            }
-
-            if (filters.sources.length) {
-                sourcesQuery = ' AND l.source_id = ' + filters.sources.join(' OR l.source_id = ');
-            }
-
-            if (filters.agents.length) {
-                agentsQuery = ' AND u.id = ' + filters.agents.join(' OR u.id = ');
-            }
 
             const startEnd = () => {
-                // if (filters.start && filters.end) {
-                //     query = ' AND ( l.createdAt BETWEEN ' + filters.start + ' AND ' + filters.end + ' )';
-                // } else if (filters.end) {
-                //     query = ' AND l.createdAt > ' + filters.end;
-                // } else if (filters.start) {
-                //     query = ' AND l.createdAt < ' + filters.start;
-                // }
-                return "";
+                let query = '';
+
+                if (filters.date.length == 2) {
+                    filters.date.sort();
+                    let start = filters.date[0] + ' ' + '00:00:00';
+                    let end = filters.date[1] + ' ' + '23:59:59';
+
+                    query = " AND ( l.createdAt BETWEEN '" + start + "' AND '" + end + "')";
+                }
+
+                return query;
             }
 
-            const statInfo = await db.sequelize.query(`SELECT CONCAT(u.fname, ' ', u.lname) agent, COUNT(l.user_id) c_a, (SELECT COUNT(l.id) FROM leads l WHERE l.user_id = u.id AND l.status_id IN (12, 13, 14, 15)) c_d, (SELECT COUNT(l.id) FROM leads l WHERE l.user_id = u.id AND l.status_id IN (12, 13, 14, 15))/COUNT(l.user_id)*100 c_r FROM users u INNER JOIN leads l ON l.user_id = u.id WHERE u.role_id = 2 ${agentsQuery} GROUP BY u.fname ORDER BY u.fname`, {
+            const statInfo = await db.sequelize.query(`SELECT CONCAT(u.fname, ' ', u.lname) agent, COUNT(l.id) c_a, (SELECT COUNT(l.id) FROM leads l WHERE l.user_id = u.id AND l.status_id IN (20, 21, 22, 15, 16)${sourcesQuery}${typeQuery}${startEnd()}) c_d, (SELECT COUNT(l.id) FROM leads l WHERE l.user_id = u.id AND l.status_id IN (20, 21, 22, 15, 16)${sourcesQuery}${typeQuery}${startEnd()})/COUNT(l.id)*100 c_r  FROM users u INNER JOIN leads l ON l.user_id = u.id WHERE u.role_id = 2${agentsQuery}${sourcesQuery}${typeQuery}${startEnd()} GROUP BY u.fname ORDER BY u.fname`, {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
-            console.log(statInfo)
+            console.log(statInfo);
 
-
-            // return statInfo;
-            return "";
+            return statInfo;
         } catch (error) {
             throw error;
         }
