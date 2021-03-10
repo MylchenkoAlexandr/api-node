@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       type: DataTypes.BIGINT.UNSIGNED,
     },
+    name: {
+      allowNull: false,
+      type: DataTypes.STRING,
+    },
     title: {
       allowNull: false,
       type: DataTypes.STRING,
