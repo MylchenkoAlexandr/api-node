@@ -25,6 +25,10 @@ class StatisticRepository {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
+            statInfo.forEach(item => {
+                item.c_r = `${parseInt(item.c_r)}%`
+            });
+
             return statInfo;
         } catch (error) {
             throw error;
