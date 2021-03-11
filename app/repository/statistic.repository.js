@@ -42,10 +42,12 @@ class StatisticRepository {
                         CSA += 1;
                     }
                 });
+                TMP = TMP ? TMP : 0;
+                let AMP = TMP / CSA ? TMP / CSA : 0;
 
                 statInfo[index].c_r = `${parseInt(agent.c_r)}%`
                 statInfo[index].tmp = `$${TMP.toFixed(2)}`
-                statInfo[index].amp = `$${(TMP / CSA).toFixed(2)}`
+                statInfo[index].amp = `$${(AMP).toFixed(2)}`
             }
 
 
