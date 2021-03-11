@@ -26,9 +26,9 @@ class StatisticRepository {
             });
 
             for (const [index, agent] of Object.entries(statInfo)) {
-                let TMP;
+                let TMP = 0;
                 let CSA = 0;
-
+                
                 let premiumPrice = await db.sequelize.query("SELECT p.premium_carrier FROM leads l INNER JOIN prices p ON p.lead_id = l.id WHERE l.user_id = :user_id", {
                     replacements: {
                         user_id: agent.id
