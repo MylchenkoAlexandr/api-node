@@ -45,9 +45,10 @@ class TwilioService {
     };
 
     genereteCapabilityToken(agentId) {
-        const capability = new ClientCapability({
+        let capability = new ClientCapability({
             accountSid: process.env.TWILIO_ACCOUNT_SID,
-            authToken: process.env.TWILIO_AUTH_TOKEN
+            authToken: process.env.TWILIO_AUTH_TOKEN,
+            ttl: 43200
         });
 
         capability.addScope(new ClientCapability.IncomingClientScope(agentId));
