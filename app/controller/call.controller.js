@@ -198,7 +198,6 @@ class CallController {
 
                     const dial = twiml.dial();
 
-                    // dial.client(agent.id);
                     const confName = lead.id + (+new Date());
 
                     dial.conference(confName, {
@@ -223,18 +222,8 @@ class CallController {
                             console.log(err);
                         });
                 } else {
-                    // if (!lead.user_id) {
-                    //     if (state_id) {
-                    //         agent = await UserRepository.findSuitableAgentByState(state_id);
-
-                    //         client.emit("assign-agent", lead.id, agent.id);
-                    //         recordCall = true;
-                    //     }
-                    // }
-
                     twiml.play(process.env.WEBSOCKET_URL + '/' + callbackVoiseMailUrl);
 
-                    // if (recordCall) {
                     twiml.record({
                         action: `${process.env.CALLBACK_TWILIO}/api/call/recieve-voicemail/${lead.id}`,
                         maxLength: 300,
@@ -242,7 +231,6 @@ class CallController {
                         method: 'POST',
                         finishOnKey: '*'
                     });
-                    // }
 
                     MessageService.sendMessage(defaultPhone, data.From, callbackTextMessage);
                 }

@@ -48,25 +48,18 @@ class UserRepository {
         return _.isEmpty(data) ? false : data[0].id;
     }
 
-    async findSuitableAgent(id = null, state_id = null) {
-        let query = ' ';
-        let state = ' ';
-
-        if (id) {
-            query = ' users.id = ' + id + ' AND ';
-        }
-
-        if (state_id) {
-            state = " users_states.state_id = '" + state_id + "' AND ";
-        }
-
-        const data = await db.sequelize.query('SELECT users.id FROM users INNER JOIN users_states ON users_states.user_id = users.id WHERE' + state + query + ' users.online = 1 AND users.in_call = 0;', {
+    async findSuitableAgent(id) {
+        const data = await db.sequelize.query('SELECT u.id FROM users u WHERE u.id = :id AND u.online = 1 AND u.in_call = 0;', {
+            replacements: {
+                id: id
+            },
             type: db.sequelize.QueryTypes.SELECT,
+            plain: true
         }).catch(e => {
             throw e;
         });
 
-        return _.isEmpty(data) ? false : data[0];
+        return data ? data : false;
     }
 
     async findSuitableAgentByState(state_id) {
