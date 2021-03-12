@@ -410,12 +410,20 @@ class LeadService {
                 }
             });
 
+            await models.Followups.destroy({
+                force: true,
+                where: {
+                    lead_id: lead_id
+                }
+            });
+
             await models.Leads.destroy({
                 force: true,
                 where: {
                     id: lead_id
                 }
             });
+
         } catch (error) {
             throw error;
         }
