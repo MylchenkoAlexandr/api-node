@@ -2,7 +2,13 @@ const TelcastService = require('./telcast.service');
 
 class TelcastController {
     index(req, res){
-        TelcastService.sendLead();
+        try {
+            // find the list of leads
+            TelcastService.request();
+
+        } catch (error) {
+            throw error;
+        }
     }
 }
 
