@@ -8,7 +8,7 @@ const app = express();
 const cors = require('cors');
 const helmet = require('helmet');
 const cron = require('node-cron');
-const CronService = require('./app/cron/cron.service')
+const CronService = require('./app/cron/cron.service');
 
 require('dotenv').config();
 

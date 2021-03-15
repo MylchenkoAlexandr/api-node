@@ -1,14 +1,26 @@
 const fetch = require('node-fetch');
-const { URLSearchParams } = require('url');
+const request = require('request');
+const winston = require('winston');
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        new winston.transports.File({ filename: '../../logs/telcast/err_telcast.log', level: 'error' }),
+        new winston.transports.File({ filename: '../../logs/telcast/inf_telcast.log' }),
+    ],
+});
 
 class TelcastService {
     request(lead) {
         try {
-            const URL = process.env.TELCAST_API_URL;
-            const params = new URLSearchParams();
-            params.append("a", 1);
+            const url = process.env.TELCAST_API_URL;
+            const params = { a: 1 };
 
-            console.log(URL, params);
+            request({ url: url, qs: params }, function (err, response, body) {
+                if (err) { console.log(err); return; }
+                console.log("🚀 ~ file: telcast.service.js ~ line 12 ~ TelcastService ~ body", body)
+            });
             return 0;
         } catch (error) {
             throw error;
