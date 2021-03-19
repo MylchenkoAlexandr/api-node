@@ -122,3 +122,5 @@ dist
 .pnp.*
 
 public/voice_mails
+
+logs/telcast/*
