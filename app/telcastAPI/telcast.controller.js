@@ -29,7 +29,7 @@ class TelcastController {
 
             return res.status(400).send({ status: "error", message: "Bad request!" });
         } catch (error) {
-            return res.status(500).send({ status: "error", message: "Server error!" });
+            res.status(500).send({ status: "error", message: "Server error!" });
             throw error;
         }
     }
