@@ -39,7 +39,7 @@ class TelcastService {
                 list_id: list_id,
                 custom_fields: "Y",
                 lead_status: "Contact Attempt",
-                LeadType: lead.source_title,
+                lead_type: lead.source_title,
                 lead_status: lead.status_title,
                 duplicate_check: "DUPLIST"
             };
@@ -57,6 +57,8 @@ class TelcastService {
             lead.gender ? params.gender = lead.gender : false;
             lead.birth_date ? params.date_of_birth = lead.birth_date : false;
             lead.email ? params.email = lead.email : false;
+
+            console.log(params);
 
             request({ url: url, qs: params }, function (err, response, body) {
                 if (err) {
