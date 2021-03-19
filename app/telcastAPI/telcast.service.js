@@ -38,7 +38,6 @@ class TelcastService {
                 phone_number: lead.phone,
                 list_id: list_id,
                 custom_fields: "Y",
-                lead_status: "Contact Attempt",
                 lead_type: lead.source_title,
                 lead_status: lead.status_title,
                 duplicate_check: "DUPLIST"
