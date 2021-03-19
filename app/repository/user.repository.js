@@ -130,7 +130,6 @@ class UserRepository {
         }
 
         return agents[0];
-        d
     }
 }
 
