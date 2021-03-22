@@ -209,15 +209,19 @@ async function selectCarrier(req, res) {
                     lead_id: req.body.lead_id
                 }
             });
+
             let updatedCarrier = {};
+
 
             updatedCarrier[req.body.carrier] = price.price[req.body.carrier];
 
-            price.update({
-                premium_carrier: JSON.stringify(updatedCarrier)
-            });
+            if (updatedCarrier.length) {
+                price.update({
+                    premium_carrier: JSON.stringify(updatedCarrier)
+                });
 
-            client.emit("update_carrier", req.body.lead_id, updatedCarrier);
+                client.emit("update_carrier", req.body.lead_id, updatedCarrier);
+            }
 
             return res.status(200).send({ status: "status", message: "Success!" });
         }
