@@ -9,16 +9,7 @@ class TelcastController {
     async index(req, res) {
         try {
             if (req.body) {
-
-                const data = req.body;
-
-                let leads;
-
-                if (data.filters) {
-                    leads = await LeadRepository.getLeadsByFilters(data.filters);
-                } else if (data.leads) {
-                    leads = data.leads;
-                }
+                const leads = req.body;
 
                 leads.forEach(lead => {
                     TelcastService.sendLead(lead);
