@@ -36,6 +36,13 @@ class StatisticRepository {
                     type: db.sequelize.QueryTypes.SELECT
                 });
 
+                let leads = await db.sequelize.query(`SELECT l.id, s.title s_t, l.fullname, l.email, l.phone FROM leads l INNER JOIN status s ON s.id = l.status_id WHERE l.user_id = :user_id AND l.status_id IN (13, 20, 21, 22, 15, 16, 18, 14)${sourcesQuery}${typeQuery}${startEnd()}`, {
+                    replacements: {
+                        user_id: agent.id
+                    },
+                    type: db.sequelize.QueryTypes.SELECT
+                });
+
                 premiumPrice.map(p => {
                     if (p.premium_carrier) {
                         p.premium_carrier = JSON.parse(p.premium_carrier);
@@ -47,11 +54,11 @@ class StatisticRepository {
                 TMP = TMP ? TMP : 0;
                 let AMP = TMP / CSA ? TMP / CSA : 0;
 
-                statInfo[index].c_r = `${parseInt(agent.c_r)}%`
-                statInfo[index].tmp = `$${TMP.toFixed(2)}`
-                statInfo[index].amp = `$${AMP.toFixed(2)}`
+                statInfo[index].c_r = `${parseInt(agent.c_r)}%`;
+                statInfo[index].tmp = `$${TMP.toFixed(2)}`;
+                statInfo[index].amp = `$${AMP.toFixed(2)}`;
+                statInfo[index].leads = leads;
             }
-
 
             return statInfo;
         } catch (error) {
