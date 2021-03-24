@@ -122,13 +122,9 @@ class UserRepository {
         agents.sort((a, b) => (a.l7d < b.l7d) ? 1 : -1);
 
         if (agents[0]) {
-            agents[0].count -= 2;
+            agents[0].count -= 1;
         }
-
-        if (agents[1]) {
-            agents[1].count -= 1;
-        }
-
+        
         return agents[0];
     }
 }

@@ -408,6 +408,10 @@ class FormatService {
         }
 
         return rawLead;
+
+        email
+        gender
+        tobacco
     }
 
     /**
