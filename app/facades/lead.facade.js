@@ -7,6 +7,7 @@ const AutoDiallerService = require('../services/autodialler.service');
 const TransformationHelper = require('../helpers/transformation.helper');
 const LeadRepository = require('../repository/lead.repository');
 const UserRepository = require('../repository/user.repository');
+const TelcastService = require('../telcastAPI/telcast.service');
 
 class LeadFacade {
     async createLead(formatedLead, quoter) {
@@ -60,8 +61,14 @@ class LeadFacade {
                     }
                 }
 
+                const lead = await LeadService.getOne(createdLead.id);
+                console.log("🚀 ~ file: lead.facade.js ~ line 65 ~ LeadFacade ~ createLead ~ lead", lead)
 
-                return await LeadService.getOne(createdLead.id);
+                if (lead.status_title == 'New Lead' && lead.source_title == 'mediaalpha') {
+                    TelcastService.sendLead(lead);
+                }
+
+                return lead;
             }
 
             return await LeadService.getRawLead(createdLead.id);
@@ -119,7 +126,14 @@ class LeadFacade {
                     }
                 }
 
-                return await LeadService.getOne(updatedLead.id);
+                const lead = await LeadService.getOne(updatedLead.id);
+                console.log("🚀 ~ file: lead.facade.js ~ line 129 ~ LeadFacade ~ updateLead ~ lead", lead)
+
+                if (lead.status_title == 'New Lead' && lead.source_title == 'mediaalpha') {
+                    TelcastService.sendLead(lead);
+                }
+
+                return lead;
             }
 
             return await LeadService.getRawLead(updatedLead.id);
