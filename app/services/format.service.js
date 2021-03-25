@@ -348,7 +348,7 @@ class FormatService {
 
         if (rawLead.email == 'NULL' || rawLead.email == 0) {
             delete rawLead.email;
-        } else {
+        } else if (rawLead.email) {
             rawLead.email = rawLead.email.replace(/"/ig, '');
         }
 
@@ -372,11 +372,12 @@ class FormatService {
         } else {
             if ('birth_date' in rawLead) delete rawLead.birth_date
         }
-
+        console.log(rawLead);
         if (rawLead.phone != 0 || rawLead.phone != 'NULL') {
-            let clearPhone = String(rawLead.phone).length == 11 ? String(rawLead.phone).substring(1) : rawLead.phone;
-
-            rawLead.phone = TransformationHelper.phoneNumber(clearPhone).toString().replace(' ', '');
+            if (rawLead.phone) {
+                let clearPhone = String(rawLead.phone).length == 11 ? String(rawLead.phone).substring(1) : rawLead.phone;
+                rawLead.phone = TransformationHelper.phoneNumber(clearPhone).toString().replace(' ', '');
+            }
         } else {
             delete rawLead.phone;
         }
@@ -408,10 +409,6 @@ class FormatService {
         }
 
         return rawLead;
-
-        email
-        gender
-        tobacco
     }
 
     /**

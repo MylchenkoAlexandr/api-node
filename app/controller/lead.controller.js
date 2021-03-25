@@ -231,6 +231,27 @@ async function selectCarrier(req, res) {
     }
 }
 
+/**
+ * Function for unassign leads from the selected aggents 
+ * @param {*} req 
+ * @param {*} res 
+ */
+async function unassign(req, res) {
+    try {
+        if (req.body) {
+            const data = req.body;
+            for (const [index, lead] of Object.entries(data)) {
+                console.log(lewad.id);
+            }
+            return res.status(200).send({ stunassignatus: "success", message: "Leads unassigned!" });
+        }
+        return res.status(400).send({ status: "error", message: "Bad request!" });
+    } catch (err) {
+        res.status(500).send({ status: "error", message: "Server error!" });
+        throw err;
+    }
+}
+
 module.exports = {
     test,
     getLead,
@@ -245,5 +266,6 @@ module.exports = {
     getLeadsByFilters,
     deteleLead,
     deleteSelectedLeads,
-    selectCarrier
+    selectCarrier,
+    unassign
 }
