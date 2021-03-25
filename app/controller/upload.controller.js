@@ -12,12 +12,13 @@ class UploadController {
     async uploadCSV(req, res) {
         try {
             const form = new formidable.IncomingForm();
-
+            let lt;
             const rawLeads = await new Promise((resolve, reject) => {
                 form.parse(req, (err, fields, files) => {
                     if (err) return reject(err);
 
                     const delimiter = fields.delimiter;
+                    lt = fields.lt;
                     const result = csvToJson.fieldDelimiter(delimiter).formatValueByType().getJsonFromCsv(files["file"].path);
                     resolve(result);
                 });
@@ -25,7 +26,7 @@ class UploadController {
 
             if (rawLeads) {
                 Object.keys(rawLeads).forEach(index => {
-                    let preparedRawLead = FormatService.formatRawLead(rawLeads[index], "bulk", "life");
+                    let preparedRawLead = FormatService.formatRawLead(rawLeads[index], "bulk", lt);
                     client.emit("process-lead", preparedRawLead);
                 });
 
