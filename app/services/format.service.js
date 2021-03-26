@@ -372,7 +372,6 @@ class FormatService {
         } else {
             if ('birth_date' in rawLead) delete rawLead.birth_date
         }
-        console.log(rawLead);
         if (rawLead.phone != 0 || rawLead.phone != 'NULL') {
             if (rawLead.phone) {
                 let clearPhone = String(rawLead.phone).length == 11 ? String(rawLead.phone).substring(1) : rawLead.phone;

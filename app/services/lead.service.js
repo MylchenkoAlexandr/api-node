@@ -2,6 +2,7 @@ const models = require('../../database/models');
 const zipcodes = require('zipcodes');
 const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
+const moment = require('moment-timezone');
 
 class LeadService {
     /**
@@ -176,6 +177,11 @@ class LeadService {
             const location = zipcodes.lookup(lead.zipcode);
             if (location) lead.city = location.city;
 
+            const updatedAt = moment(lead.updatedAt);
+            lead.updatedAt = `${updatedAt.tz('America/Los_Angeles').format('L')} ${updatedAt.tz('America/Los_Angeles').format('LTS')}`;
+
+            const createdAt = moment(lead.createdAt);
+            lead.createdAt = `${createdAt.tz('America/Los_Angeles').format('L')} ${createdAt.tz('America/Los_Angeles').format('LTS')}`;
             return lead;
         } catch (error) {
             throw error;

@@ -62,7 +62,6 @@ class LeadFacade {
                 }
 
                 const lead = await LeadService.getOne(createdLead.id);
-                console.log("🚀 ~ file: lead.facade.js ~ line 65 ~ LeadFacade ~ createLead ~ lead", lead)
 
                 if (lead.status_title == 'New Lead' && lead.source_title == 'mediaalpha') {
                     TelcastService.sendLead(lead);
@@ -127,7 +126,6 @@ class LeadFacade {
                 }
 
                 const lead = await LeadService.getOne(updatedLead.id);
-                console.log("🚀 ~ file: lead.facade.js ~ line 129 ~ LeadFacade ~ updateLead ~ lead", lead)
 
                 if (lead.status_title == 'New Lead' && lead.source_title == 'mediaalpha') {
                     TelcastService.sendLead(lead);

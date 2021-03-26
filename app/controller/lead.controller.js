@@ -236,18 +236,20 @@ async function selectCarrier(req, res) {
  * @param {*} req 
  * @param {*} res 
  */
-async function unassign(req, res) {
+async function assign(req, res) {
     try {
-        if (req.body) {
+        if (req.body.leads) {
             const data = req.body;
-            for (const [index, lead] of Object.entries(data)) {
-                console.log(lewad.id);
+
+            for (const [index, lead] of Object.entries(data.leads)) {
+                client.emit("assign-agent", lead.id, data.agent);
             }
-            return res.status(200).send({ stunassignatus: "success", message: "Leads unassigned!" });
+
+            return res.status(200).json({ status: "success", message: "Leads unassigned!" });
         }
-        return res.status(400).send({ status: "error", message: "Bad request!" });
+        return res.status(400).json({ status: "error", message: "Bad request!" });
     } catch (err) {
-        res.status(500).send({ status: "error", message: "Server error!" });
+        res.status(500).json({ status: "error", message: "Server error!" });
         throw err;
     }
 }
@@ -267,5 +269,5 @@ module.exports = {
     deteleLead,
     deleteSelectedLeads,
     selectCarrier,
-    unassign
+    assign
 }

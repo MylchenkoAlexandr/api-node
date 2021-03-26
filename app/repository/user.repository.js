@@ -124,9 +124,28 @@ class UserRepository {
         if (agents[0]) {
             agents[0].count -= 1;
         }
-        
+
         return agents[0];
     }
+
+    /**
+     * 
+     * @param {Array} states[]
+     */
+    async findSuitableAgentsByStates(states) {
+        if (states) {
+            let agents = await db.sequelize.query("SELECT u.id, CONCAT(u.fname, ' ', u.lname) title FROM users u INNER JOIN users_states us ON us.user_id = u.id WHERE us.state_id IN (:states) AND u.role_id = 2 AND u.banned = 0 AND u.not_assign = 0", {
+                replacements: { states: states },
+                type: db.sequelize.QueryTypes.SELECT,
+            }).catch(e => { throw e });
+            agents.unshift({ id: null, title: "Without agent" })
+            return agents;
+        }
+
+        return [{ id: null, title: "Without agent" }]
+    }
+
+
 }
 
 module.exports = new UserRepository

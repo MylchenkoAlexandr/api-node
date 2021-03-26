@@ -19,7 +19,8 @@ const {
     deleteScript,
     updateScript,
     getOnlineAgents,
-    getSubroles
+    getSubroles,
+    getSuitableAgentByStates
 } = require('../app/controller/agent.controller');
 
 router.get('/', authenticateToken, checkedAdminRole, getAgents);
@@ -36,4 +37,5 @@ router.patch('/scripts/:script_id', authenticateToken, updateScript);
 router.delete('/scripts/:script_id', authenticateToken, deleteScript);
 router.get('/online', authenticateToken, getOnlineAgents);
 router.get('/subroles', authenticateToken, getSubroles);
+router.post('/suitable/states', authenticateToken, getSuitableAgentByStates);
 module.exports = router;
