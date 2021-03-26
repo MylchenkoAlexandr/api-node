@@ -1,6 +1,7 @@
 const AgentFacade = require('../facades/agent.facade');
 const CustomScriptsFacade = require('../facades/custom-scripts.facade');
 const models = require('../../database/models');
+const UserRepository = require('../repository/user.repository');
 
 async function createAgent(req, res) {
     try {
@@ -214,6 +215,29 @@ async function getSubroles(req, res) {
     }
 }
 
+async function getSuitableAgentByStates(req, res) {
+    try {
+        if (req.body) {
+            const leads = req.body;
+            let leadsStates = [];
+
+            leads.forEach(lead => {
+                if (lead.state_id) {
+                    leadsStates.push(lead.state_id);
+                }
+            });
+
+            const agents = await UserRepository.findSuitableAgentsByStates(leadsStates);
+
+            return res.status(200).json({ status: 'error', message: "Success!", agents: agents });
+        }
+        return res.status(400).json({ status: 'error', message: 'Bad Request' });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: "Server Error" });
+        throw error;
+    }
+}
+
 module.exports = {
     getAgents,
     createAgent,
@@ -228,5 +252,6 @@ module.exports = {
     deleteScript,
     updateScript,
     getOnlineAgents,
-    getSubroles
+    getSubroles,
+    getSuitableAgentByStates
 }
