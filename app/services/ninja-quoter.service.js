@@ -10,6 +10,10 @@ class NinjaQuoterService {
             sagicor_express_issue: 0,
             american_general: 0,
             american_national: 0,
+            north_american: 0,
+            lincoln_financial: 0,
+            lincoln_financial_express: 0,
+            protective: 0,
         };
 
         const preferedCompaniesFEX = {
