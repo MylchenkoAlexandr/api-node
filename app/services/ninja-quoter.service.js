@@ -23,8 +23,8 @@ class NinjaQuoterService {
             royal_neighbors: 0,
             liberty_bankers: 0,
             prosperity_life: 0,
-            great_western: 0,
-            american_general: 0
+            american_general: 0,
+            great_western: 0
         };
 
         this.companies = customerInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies;
