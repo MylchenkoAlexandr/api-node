@@ -23,7 +23,7 @@ class NinjaQuoterService {
             royal_neighbors: 0,
             liberty_bankers: 0,
             prosperity_life: 0,
-            americo: 0,
+            great_western: 0,
             american_general: 0
         };
 
