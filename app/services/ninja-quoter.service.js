@@ -10,6 +10,10 @@ class NinjaQuoterService {
             sagicor_express_issue: 0,
             american_general: 0,
             american_national: 0,
+            north_american: 0,
+            lincoln_financial: 0,
+            lincoln_financial_express: 0,
+            protective: 0,
         };
 
         const preferedCompaniesFEX = {
@@ -19,8 +23,8 @@ class NinjaQuoterService {
             royal_neighbors: 0,
             liberty_bankers: 0,
             prosperity_life: 0,
-            americo: 0,
-            american_general: 0
+            american_general: 0,
+            great_western: 0
         };
 
         this.companies = customerInfo.term == 'fex' ? preferedCompaniesFEX : preferedCompanies;
