@@ -1,4 +1,5 @@
 'use strict';
+const mysqldump = require('mysqldump');
 
 const http = require('http');
 const path = require('path');
@@ -56,6 +57,20 @@ app.use('*', (req, res) => {
 
 cron.schedule("* * * * *", async () => {
     await CronService.followUpsNotification();
+});
+
+cron.schedule("59 1 * * *", async () => {
+    if (process.env.WEBSOCKET_URL == "https://api.joinblueberry.com") {
+        mysqldump({
+            connection: {
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME
+            },
+            dumpToFile: '/var/www/dumps/' + new Date() + '.sql',
+        });
+    }
 });
 
 // Start server

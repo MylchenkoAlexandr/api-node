@@ -213,8 +213,7 @@ async function selectCarrier(req, res) {
             let updatedCarrier = {};
 
             updatedCarrier[req.body.carrier] = price.price[req.body.carrier];
-
-            if (Object.keys(updatedCarrier).length > 0) {
+            if (updatedCarrier[req.body.carrier]) {
                 price.update({
                     premium_carrier: JSON.stringify(updatedCarrier)
                 });
