@@ -59,7 +59,7 @@ cron.schedule("* * * * *", async () => {
     await CronService.followUpsNotification();
 });
 
-cron.schedule("59 1 * * *", async () => {
+cron.schedule("0 */2 * * *", async () => {
     if (process.env.WEBSOCKET_URL == "https://api.joinblueberry.com") {
         mysqldump({
             connection: {
