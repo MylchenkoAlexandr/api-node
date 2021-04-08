@@ -9,7 +9,8 @@ class ConferenceController {
                     .participants
                     .create({
                         from: process.env.TWILIO_NUMBER,
-                        to: req.body.number
+                        to: req.body.number,
+                        statusCallback: `${process.env.CALLBACK_TWILIO}/api/conference/participiant-status-callback`,
                     }).then(res => {
                         client.emit("send-second-part-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
                     }).catch((err) => {
@@ -62,6 +63,16 @@ class ConferenceController {
             return res.status(400).send({ status: "error", message: "Bad request!" });
         } catch (error) {
             res.status(500).send({ status: "error", message: "Server error!" });
+            throw error;
+        }
+    }
+
+    participiantStatusCallback(req, res) {
+        try {
+            if (req.body.CallStatus != 'answered') {
+                client.emit("send-second-part-params", false);
+            }
+        } catch (error) {
             throw error;
         }
     }
