@@ -335,8 +335,6 @@ class FormatService {
         rawLead.type = type;
         rawLead.empty = 0;
 
-        if ('city' in rawLead) delete rawLead.city;
-
         if (rawLead.contact) {
             rawLead.contact = rawLead.contact.replace(/"/ig, '');
         }
@@ -406,7 +404,7 @@ class FormatService {
             rawLead.tobacco = rawLead.smoker;
             delete rawLead.smoker;
         }
-
+        
         return rawLead;
     }
 
