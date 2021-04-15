@@ -52,7 +52,12 @@ class TwilioService {
         });
 
         capability.addScope(new ClientCapability.IncomingClientScope(agentId));
-
+        capability.addScope(
+            new ClientCapability.OutgoingClientScope({
+                applicationSid: process.env.TWILIO_TWIML_APP_SID
+            })
+        );
+        
         const token = capability.toJwt();
 
         return token;
