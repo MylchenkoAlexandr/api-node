@@ -312,7 +312,9 @@ class CallController {
             const data = req.body;
             if (data.CallStatus === "cancelled" || data.CallStatus === 'busy' || data.CallStatus === "failed" || data.CallStatus === "no-answer") {
                 client.emit("remove_lock_from_agent", req.params.user_id, null);
+                return res.status(200);
             }
+            return res.status(400)
         } catch (error) {
             throw error;
         }
