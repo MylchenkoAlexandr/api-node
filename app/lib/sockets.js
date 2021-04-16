@@ -711,9 +711,9 @@ module.exports = server => {
             }
         });
 
-        socket.on("send-second-part-params", (params) => {
+        socket.on("send-second-part-params", (params, user_id) => {
             try {
-                io.sockets.emit("SET_SECOND_PARTICIPIANT_PARAMS", params);
+                io.sockets.to(user_id).emit("SET_SECOND_PARTICIPIANT_PARAMS", params);
             } catch (error) {
                 throw error;
             }
