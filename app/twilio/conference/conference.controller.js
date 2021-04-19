@@ -4,13 +4,13 @@ const twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.e
 class ConferenceController {
     addParticipant(req, res) {
         try {
-            if ("lead_id" in req.body && "number" in req.body) {
+            if ("lead_id" in req.body && "number" in req.body && "user_id" in req.body) {
                 twilioClient.conferences(req.body.lead_id)
                     .participants
                     .create({
                         from: process.env.TWILIO_NUMBER,
                         to: req.body.number,
-                        statusCallback: `${process.env.CALLBACK_TWILIO}/api/conference/participiant-status-callback`,
+                        statusCallback: `${process.env.CALLBACK_TWILIO}/api/conference/participiant-status-callback/${req.body.user_id}`,
                     }).then(res => {
                         client.emit("send-second-part-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
                     }).catch((err) => {
@@ -69,8 +69,8 @@ class ConferenceController {
 
     participiantStatusCallback(req, res) {
         try {
-            if (req.body.CallStatus != 'answered') {
-                client.emit("send-second-part-params", false);
+            if (req.body.CallStatus != 'answered' && req.params.user_id) {
+                client.emit("send-second-part-params", false, req.params.user_id);
                 return res.status(200).send({});
             }
             return res.status(400).send({});

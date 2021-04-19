@@ -4,6 +4,6 @@ const ConferenceController = require('../app/twilio/conference/conference.contro
 router.post("/add-participiant", ConferenceController.addParticipant);
 router.post("/handle-hold", ConferenceController.handleParticipantHold);
 router.post("/remove-participiant", ConferenceController.removeParticipiant);
-router.post("/participiant-status-callback", ConferenceController.participiantStatusCallback);
+router.post("/participiant-status-callback/:user_id", ConferenceController.participiantStatusCallback);
 
 module.exports = router;
