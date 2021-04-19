@@ -49,11 +49,11 @@ class ConferenceController {
 
     removeParticipiant(req, res) {
         try {
-            if ("conferenceSid" in req.body && "callSid" in req.body) {
+            if ("conferenceSid" in req.body && "callSid" in req.body && "user_id" in req.body) {
                 twilioClient.conferences(req.body.conferenceSid)
                     .participants(req.body.callSid)
                     .remove().then(() => {
-                        client.emit("send-second-part-params", false);
+                        client.emit("send-second-part-params", false, req.body.user_id);
                     }).catch((err) => {
                         console.log(err);
                     });
