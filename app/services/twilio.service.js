@@ -50,16 +50,9 @@ class TwilioService {
             authToken: process.env.TWILIO_AUTH_TOKEN,
             ttl: 43200
         });
-
         capability.addScope(new ClientCapability.IncomingClientScope(agentId));
-        capability.addScope(
-            new ClientCapability.OutgoingClientScope({
-                applicationSid: process.env.TWILIO_TWIML_APP_SID
-            })
-        );
-        
+        capability.addScope(new ClientCapability.OutgoingClientScope({ applicationSid: process.env.TWILIO_TWIML_APP_SID, clientName: agentId }));
         const token = capability.toJwt();
-
         return token;
     }
 }
