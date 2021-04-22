@@ -15,11 +15,13 @@ class CronService {
             });
 
             if (user) {
-                const agentPhone = TransformationHelper.formatPhoneForCall(user.phone);
-                // Sending sms to customer numbers
-                MessageService.sendMessage(defaultPhone, agentPhone, nfText);
-                // Sending notification 
-                client.emit("send_follow_up_notification", followup.user_id, nfText);
+                if (user.phone) {
+                    const agentPhone = TransformationHelper.formatPhoneForCall(user.phone);
+                    // Sending sms to customer numbers
+                    MessageService.sendMessage(defaultPhone, agentPhone, nfText);
+                    // Sending notification 
+                    client.emit("send_follow_up_notification", followup.user_id, nfText);
+                }
             }
         } catch (error) {
             throw error;
