@@ -1,8 +1,4 @@
 class ConferenceService {
-    create() {
-
-    }
-
     addParticipant(lead_id, number, callSid, conferenceSid) {
         try {
             twilioClient.conferences(lead_id)

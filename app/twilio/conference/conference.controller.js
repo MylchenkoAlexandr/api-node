@@ -71,9 +71,8 @@ class ConferenceController {
         try {
             if (req.body.CallStatus != 'answered' && req.params.user_id) {
                 client.emit("send-second-part-params", false, req.params.user_id);
-                return res.status(200).send({});
             }
-            return res.status(400).send({});
+            return res.status(200).send({});
         } catch (error) {
             throw error;
         }
