@@ -46,8 +46,8 @@ class CallController {
             const twiml = new VoiceResponse();
 
             voiceResponse = twiml.dial();
-
-            voiceResponse.conference(req.body.lead_id, {
+            const confName = req.body.lead_id + (+new Date());
+            voiceResponse.conference(confName, {
                 endConferenceOnExit: true,
                 record: 'true',
                 recordingStatusCallbackEvent: "completed",
@@ -55,7 +55,7 @@ class CallController {
             });
 
             // Connect participiant to the conference 
-            twilioClient.conferences(req.body.lead_id)
+            twilioClient.conferences(confName)
                 .participants
                 .create({
                     from: process.env.TWILIO_NUMBER,
@@ -65,7 +65,7 @@ class CallController {
                     startConferenceOnEnter: true,
                     endConferenceOnExit: true,
                 }).then(res => {
-                    client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid });
+                    client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid }, req.body.user_id);
                 }).catch((err) => {
                     console.log(err);
                 });
@@ -218,7 +218,7 @@ class CallController {
                             to: `client:${agent.id}`,
                             endConferenceOnExit: true,
                         }).then(res => {
-                            client.emit("send-conf-params", { callSid: lead.phone, conferenceSid: res.conferenceSid });
+                            client.emit("send-conf-params", { callSid: lead.phone, conferenceSid: res.conferenceSid }, agent.id);
                         }).catch((err) => {
                             console.log(err);
                         });
