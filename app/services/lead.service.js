@@ -300,7 +300,7 @@ class LeadService {
 
             let post_sale = 0;
 
-            if (statusName === 'purchased' ||
+            if (statusName === 'approved' ||
                 statusName === 'in-force'
             ) {
                 post_sale = 1;
