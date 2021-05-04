@@ -28,11 +28,15 @@ class PriceService {
                 if (exist.premium_carrier) {
                     let pc = JSON.parse(exist.premium_carrier);
                     const pc_key = Object.keys(pc)[0];
-                    pc[pc_key] = price[pc_key]
+                    if (pc_key) {
+                        pc[pc_key] = price[pc_key]
 
-                    exist.update({
-                        premium_carrier: JSON.stringify(pc)
-                    });
+                        if (pc) {
+                            exist.update({
+                                premium_carrier: JSON.stringify(pc)
+                            });
+                        }
+                    }
                 }
             } else {
                 await this.createPrice(quoter.id, lead_id, stringifiedPrice);
