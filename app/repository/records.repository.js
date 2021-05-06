@@ -20,7 +20,7 @@ const RecordsRepository = {
 
     async getByLeadId(lead_id) {
         try {
-            let records = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.lead_id, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.lead_id = ${lead_id}`, {
+            let records = await db.sequelize.query(`SELECT records.id, CONCAT(users.fname, ' ' , users.lname) as agentName, leads.fullname as leadName, records.createdAt, records.url, records.lead_id, records.transcription_text AS text FROM records INNER JOIN users ON records.user_id = users.id INNER JOIN leads ON records.lead_id = leads.id WHERE records.lead_id = ${lead_id} ORDER BY records.id DESC`, {
                 type: db.sequelize.QueryTypes.SELECT
             });
 
