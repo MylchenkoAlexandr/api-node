@@ -25,17 +25,19 @@ class PriceService {
 
             if (exist) {
                 await this.updatePrice(exist, stringifiedPrice);
-                if (exist.premium_carrier) {
-                    let pc = JSON.parse(exist.premium_carrier);
-                    const pc_key = Object.keys(pc)[0];
-                    if (pc_key) {
-                        pc[pc_key] = price[pc_key]
 
-                        if (pc) {
-                            exist.update({
-                                premium_carrier: JSON.stringify(pc)
-                            });
-                        }
+                if (exist.premium_carrier) {
+                    let premiumCarrier = JSON.parse(exist.premium_carrier);
+                    const premiumCarrierKey = Object.keys(premiumCarrier)[0];
+
+                    exist.update({
+                        premium_carrier: null
+                    });
+
+                    if (price[premiumCarrierKey] && price[premiumCarrierKey] != 0) {
+                        exist.update({
+                            premium_carrier: JSON.stringify({[premiumCarrierKey]: price[premiumCarrierKey]})
+                        });
                     }
                 }
             } else {
