@@ -697,7 +697,7 @@ module.exports = server => {
 
         socket.on("send-conf-params", (confParams, user_id) => {
             try {
-                io.sockets.to(user_id).emit("SET_CONF_PARAMS", confParams);
+                io.sockets.to(user_id).to("admin").emit("SET_CONF_PARAMS", confParams);
             } catch (error) {
                 throw error;
             }
@@ -713,7 +713,7 @@ module.exports = server => {
 
         socket.on("send-second-part-params", (params, user_id) => {
             try {
-                io.sockets.to(user_id).emit("SET_SECOND_PARTICIPIANT_PARAMS", params);
+                io.sockets.to(user_id).to("admin").emit("SET_SECOND_PARTICIPIANT_PARAMS", params);
             } catch (error) {
                 throw error;
             }
