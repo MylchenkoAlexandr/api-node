@@ -96,7 +96,7 @@ class UserRepository {
         l7d.setDate(l7d.getDate() - 7);
         const l7dStart = `${l7d.toISOString().slice(0, 10)} ${sT}`;
         const l7dEnd = `${new Date().toISOString().slice(0, 10)} ${eT}`;
-
+        
         // Current date start and end datetime
         const cd = new Date().toISOString().slice(0, 10);
         const cdStart = `${cd} ${sT}`;
@@ -110,20 +110,35 @@ class UserRepository {
         let agents = [];
 
         for (const [index, agent] of Object.entries(agentsList)) {
-            let count = await db.sequelize.query("SELECT users.id, (SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id = 1 AND leads.status_id = 15 OR leads.status_id = 16 OR leads.status_id = 17 OR leads.status_id = 18 OR leads.status_id = 19 OR leads.status_id = 20 OR leads.status_id = 21 OR leads.status_id = 22 AND leads.createdAt BETWEEN :start AND :end ) AS `count` FROM users WHERE users.in_call = 0 AND users.online = 1 AND users.id = :user_id ORDER BY users.id", {
+            let count = await db.sequelize.query("SELECT users.id, (SELECT COUNT(leads.id) FROM leads WHERE leads.user_id = users.id AND leads.source_id = 1 AND leads.status_id IN (15, 16, 17, 18, 19, 20, 21, 22) AND leads.createdAt BETWEEN :start AND :end ) AS `count` FROM users WHERE users.in_call = 0 AND users.online = 1 AND users.id = :user_id ORDER BY users.id", {
                 replacements: { user_id: agent.id, start: l7dStart, end: l7dEnd },
                 type: db.sequelize.QueryTypes.SELECT,
                 plain: true
             }).catch(e => { throw e });
 
             agents.push({ ...agent, l7d: count.count });
-
         }
+
         agents.sort((a, b) => (a.l7d < b.l7d) ? 1 : -1);
 
-        if (agents[0]) {
+        if(agents.length > 1){
+            let tmp = null;
+            for (let i = 0; i < agents.length; i++) {
+                if (agents[i+1] && agents[i].l7d === agents[i+1].l7d) {
+                    if(agents[i+1].count < agents[i].count){
+                        tmp = agents[i];
+                        agents[i] = agents[i+1];
+                        agents[i+1] = tmp;
+                    }
+                }
+            }
+        }    
+        
+        if(agents[0].l7d > 0){
             agents[0].count -= 1;
         }
+
+        console.log(agents);
 
         return agents[0];
     }
