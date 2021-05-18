@@ -65,7 +65,8 @@ module.exports = (sequelize, DataTypes) => {
     busy: DataTypes.BOOLEAN,
     busy_agent_id: DataTypes.BIGINT.UNSIGNED,
     post_sale: DataTypes.BOOLEAN,
-
+    draft_date: DataTypes.STRING,
+    app_date: DataTypes.STRING,
     property: {
       type: DataTypes.TEXT,
       get() {

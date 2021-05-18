@@ -47,7 +47,9 @@ class LeadService {
                 email: lead.email || null,
                 phone: lead.phone || null,
                 fullname: lead.fullname || null,
-                property: JSON.stringify(lead.property)
+                property: JSON.stringify(lead.property),
+                draft_date: lead.draft_date,
+                app_date: lead.app_date
             });
 
             return updatedLead;

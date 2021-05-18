@@ -94,6 +94,16 @@ class FormatService {
                 delete lead.phone;
             }
 
+            if ("draft_date" in lead) {
+                formatedLead.draft_date = lead.draft_date;
+                delete lead.draft_date
+            }
+
+            if ("app_date" in lead) {
+                formatedLead.app_date = lead.app_date;
+                delete lead.app_date
+            }
+
             if ("second_phone" in lead) {
                 formatedLead.second_phone = lead.second_phone.replace(' ', '');
                 delete lead.second_phone;
