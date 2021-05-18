@@ -141,6 +141,7 @@ class CallController {
                         }
                     });
                 }
+
                 const twiml = new VoiceResponse();
 
                 twiml.say({

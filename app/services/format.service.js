@@ -94,6 +94,11 @@ class FormatService {
                 delete lead.phone;
             }
 
+            if ("second_phone" in lead) {
+                formatedLead.second_phone = lead.second_phone.replace(' ', '');
+                delete lead.second_phone;
+            }
+
             if ("zip" in lead && formatedLead.type_id === 2) {
                 lead.zipcode = lead.zip;
                 delete lead.zip;
