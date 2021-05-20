@@ -134,14 +134,6 @@ class CallController {
                     }
                 });
 
-                // if (!lead) {
-                //     lead = await models.Leads.findOne({
-                //         where: {
-                //             second_phone: formatedPhone
-                //         }
-                //     });
-                // }
-
                 const twiml = new VoiceResponse();
 
                 twiml.say({
