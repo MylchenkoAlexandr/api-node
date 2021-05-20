@@ -94,6 +94,21 @@ class FormatService {
                 delete lead.phone;
             }
 
+            if ("draft_date" in lead) {
+                formatedLead.draft_date = lead.draft_date;
+                delete lead.draft_date
+            }
+
+            if ("app_date" in lead) {
+                formatedLead.app_date = lead.app_date;
+                delete lead.app_date
+            }
+
+            if ("second_phone" in lead) {
+                formatedLead.second_phone = lead.second_phone.replace(' ', '');
+                delete lead.second_phone;
+            }
+
             if ("zip" in lead && formatedLead.type_id === 2) {
                 lead.zipcode = lead.zip;
                 delete lead.zip;
@@ -141,16 +156,14 @@ class FormatService {
                 delete lead.agent;
             }
 
-            if (lead.bwf) {
+            if (!formatedLead.user_id && lead.bwf) {
                 let agent;
 
                 if (formatedLead.state_id) {
                     agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(formatedLead.state_id);
                 } else if (formatedLead.phone) {
                     let formatedPhone = TransformationHelper.formatPhoneForCall(formatedLead.phone);
-
                     let state_id = await StateService.getStateIdFromPhone(formatedPhone);
-
                     if (state_id) {
                         agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                     }
@@ -160,16 +173,6 @@ class FormatService {
 
                 delete lead.bwf;
             }
-
-            // TODO commented out for that stage
-            // else if ("state_id" in formatedLead) {
-            //     if (!("user_id" in formatedLead) || formatedLead.user_id == null) {
-            //         const suitableAgent = await AgentRepository.getAgentWithSmallestCountLeads(formatedLead.state_id);
-            //         if (suitableAgent) {
-            //             formatedLead.user_id = suitableAgent;
-            //         }
-            //     }
-            // }
 
             if ("status" in lead) {
                 status = await models.Status.findOne({
@@ -404,7 +407,7 @@ class FormatService {
             rawLead.tobacco = rawLead.smoker;
             delete rawLead.smoker;
         }
-        
+
         return rawLead;
     }
 

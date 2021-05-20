@@ -158,7 +158,14 @@ class MessageController {
                         phone: formatedPhone
                     }
                 });
-
+                
+                if (!lead) {
+                    lead = await models.Leads.findOne({
+                        where: {
+                            second_phone: formatedPhone
+                        }
+                    });
+                }
                 if (lead) {
                     let message = await MessageService.create(lead.id, lead.user_id, 1, 1, data.Body);
 

@@ -5,10 +5,10 @@ const LeadService = require('../services/lead.service');
 const models = require('../../database/models');
 const leadService = require('../services/lead.service');
 const LeadRepository = require('../repository/user.repository');
-async function test(req, res) {
-    await LeadRepository.findSuitableAgent(6);
-    return res.status(200);
 
+async function test(req, res) {
+    await LeadRepository.findSuitableAgentByCountOfBlueberryLeads(6);
+    return res.status(200);
 }
 
 async function getAll(req, res) {

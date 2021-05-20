@@ -127,7 +127,7 @@ class CallController {
                 let callbackTextMessage = settings.default_text_message;
 
                 const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
-
+                // where phone or second phone
                 let lead = await models.Leads.findOne({
                     where: {
                         phone: formatedPhone
