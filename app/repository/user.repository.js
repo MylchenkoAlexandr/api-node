@@ -80,8 +80,11 @@ class UserRepository {
         const eT = '23:59:59';
         const l7d = new Date();
         l7d.setDate(l7d.getDate() - 7);
-        const l7dStart = `${l7d.toISOString().slice(0, 10)} ${sT}`;
-        const l7dEnd = `${new Date().toISOString().slice(0, 10)} ${eT}`;
+        // const l7dStart = `${l7d.toISOString().slice(0, 10)} ${sT}`;
+        // const l7dEnd = `${new Date().toISOString().slice(0, 10)} ${eT}`;
+        
+        const l7dStart = `2021-01-01 ${sT}`;
+        const l7dEnd = `2021-05-13 ${eT}`;
 
         // Current date start and end datetime
         const cd = new Date().toISOString().slice(0, 10);
@@ -111,6 +114,8 @@ class UserRepository {
             agents[0].count -= 1;
         }
 
+        agents.sort((a, b) => (a.count > b.count) ? 1 : -1);
+        
         return agents[0];
     }
 
