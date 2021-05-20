@@ -94,6 +94,15 @@ class LeadService {
                             }
                         });
                     }
+
+                    if (!exist) {
+                        exist = await models.Leads.findOne({
+                            where: {
+                                type_id: formatedLead.type_id,
+                                phone: formatedLead.phone
+                            }
+                        });
+                    }
                 }
             } else {
                 exist = await models.Leads.findOne({
