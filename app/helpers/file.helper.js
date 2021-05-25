@@ -15,7 +15,6 @@ class FileHelper {
             // fs.writeFileSync(pathToFile, data);
             fs.createWriteStream(filename, data, function (err) {
                 if (err) throw err;
-                console.log('Saved!');
             });
 
             return pathToFile;

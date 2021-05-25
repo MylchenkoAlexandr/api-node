@@ -126,7 +126,6 @@ module.exports = server => {
         });
 
         socket.on("join_bulk_leads", (type) => {
-            console.log("bulk_leads" + type);
             socket.join("bulk_leads" + type);
             socket.leave("blueberry_leads" + type);
             socket.leave("media-alpha_leads" + type);
