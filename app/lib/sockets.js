@@ -164,12 +164,14 @@ module.exports = server => {
                     }
                 }
 
-                let exist;
-                console.log(lead);
+                const doNotUpdate = lead.doNotUpdate ?? false;
+                const leadId = lead.id ?? false;
+
                 let formatedLead = await FormatService.formatLead(lead);
 
-                if (lead.id) {
-                    exist = await models.Leads.findOne({ where: { id: lead.id } });
+                let exist;
+                if (leadId) {
+                    exist = await models.Leads.findOne({ where: { id: leadId } });
                 } else {
                     exist = await LeadService.foundExistLead(formatedLead);
                 }
@@ -177,7 +179,7 @@ module.exports = server => {
                 let uploadedLead;
 
                 if (exist) {
-                    if (!lead.doNotUpdate) {
+                    if (!doNotUpdate) {
                         const emptyStatus = exist.empty;
                         if (exist.empty == 0 && formatedLead.empty == 1) {
                             console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);

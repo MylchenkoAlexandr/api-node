@@ -73,8 +73,6 @@ async function getCompaniesListByLeadData(req, res) {
 
         rawLead.doNotUpdate = true;
 
-        console.log("🚀 ~ file: lead.controller.js ~ line 75 ~ getCompaniesListByLeadData ~ rawLead", rawLead);
-
         client.emit("process-lead", rawLead);
 
         const companies = await LeadFacade.getCompaniesList(rawLead);
