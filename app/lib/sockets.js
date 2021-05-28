@@ -165,23 +165,18 @@ module.exports = server => {
                 }
 
                 let exist;
-                let lead_id = lead.id;
 
                 let formatedLead = await FormatService.formatLead(lead);
 
-                if (lead_id) {
-                    exist = await models.Leads.findOne({
-                        where: {
-                            id: lead_id
-                        }
-                    });
+                if (lead.id) {
+                    exist = await models.Leads.findOne({ where: { id: lead.id } });
                 } else {
                     exist = await LeadService.foundExistLead(formatedLead);
                 }
 
                 let uploadedLead;
 
-                if (exist) {
+                if (exist && !lead.bwf) {
                     const emptyStatus = exist.empty;
                     if (exist.empty == 0 && formatedLead.empty == 1) {
                         console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);
