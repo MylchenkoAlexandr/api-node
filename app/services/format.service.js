@@ -295,6 +295,10 @@ class FormatService {
                 delete lead.type_id;
             }
 
+            if ("doNotUpdate" in lead) {
+                delete lead.doNotUpdate;
+            }
+
 
             formatedLead.property = {
                 ...lead

@@ -176,7 +176,7 @@ module.exports = server => {
 
                 let uploadedLead;
 
-                if (exist && !lead.bwf) {
+                if (exist && !lead.doNotUpdate) {
                     const emptyStatus = exist.empty;
                     if (exist.empty == 0 && formatedLead.empty == 1) {
                         console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);

@@ -71,6 +71,8 @@ async function getCompaniesListByLeadData(req, res) {
             delete rawLead['medications[]']
         }
 
+        rawLead.doNotUpdate = true;
+
         client.emit("process-lead", rawLead);
 
         const companies = await LeadFacade.getCompaniesList(rawLead);
