@@ -165,7 +165,7 @@ module.exports = server => {
                 }
 
                 let exist;
-
+                console.log(lead);
                 let formatedLead = await FormatService.formatLead(lead);
 
                 if (lead.id) {
@@ -177,8 +177,6 @@ module.exports = server => {
                 let uploadedLead;
 
                 if (exist) {
-                    console.log(lead);
-                    console.log(lead.doNotUpdate);
                     if (!lead.doNotUpdate) {
                         const emptyStatus = exist.empty;
                         if (exist.empty == 0 && formatedLead.empty == 1) {
