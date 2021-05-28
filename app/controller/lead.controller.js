@@ -71,7 +71,7 @@ async function getCompaniesListByLeadData(req, res) {
             delete rawLead['medications[]']
         }
 
-        rawLead['doNotUpdate'] = true;
+        rawLead.doNotUpdate = true;
 
         console.log("🚀 ~ file: lead.controller.js ~ line 75 ~ getCompaniesListByLeadData ~ rawLead", rawLead);
 
