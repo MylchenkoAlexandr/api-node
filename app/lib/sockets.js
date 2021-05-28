@@ -164,8 +164,8 @@ module.exports = server => {
                     }
                 }
 
-                const doNotUpdate = lead.doNotUpdate ?? false;
-                const leadId = lead.id ?? false;
+                const doNotUpdate = lead.doNotUpdate ? lead.doNotUpdate : false;
+                const leadId = lead.id ? lead.id : false;
 
                 let formatedLead = await FormatService.formatLead(lead);
 
