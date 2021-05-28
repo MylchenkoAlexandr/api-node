@@ -176,76 +176,80 @@ module.exports = server => {
 
                 let uploadedLead;
 
-                if (exist && !lead.doNotUpdate) {
-                    const emptyStatus = exist.empty;
-                    if (exist.empty == 0 && formatedLead.empty == 1) {
-                        console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);
-                    } else {
-                        uploadedLead = await LeadFacade.updateLead(exist, formatedLead, quoter);
+                if (exist) {
+                    console.log(lead);
+                    console.log(lead.doNotUpdate);
+                    if (!lead.doNotUpdate) {
+                        const emptyStatus = exist.empty;
+                        if (exist.empty == 0 && formatedLead.empty == 1) {
+                            console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);
+                        } else {
+                            uploadedLead = await LeadFacade.updateLead(exist, formatedLead, quoter);
 
-                        if (uploadedLead) {
-                            for (user in users) {
-                                if (users[user].id != uploadedLead.user_id) {
-                                    io.sockets.to(users[user].id).emit("DELETE_LEAD", uploadedLead.id);
-                                } else if (users[user].id == uploadedLead.user_id) {
-                                    io.sockets.to(users[user].id).emit("UPDATE_LEAD", uploadedLead);
-                                } else {
-                                    io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
+                            if (uploadedLead) {
+                                for (user in users) {
+                                    if (users[user].id != uploadedLead.user_id) {
+                                        io.sockets.to(users[user].id).emit("DELETE_LEAD", uploadedLead.id);
+                                    } else if (users[user].id == uploadedLead.user_id) {
+                                        io.sockets.to(users[user].id).emit("UPDATE_LEAD", uploadedLead);
+                                    } else {
+                                        io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
+                                    }
                                 }
-                            }
 
-                            io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
-                            io.sockets.to(uploadedLead.user_id).emit("UPDATE_LEADS", uploadedLead);
+                                io.sockets.to(uploadedLead.id).emit("UPDATE_LEAD", uploadedLead);
+                                io.sockets.to(uploadedLead.user_id).emit("UPDATE_LEADS", uploadedLead);
 
-                            if (uploadedLead.source != 'manual') {
-                                if (!uploadedLead.AD_procced) {
-                                    io.sockets.to("guide").emit("UPDATE_LEADS", uploadedLead);
-                                } else {
-                                    io.sockets.to("guide").emit("DELETE_LEAD", uploadedLead.id);
+                                if (uploadedLead.source != 'manual') {
+                                    if (!uploadedLead.AD_procced) {
+                                        io.sockets.to("guide").emit("UPDATE_LEADS", uploadedLead);
+                                    } else {
+                                        io.sockets.to("guide").emit("DELETE_LEAD", uploadedLead.id);
+                                    }
                                 }
-                            }
 
-                            if (uploadedLead.user_id && uploadedLead.source == 'manual') {
-                                io.sockets.to(uploadedLead.user_id + "manual_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
-                            }
-
-                            if (uploadedLead.source === 'blueberry') {
-                                io.sockets.to("blueberry_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
-                            } else if (uploadedLead.source === 'mediaalpha') {
-                                io.sockets.to("media-alpha_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
-                            }
-                            else if (uploadedLead.source === 'manual') {
-                                io.sockets.to("manual_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
-                            }
-                            else if (uploadedLead.source === 'bulk') {
-                                io.sockets.to("bulk_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
-                            }
-                            else if (uploadedLead.source === 'clickListing') {
-                                io.sockets.to("click-listing_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
-                            }
-                            else if (uploadedLead.source === 'liveTransfer') {
-                                io.sockets.to("live-transfer_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
-                            }
-
-                            if (emptyStatus) {
-                                io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
+                                if (uploadedLead.user_id && uploadedLead.source == 'manual') {
+                                    io.sockets.to(uploadedLead.user_id + "manual_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
+                                }
 
                                 if (uploadedLead.source === 'blueberry') {
-                                    io.sockets.to("blueberry_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    io.sockets.to("blueberry_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
                                 } else if (uploadedLead.source === 'mediaalpha') {
-                                    io.sockets.to("media-alpha_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    io.sockets.to("media-alpha_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
                                 }
                                 else if (uploadedLead.source === 'manual') {
-                                    io.sockets.to("manual_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    io.sockets.to("manual_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
                                 }
                                 else if (uploadedLead.source === 'bulk') {
-                                    io.sockets.to("bulk_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    io.sockets.to("bulk_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
                                 }
                                 else if (uploadedLead.source === 'clickListing') {
-                                    io.sockets.to("click-listing_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    io.sockets.to("click-listing_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
                                 }
                                 else if (uploadedLead.source === 'liveTransfer') {
-                                    io.sockets.to("live-transfer_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    io.sockets.to("live-transfer_leads" + uploadedLead.type_id).emit("UPDATE_LEADS", uploadedLead);
+                                }
+
+                                if (emptyStatus) {
+                                    io.sockets.to(uploadedLead.user_id).emit("CREATE_LEAD", uploadedLead);
+
+                                    if (uploadedLead.source === 'blueberry') {
+                                        io.sockets.to("blueberry_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    } else if (uploadedLead.source === 'mediaalpha') {
+                                        io.sockets.to("media-alpha_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    }
+                                    else if (uploadedLead.source === 'manual') {
+                                        io.sockets.to("manual_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    }
+                                    else if (uploadedLead.source === 'bulk') {
+                                        io.sockets.to("bulk_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    }
+                                    else if (uploadedLead.source === 'clickListing') {
+                                        io.sockets.to("click-listing_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    }
+                                    else if (uploadedLead.source === 'liveTransfer') {
+                                        io.sockets.to("live-transfer_leads" + uploadedLead.type_id).emit("CREATE_LEAD", uploadedLead);
+                                    }
                                 }
                             }
                         }
