@@ -115,19 +115,21 @@ class CallController {
     async inboundCall(req, res) {
         try {
             const data = req.body;
-
             if ("CallSid" in data && "From" in data) {
                 let agent, state_id;
-                let recordCall = false;
-
+                let leadType = 1;
                 const settings = await SettingsService.get();
                 const defaultPhone = TransformationHelper.formatPhoneForCall(settings.default_phone);
+                
+                if (data.To === '+1') {
+                    leadType = 2;
+                }
 
                 let callbackVoiseMailUrl = settings.default_voice_mail;
                 let callbackTextMessage = settings.default_text_message;
 
                 const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
-                // where phone or second phone
+                
                 let lead = await models.Leads.findOne({
                     where: {
                         phone: formatedPhone
@@ -141,7 +143,6 @@ class CallController {
                 }, 'Please wait connection with agent!');
 
                 if (lead) {
-                    recordCall = true;
                     if (lead.user_id) {
                         const user = await models.Users.findOne({
                             where: { id: lead.user_id }
@@ -157,12 +158,12 @@ class CallController {
                         }
                     } else {
                         if (lead.state_id) {
-                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id);
+                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id, leadType);
                         } else {
                             let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                             if (state_id) {
-                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
+                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
                             }
                         }
                     }
@@ -170,7 +171,7 @@ class CallController {
                     state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                     if (state_id) {
-                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
+                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
                     }
 
                     lead = await models.Leads.create({
@@ -245,6 +246,8 @@ class CallController {
             throw error;
         }
     }
+
+    // Add new function for the health inbout call
 
     async recieveVoiceMail(req, res) {
         try {

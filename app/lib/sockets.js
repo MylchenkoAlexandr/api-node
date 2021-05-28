@@ -167,7 +167,7 @@ module.exports = server => {
                 let exist;
 
                 let formatedLead = await FormatService.formatLead(lead);
-=
+
                 if (lead.id) {
                     exist = await models.Leads.findOne({ where: { id: lead.id } });
                 } else {
