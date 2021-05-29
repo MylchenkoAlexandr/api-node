@@ -117,13 +117,13 @@ class CallController {
             const data = req.body;
             if ("CallSid" in data && "From" in data) {
                 let agent, state_id;
-                let leadType = 1;
+                // let leadType = 1;
                 const settings = await SettingsService.get();
                 const defaultPhone = TransformationHelper.formatPhoneForCall(settings.default_phone);
                 
-                if (data.To === '+1') {
-                    leadType = 2;
-                }
+                // if (data.To === '+1') {
+                //     leadType = 2;
+                // }
 
                 let callbackVoiseMailUrl = settings.default_voice_mail;
                 let callbackTextMessage = settings.default_text_message;
@@ -158,12 +158,12 @@ class CallController {
                         }
                     } else {
                         if (lead.state_id) {
-                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id, leadType);
+                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id);
                         } else {
                             let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                             if (state_id) {
-                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
+                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                             }
                         }
                     }
@@ -171,7 +171,7 @@ class CallController {
                     state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                     if (state_id) {
-                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
+                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
                     }
 
                     lead = await models.Leads.create({
