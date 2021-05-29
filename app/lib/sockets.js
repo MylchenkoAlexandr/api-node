@@ -164,7 +164,8 @@ module.exports = server => {
                     }
                 }
 
-                const doNotUpdate = lead.doNotUpdate ? lead.doNotUpdate : false;
+                var doNotUpdate = lead.doNotUpdate ? lead.doNotUpdate : false;
+                const bwf = lead.bwf ? lead.bwf : false;
                 const leadId = lead.id ? lead.id : false;
 
                 let formatedLead = await FormatService.formatLead(lead);
@@ -174,6 +175,16 @@ module.exports = server => {
                     exist = await models.Leads.findOne({ where: { id: leadId } });
                 } else {
                     exist = await LeadService.foundExistLead(formatedLead);
+                }
+
+                // Additional check for live transfer leads
+                if (bwf) {
+                    if (!exist.email && !exist.fullname) {
+                        if (exist.user_id) {
+                            formatedLead.user_id = exist.user_id;
+                        }
+                        doNotUpdate = false;
+                    }
                 }
 
                 let uploadedLead;
