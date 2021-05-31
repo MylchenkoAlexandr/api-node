@@ -117,19 +117,19 @@ class CallController {
             const data = req.body;
             if ("CallSid" in data && "From" in data) {
                 let agent, state_id;
-                // let leadType = 1;
+                let leadType = { type_id: 2, subrole_id: 1 };
                 const settings = await SettingsService.get();
                 const defaultPhone = TransformationHelper.formatPhoneForCall(settings.default_phone);
-                
-                // if (data.To === '+1') {
-                //     leadType = 2;
-                // }
+
+                if (data.To === '+18432339861') {
+                    leadType = { type_id: 4, subrole_id: 2 }
+                }
 
                 let callbackVoiseMailUrl = settings.default_voice_mail;
                 let callbackTextMessage = settings.default_text_message;
 
                 const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
-                
+
                 let lead = await models.Leads.findOne({
                     where: {
                         phone: formatedPhone
@@ -158,12 +158,12 @@ class CallController {
                         }
                     } else {
                         if (lead.state_id) {
-                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id);
+                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id, leadType);
                         } else {
                             let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                             if (state_id) {
-                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
+                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
                             }
                         }
                     }
@@ -171,7 +171,7 @@ class CallController {
                     state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                     if (state_id) {
-                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
+                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
                     }
 
                     lead = await models.Leads.create({
@@ -259,43 +259,6 @@ class CallController {
             return res.status(400).send({ status: "error", message: "Bad request!" });
         } catch (error) {
             res.status(500).send({ status: "error", message: "Server error!" });
-            throw error;
-        }
-    }
-
-    async playPreRecordedVM(req, res) {
-        try {
-            // twilioClient.calls.create({
-            //     url: 'https://api.twilio.com/cowbell.mp3'
-            // });
-
-            twilioClient.calls(req.body.callSid)
-                .update({
-                    // from: "+380632796212",
-                    // to: "+18339282583",
-                    // url: 'http://demo.twilio.com/docs/classic.mp3'
-                    method: "POST",
-                    url: `${process.env.CALLBACK_TWILIO}/api/call/voicemail-response`,
-                });
-
-            // const response = new VoiceResponse();
-            // response.enqueue({
-            //     waitUrl: 'https://api.twilio.com/cowbell.mp3'
-            // }, 'support');
-
-            // const response = new VoiceResponse();
-            // response.play('https://api.twilio.com/cowbell.mp3');
-
-
-            // response.play({
-            //     loop: 10
-            // }, '');
-
-
-            // res.type('text/xml');
-
-            return res.status(200).send({});
-        } catch (error) {
             throw error;
         }
     }
