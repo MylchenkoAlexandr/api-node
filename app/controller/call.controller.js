@@ -132,7 +132,8 @@ class CallController {
 
                 let lead = await models.Leads.findOne({
                     where: {
-                        phone: formatedPhone
+                        phone: formatedPhone,
+                        type_id: leadType.type_id
                     }
                 });
 
