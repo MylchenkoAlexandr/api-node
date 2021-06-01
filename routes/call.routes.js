@@ -4,7 +4,7 @@ const authenticateToken = AuthMiddleware.authenticateToken;
 
 const CallController = require('../app/twilio/call/call.controller');
 
-router.get('/token', authenticateToken, CallController.token);
+router.post('/token/:agent_id', authenticateToken, CallController.token);
 router.post('/voice', CallController.voice);
 router.post('/record-callback/:lead_id/:user_id', CallController.recordCallback);
 router.post('/recieve-voicemail/:lead_id', CallController.recieveVoiceMail);

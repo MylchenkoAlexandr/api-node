@@ -10,24 +10,12 @@ const StateService = require('../../services/state.service');
 const UserRepository = require('../../repository/user.repository');
 const MessageService = require('../message/message.service');
 const SettingsService = require('../../services/settings.service');
-const twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const TwilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const TwilioService = require('../../services/twilio.service');
 
 class CallController {
     token(req, res) {
-        const capability = new ClientCapability({
-            accountSid: process.env.TWILIO_ACCOUNT_SID,
-            authToken: process.env.TWILIO_AUTH_TOKEN,
-            ttl: 43200
-        });
-
-        capability.addScope(
-            new ClientCapability.OutgoingClientScope({
-                applicationSid: process.env.TWILIO_TWIML_APP_SID
-            })
-        );
-
-        const token = capability.toJwt();
-
+        const token = TwilioService.genereteCapabilityToken(req.params.agent_id);
         return res.status(200).json({ token });
     }
 
@@ -55,7 +43,7 @@ class CallController {
             });
 
             // Connect participiant to the conference 
-            twilioClient.conferences(confName)
+            TwilioClient.conferences(confName)
                 .participants
                 .create({
                     from: process.env.TWILIO_NUMBER,
@@ -213,7 +201,7 @@ class CallController {
                     });
 
                     // Connect participiant to the conference 
-                    twilioClient.conferences(confName)
+                    TwilioClient.conferences(confName)
                         .participants
                         .create({
                             from: process.env.TWILIO_NUMBER,
