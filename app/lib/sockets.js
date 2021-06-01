@@ -44,49 +44,49 @@ module.exports = server => {
             switch (source) {
                 case 1:
                     socket.join(user_id + "blueberry_leads" + type);
-                    socket.leave(user_id + "media-alpha_leads" + type);
+                    socket.leave(user_id + "mediaalpha_leads" + type);
                     socket.leave(user_id + "manual_leads" + type);
                     socket.leave(user_id + "bulk_leads" + type);
-                    socket.leave(user_id + "click-listing_leads" + type);
-                    socket.leave(user_id + "live-transfer_leads" + type);
+                    socket.leave(user_id + "clickListing_leads" + type);
+                    socket.leave(user_id + "liveTransfer_leads" + type);
                     break;
                 case 2:
-                    socket.join(user_id + "media-alpha_leads" + type);
+                    socket.join(user_id + "mediaalpha_leads" + type);
                     socket.leave(user_id + "blueberry_leads" + type);
                     socket.leave(user_id + "manual_leads" + type);
                     socket.leave(user_id + "bulk_leads" + type);
-                    socket.leave(user_id + "click-listing_leads" + type);
-                    socket.leave(user_id + "live-transfer_leads" + type);
+                    socket.leave(user_id + "clickListing_leads" + type);
+                    socket.leave(user_id + "liveTransfer_leads" + type);
                     break;
                 case 3:
                     socket.join(user_id + "manual_leads" + type);
-                    socket.leave(user_id + "media-alpha_leads" + type);
+                    socket.leave(user_id + "mediaalpha_leads" + type);
                     socket.leave(user_id + "blueberry_leads" + type);
                     socket.leave(user_id + "bulk_leads" + type);
-                    socket.leave(user_id + "click-listing_leads" + type);
-                    socket.leave(user_id + "live-transfer_leads" + type);
+                    socket.leave(user_id + "clickListing_leads" + type);
+                    socket.leave(user_id + "liveTransfer_leads" + type);
                     break;
                 case 4:
                     socket.join(user_id + "bulk_leads" + type);
                     socket.leave(user_id + "blueberry_leads" + type);
-                    socket.leave(user_id + "media-alpha_leads" + type);
+                    socket.leave(user_id + "mediaalpha_leads" + type);
                     socket.leave(user_id + "manual_leads" + type);
-                    socket.leave(user_id + "click-listing_leads" + type);
-                    socket.leave(user_id + "live-transfer_leads" + type);
+                    socket.leave(user_id + "clickListing_leads" + type);
+                    socket.leave(user_id + "liveTransfer_leads" + type);
                     break;
                 case 5:
-                    socket.join(user_id + "click-listing_leads" + type);
+                    socket.join(user_id + "clickListing_leads" + type);
                     socket.leave(user_id + "blueberry_leads" + type);
-                    socket.leave(user_id + "media-alpha_leads" + type);
+                    socket.leave(user_id + "mediaalpha_leads" + type);
                     socket.leave(user_id + "manual_leads" + type);
                     socket.leave(user_id + "bulk_leads" + type);
-                    socket.leave(user_id + "live-transfer_leads" + type);
+                    socket.leave(user_id + "liveTransfer_leads" + type);
                     break;
                 case 6:
-                    socket.join(user_id + "live-transfer_leads" + type);
-                    socket.leave(user_id + "click-listing_leads" + type);
+                    socket.join(user_id + "liveTransfer_leads" + type);
+                    socket.leave(user_id + "clickListing_leads" + type);
                     socket.leave(user_id + "blueberry_leads" + type);
-                    socket.leave(user_id + "media-alpha_leads" + type);
+                    socket.leave(user_id + "mediaalpha_leads" + type);
                     socket.leave(user_id + "manual_leads" + type);
                     socket.leave(user_id + "bulk_leads" + type);
                     break;
@@ -96,54 +96,54 @@ module.exports = server => {
 
         socket.on("join_blueberry_leads", (type) => {
             socket.join("blueberry_leads" + type);
-            socket.leave("media-alpha_leads" + type);
+            socket.leave("mediaalpha_leads" + type);
             socket.leave("manual_leads" + type);
             socket.leave("bulk_leads" + type);
-            socket.leave("click-listing_leads" + type);
-            socket.leave("live-transfer_leads" + type);
+            socket.leave("clickListing_leads" + type);
+            socket.leave("liveTransfer_leads" + type);
         });
 
-        socket.on("join_media-alpha_leads", (type) => {
-            socket.join("media-alpha_leads" + type);
+        socket.on("join_mediaalpha_leads", (type) => {
+            socket.join("mediaalpha_leads" + type);
             socket.leave("blueberry_leads" + type);
             socket.leave("manual_leads" + type);
             socket.leave("bulk_leads" + type);
-            socket.leave("click-listing_leads" + type);
-            socket.leave("live-transfer_leads" + type);
+            socket.leave("clickListing_leads" + type);
+            socket.leave("liveTransfer_leads" + type);
         });
 
         socket.on("join_manual_leads", (type) => {
             socket.join("manual_leads" + type);
-            socket.leave("media-alpha_leads" + type);
+            socket.leave("mediaalpha_leads" + type);
             socket.leave("blueberry_leads" + type);
             socket.leave("bulk_leads" + type);
-            socket.leave("click-listing_leads" + type);
-            socket.leave("live-transfer_leads" + type);
+            socket.leave("clickListing_leads" + type);
+            socket.leave("liveTransfer_leads" + type);
         });
 
         socket.on("join_bulk_leads", (type) => {
             socket.join("bulk_leads" + type);
             socket.leave("blueberry_leads" + type);
-            socket.leave("media-alpha_leads" + type);
+            socket.leave("mediaalpha_leads" + type);
             socket.leave("manual_leads" + type);
-            socket.leave("click-listing_leads" + type);
-            socket.leave("live-transfer_leads" + type);
+            socket.leave("clickListing_leads" + type);
+            socket.leave("liveTransfer_leads" + type);
         });
 
-        socket.on("join_click-listing_leads", (type) => {
-            socket.join("click-listing_leads" + type);
+        socket.on("join_clickListing_leads", (type) => {
+            socket.join("clickListing_leads" + type);
             socket.leave("blueberry_leads" + type);
-            socket.leave("media-alpha_leads" + type);
+            socket.leave("mediaalpha_leads" + type);
             socket.leave("manual_leads" + type);
             socket.leave("bulk_leads" + type);
-            socket.leave("live-transfer_leads" + type);
+            socket.leave("liveTransfer_leads" + type);
         });
 
-        socket.on("join_live-transfer_leads", (type) => {
-            socket.join("live-transfer_leads" + type);
-            socket.leave("click-listing_leads" + type);
+        socket.on("join_liveTransfer_leads", (type) => {
+            socket.join("liveTransfer_leads" + type);
+            socket.leave("clickListing_leads" + type);
             socket.leave("blueberry_leads" + type);
-            socket.leave("media-alpha_leads" + type);
+            socket.leave("mediaalpha_leads" + type);
             socket.leave("manual_leads" + type);
             socket.leave("bulk_leads" + type);
         });
@@ -167,7 +167,7 @@ module.exports = server => {
                 let formatedLead = await FormatService.formatLead(lead);
 
                 let exist;
-                
+
                 if (leadId) {
                     exist = await models.Leads.findOne({ where: { id: leadId } });
                 } else {
@@ -192,15 +192,7 @@ module.exports = server => {
                         if (exist.empty == 0 && formatedLead.empty == 1) {
                             console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);
                         } else {
-                            uploadedLead = await LeadFacade.updateLead(exist, formatedLead, quoter);
-
-                            if (uploadedLead.source === 'mediaalpha') {
-                                uploadedLead.source = 'media-alpha';
-                            } else if (uploadedLead.source === 'clickListing') {
-                                uploadedLead.source = 'click-listing';
-                            } else if (uploadedLead.source === 'liveTransfer') {
-                                uploadedLead.source = 'live-transfer';
-                            }
+                            uploadedLead = await LeadFacade.updateLead(exist, formatedLead, quoter);                            
 
                             if (uploadedLead) {
                                 for (user in users) {
@@ -239,15 +231,7 @@ module.exports = server => {
                         }
                     }
                 } else {
-                    uploadedLead = await LeadFacade.createLead(formatedLead, quoter);
-
-                    if (uploadedLead.source === 'mediaalpha') {
-                        uploadedLead.source = 'media-alpha';
-                    } else if (uploadedLead.source === 'clickListing') {
-                        uploadedLead.source = 'click-listing';
-                    } else if (uploadedLead.source === 'liveTransfer') {
-                        uploadedLead.source = 'live-transfer';
-                    }
+                    uploadedLead = await LeadFacade.createLead(formatedLead, quoter);                            
 
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
@@ -283,14 +267,6 @@ module.exports = server => {
                 io.sockets.to(updatedLead.id).emit("UPDATE_LEAD", updatedLead);
                 io.sockets.to(updatedLead.user_id).emit("UPDATE_LEADS", updatedLead);
 
-                if (updatedLead.source === 'mediaalpha') {
-                    updatedLead.source = 'media-alpha';
-                } else if (updatedLead.source === 'clickListing') {
-                    updatedLead.source = 'click-listing';
-                } else if (updatedLead.source === 'liveTransfer') {
-                    updatedLead.source = 'live-transfer';
-                }
-
                 for (user in users) {
                     if (users[user].id != updatedLead.user_id) {
                         io.sockets.to(users[user].id).emit("DELETE_LEAD", updatedLead.id);
@@ -318,15 +294,7 @@ module.exports = server => {
                 const updatedLead = await LeadService.updateStatus(lead_id, status);
 
                 io.sockets.to(updatedLead.id).emit("UPDATE_LEAD", updatedLead);
-                io.sockets.to(updatedLead.user_id).emit("UPDATE_LEADS", updatedLead);
-
-                if (updatedLead.source === 'mediaalpha') {
-                    updatedLead.source = 'media-alpha';
-                } else if (updatedLead.source === 'clickListing') {
-                    updatedLead.source = 'click-listing';
-                } else if (updatedLead.source === 'liveTransfer') {
-                    updatedLead.source = 'live-transfer';
-                }
+                io.sockets.to(updatedLead.user_id).emit("UPDATE_LEADS", updatedLead);                    
 
                 for (user in users) {
                     if (users[user].id != updatedLead.user_id) {
@@ -381,10 +349,6 @@ module.exports = server => {
                     });
 
                     if (candidate && users[socket.id]) {
-                        // await candidate.update({
-                        // busy: 1,
-                        // busy_agent_id: users[socket.id].id
-                        // });
 
                         const lead = await LeadRepository.getOne(candidate.id);
 
@@ -598,15 +562,7 @@ module.exports = server => {
         socket.on("send_lead", async (lead_id) => {
             try {
                 const lead = await LeadRepository.getOne(lead_id);
-
-                if (lead.source === 'mediaalpha') {
-                    lead.source = 'media-alpha';
-                } else if (lead.source === 'clickListing') {
-                    lead.source = 'click-listing';
-                } else if (lead.source === 'liveTransfer') {
-                    lead.source = 'live-transfer';
-                }
-
+                
                 io.sockets.to(lead.source + "_leads" + lead.type_id).emit("CREATE_LEAD", lead);
             } catch (error) {
                 throw error;
