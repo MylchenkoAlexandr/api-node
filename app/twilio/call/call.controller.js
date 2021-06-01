@@ -3,13 +3,13 @@ const ClientCapability = twilio.jwt.ClientCapability;
 const VoiceResponse = twilio.twiml.VoiceResponse;
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const axios = require('axios');
-const RecordService = require('../services/records.service');
-const models = require('../../database/models');
-const TransformationHelper = require('../helpers/transformation.helper');
-const StateService = require('../services/state.service');
-const UserRepository = require('../repository/user.repository');
-const MessageService = require('../twilio/message/message.service');
-const SettingsService = require('../services/settings.service');
+const RecordService = require('../../services/records.service');
+const models = require('../../../database/models');
+const TransformationHelper = require('../../helpers/transformation.helper');
+const StateService = require('../../services/state.service');
+const UserRepository = require('../../repository/user.repository');
+const MessageService = require('../message/message.service');
+const SettingsService = require('../../services/settings.service');
 const twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 class CallController {
@@ -121,7 +121,7 @@ class CallController {
                 const settings = await SettingsService.get();
                 const defaultPhone = TransformationHelper.formatPhoneForCall(settings.default_phone);
 
-                if (data.To === '+18432339861') {
+                if (data.To === '+18432339864') {
                     leadType = { type_id: 4, subrole_id: 2 }
                 }
 

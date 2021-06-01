@@ -5,32 +5,25 @@ const AuthMiddleware = require('../app/middleware/auth.middleware');
 
 const authenticateToken = AuthMiddleware.authenticateToken;
 const checkedAdminRole = AuthMiddleware.checkedAdminRole;
-// const checkAssignAgentLead = LeadMiddleware.checkAssignAgentLead;
 const findUncompletedLead = LeadMiddleware.findUncompletedLead;
 
-const { assign, selectCarrier, deleteSelectedLeads, deteleLead, test, getLeads, getAll, getLead, getCompaniesListByLeadData, uploadLeadFromMediaAlpha, getRawLeads, uploadLeadFromUrl, getLeadsBySource, getAllLeadsForGuide, getLeadsByFilters } = require('../app/controller/lead.controller');
-const { uploadCSV, uploadVoiceMailAudio } = require('../app/controller/upload.controller');
+const LeadController = require('../app/controller/lead.controller');
 const UploadController = require('../app/controller/upload.controller');
 
-router.post('/test', test);
-router.get('/raws', authenticateToken, getRawLeads);
-router.get('/all', authenticateToken, findUncompletedLead, getAll);
-router.get('/guide/all', authenticateToken, getAllLeadsForGuide);
-router.get('/all/:type/:user_id', authenticateToken, findUncompletedLead, getLeads);
-router.get('/:lead_id', authenticateToken, findUncompletedLead, /*checkAssignAgentLead,*/ getLead);
-router.get('/all/:source', authenticateToken, checkedAdminRole, getLeadsBySource);
-router.post('/get-companies', getCompaniesListByLeadData);
+router.get('/raws', authenticateToken, LeadController.getRawLeads);
+router.get('/guide/all', authenticateToken, LeadController.getAllLeadsForGuide);
+router.get('/all/:type/:user_id', authenticateToken, findUncompletedLead, LeadController.getLeads);
+router.get('/:lead_id', authenticateToken, findUncompletedLead, LeadController.getLead);
+router.get('/all/:source', authenticateToken, checkedAdminRole, LeadController.getLeadsBySource);
+router.post('/get-companies', LeadController.getCompaniesListByLeadData);
 router.post('/upload/bulk-csv', authenticateToken, UploadController.uploadCSV)
-router.post('/upload/media-alpha', uploadLeadFromMediaAlpha);
-router.post('/upload/media-alpha/url', uploadLeadFromUrl);
-router.post('/filter', getLeadsByFilters);
-router.post('/delete', authenticateToken, deteleLead);
-router.post('/delete-selected', authenticateToken, deleteSelectedLeads);
-
+router.post('/upload/media-alpha', LeadController.uploadLeadFromMediaAlpha);
+router.post('/upload/media-alpha/url', LeadController.uploadLeadFromUrl);
+router.post('/filter', LeadController.getLeadsByFilters);
+router.post('/delete', authenticateToken, LeadController.deteleLead);
+router.post('/delete-selected', authenticateToken, LeadController.deleteSelectedLeads);
 router.post('/upload/voice-mail-audio', authenticateToken, UploadController.uploadVoiceMailAudio);
-
-router.post("/select-carrier", authenticateToken, selectCarrier);
-
-router.post("/reassign", authenticateToken, assign)
+router.post("/select-carrier", authenticateToken, LeadController.selectCarrier);
+router.post("/reassign", authenticateToken, LeadController.assign);
 
 module.exports = router;

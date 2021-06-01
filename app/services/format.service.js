@@ -214,7 +214,6 @@ class FormatService {
                     formatedLead.fullname = fullname;
                 }
             } else {
-                dd
                 formatedLead.fullname = lead.fullname;
                 delete lead.fullname;
             }

@@ -1,9 +1,17 @@
 const StatisticRepository = require("../repository/statistic.repository.js");
 class StatisticService {
-    async getStatistic(filters){
-        try{
+    async getStatistic(filters) {
+        try {
             return await StatisticRepository.getStatistic(filters);
-        }catch(error){
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    async getDeals(filters) {
+        try {
+            return await DealsRepository.getDeals(filters);
+        } catch (error) {
             throw error;
         }
     }

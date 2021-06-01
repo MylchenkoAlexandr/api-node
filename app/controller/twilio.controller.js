@@ -8,15 +8,6 @@ const ConferenceRepository = require('../repository/conference.repository');
 const LeadService = require('../services/lead.service');
 
 class TwilioController {
-    outboundCall(req, res) {
-        AutoDiallerService.outboundCall('', '');
-        return res.sendStatus(200);
-    }
-
-    // async AMD(req, res) {
-    //     await AutoDiallerService.machineDetection(req.body);
-    //     return res.sendStatus(200);
-    // }
 
     async answeredCallBack(req, res) {        
         if (req.body.CallStatus == 'in-progress') {

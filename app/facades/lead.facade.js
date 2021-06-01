@@ -3,13 +3,18 @@ const NinjaQuoterService = require('../services/ninja-quoter.service');
 const FormatService = require('../services/format.service');
 const MailService = require('../services/mail.service');
 const PriceService = require('../services/price.service');
-const AutoDiallerService = require('../services/autodialler.service');
 const TransformationHelper = require('../helpers/transformation.helper');
 const LeadRepository = require('../repository/lead.repository');
 const UserRepository = require('../repository/user.repository');
 const TelcastService = require('../telcastAPI/telcast.service');
 
 class LeadFacade {
+    /**
+     * create new lead
+     * @param {*} formatedLead 
+     * @param {*} quoter 
+     * @returns 
+     */
     async createLead(formatedLead, quoter) {
         try {
             const createdLead = await LeadService.createLead(formatedLead);
@@ -76,6 +81,13 @@ class LeadFacade {
         }
     }
 
+    /**
+     * Update exist lead
+     * @param {*} exist 
+     * @param {*} formatedLead 
+     * @param {*} quoter 
+     * @returns 
+     */
     async updateLead(exist, formatedLead, quoter) {
         try {
             const updatedLead = await LeadService.updateLead(exist, formatedLead);
@@ -135,95 +147,6 @@ class LeadFacade {
             }
 
             return await LeadService.getRawLead(updatedLead.id);
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getGuideLeads() {
-        try {
-            const leads = await LeadService.getGuideLeads();
-            return { code: 200, status: 'success', leads };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getAll() {
-        try {
-            const leads = await LeadService.all();
-            return { code: 200, status: 'success', leads };
-        } catch (error) {
-
-        }
-    }
-
-    async getAllLeads(type, user_id) {
-        try {
-            const leads = await LeadService.getAll(type, user_id);
-            return { code: 200, status: 'success', leads };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getRawLeads() {
-        try {
-            const leads = await LeadService.getRawLeads();
-            return { code: 200, status: 'success', leads };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getOneLead(lead_id) {
-        try {
-            const lead = await LeadService.getOne(lead_id);
-            return { code: 200, status: 'success', lead };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getCompaniesList(rawLead) {
-        try {
-            const formatedLeadForQuote = FormatService.formatLeadForQuote(rawLead);
-            const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
-            const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
-            const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
-
-            return companiesInfo;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getLeadsBySource(source) {
-        try {
-            const leads = await LeadService.getLeadsBySource(source);
-
-            return { code: 200, status: 'success', leads };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async updateADstatusFields(lead_id, field, status) {
-        try {
-            const updateStatus = await LeadService.updateADstatusFields(lead_id, field, status);
-
-            if (updateStatus != -1) return { code: 200, status: "success", message: "Status changed" };
-
-            return { code: 404, status: "error", message: "Unexpected error" };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getLeadsByFilters(params) {
-        try {
-            const leads = await LeadService.getLeadsByFilters(params);
-            return { code: 200, status: 'success', leads };
         } catch (error) {
             throw error;
         }

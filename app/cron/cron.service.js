@@ -2,7 +2,6 @@ const models = require("../../database/models");
 const MessageService = require("../twilio/message/message.service");
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const TransformationHelper = require('../helpers/transformation.helper');
-const moment = require('moment');
 
 class CronService {
     async sendNotification(followup, nfText) {

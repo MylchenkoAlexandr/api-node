@@ -2,7 +2,7 @@ const router = require('express').Router();
 const AuthMiddleware = require('../app/middleware/auth.middleware');
 const authenticateToken = AuthMiddleware.authenticateToken;
 const VoiceMailsController = require("../app/twilio/voicemails/voicemails.controller");
-const CustomersVMController = require('../app/twilio/voicemails/customers/customersVM.controller');
+const CustomersVMController = require('../app/twilio/voicemails/customers/voicemail.controller');
 
 router.get("/:user_id", authenticateToken, VoiceMailsController.get)
 router.get("/customers/:lead_id", authenticateToken, CustomersVMController.get)

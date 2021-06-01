@@ -2,7 +2,6 @@ const csvToJson = require('convert-csv-to-json');
 const formidable = require('formidable');
 const FormatService = require('../services/format.service');
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
-// const FileHelper = require('../helpers/file.helper');
 const models = require('../../database/models');
 const SettingsService = require('../services/settings.service');
 const fs = require('fs');

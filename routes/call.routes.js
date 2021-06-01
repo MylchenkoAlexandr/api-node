@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const AuthMiddleware = require('../app/middleware/auth.middleware');
 const authenticateToken = AuthMiddleware.authenticateToken;
-const CallController = require('../app/controller/call.controller');
+
+const CallController = require('../app/twilio/call/call.controller');
 
 router.get('/token', authenticateToken, CallController.token);
 router.post('/voice', CallController.voice);
@@ -11,5 +12,12 @@ router.post('/transcription-callback', CallController.transcriptionCallback);
 router.post('/inbound-call', CallController.inboundCall);
 router.post('/voicemail-response', CallController.voiceMailResponce);
 router.post('/customer-status-callback/:user_id', CallController.customerStatusCallback);
+
+const ConferenceController = require('../app/twilio/conference/conference.controller');
+
+router.post("/conference/add-participiant", ConferenceController.addParticipant);
+router.post("/conference/handle-hold", ConferenceController.handleParticipantHold);
+router.post("/conference/remove-participiant", ConferenceController.removeParticipiant);
+router.post("/conference/participiant-status-callback/:user_id", ConferenceController.participiantStatusCallback);
 
 module.exports = router;
