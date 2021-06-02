@@ -167,7 +167,7 @@ class CallController {
                         state_id: state_id ? state_id : null,
                         source_id: 1,
                         status_id: 1,
-                        type_id: 2,
+                        type_id: leadType.type_id,
                         phone: TransformationHelper.phoneNumberForSearch(data.From)
                     });
 
