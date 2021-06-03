@@ -10,7 +10,7 @@ class StatisticService {
     
     async getDeals(filters) {
         try {
-            return await DealsRepository.getDeals(filters);
+            return await StatisticRepository.getDeals(filters);
         } catch (error) {
             throw error;
         }
