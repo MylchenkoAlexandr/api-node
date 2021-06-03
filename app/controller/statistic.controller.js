@@ -17,7 +17,7 @@ class StatisticController {
     async getDeals(req, res) {
         try {
             if (req.body.filters) {
-                const info = await DealsService.getDeals(req.body.filters);
+                const info = await StatisticService.getDeals(req.body.filters);
                 return res.status(200).send({ status: "success", message: "Success!", deals: info });
             }
             return res.status(400).send({ status: "error", message: "Bad request!" });
