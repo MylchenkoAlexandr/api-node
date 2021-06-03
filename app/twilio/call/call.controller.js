@@ -16,7 +16,8 @@ const TwilioService = require('../../services/twilio.service');
 class CallController {
     token(req, res) {
         const token = TwilioService.genereteCapabilityToken(req.params.agent_id);
-        return res.status(200).json({ token });
+        console.log("🚀 ~ file: call.controller.js ~ line 19 ~ CallController ~ token ~ token", token)
+        return res.status(200).json({ token: token });
     }
 
     voice(req, res) {
