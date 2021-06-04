@@ -16,38 +16,51 @@ const TwilioService = require('../../services/twilio.service');
 class CallController {
     token(req, res) {
         const token = TwilioService.genereteCapabilityToken(req.params.agent_id);
-        console.log("🚀 ~ file: call.controller.js ~ line 19 ~ CallController ~ token ~ token", token)
         return res.status(200).json({ token: token });
     }
 
-    voice(req, res) {
+    async voice(req, res) {
         let voiceResponse;
+        const leadId = req.body.lead_id;
+        let from = process.env.TWILIO_NUMBER;
+
+        const lead = await models.Leads.findOne({
+            where: {
+                id: leadId
+            },
+            attributes: ['type_id']
+        });
+
+        if (lead.type_id == 4) {
+            from = process.env.TWILIO_HEALTH_NUMBER;
+        }
+
         if (req.body.callType == 'single') {
             voiceResponse = new VoiceResponse();
 
             voiceResponse.dial({
                 record: 'record-from-answer-dual',
                 recordingStatusCallbackEvent: "completed",
-                recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
-                callerId: process.env.TWILIO_NUMBER,
+                recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${leadId}/${req.body.user_id}`,
+                callerId: from,
             }, req.body.number);
         } else if (req.body.callType == 'conf') {
             const twiml = new VoiceResponse();
 
             voiceResponse = twiml.dial();
-            const confName = req.body.lead_id + (+new Date());
+            const confName = leadId + (+new Date());
             voiceResponse.conference(confName, {
                 endConferenceOnExit: true,
                 record: 'true',
                 recordingStatusCallbackEvent: "completed",
-                recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
+                recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${leadId}/${req.body.user_id}`,
             });
 
             // Connect participiant to the conference 
             TwilioClient.conferences(confName)
                 .participants
                 .create({
-                    from: process.env.TWILIO_NUMBER,
+                    from: from,
                     to: req.body.number,
                     statusCallback: `${process.env.CALLBACK_TWILIO}/api/call/customer-status-callback/${req.body.user_id}`,
                     statusCallbackEvent: ["completed"],
@@ -110,7 +123,7 @@ class CallController {
                 const settings = await SettingsService.get();
                 const defaultPhone = TransformationHelper.formatPhoneForCall(settings.default_phone);
 
-                if (data.To === '+18432339864') {
+                if (data.To === process.env.TWILIO_HEALTH_NUMBER) {
                     leadType = { type_id: 4, subrole_id: 2 }
                 }
 

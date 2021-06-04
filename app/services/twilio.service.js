@@ -47,8 +47,6 @@ class TwilioService {
             ttl: 43200
         });
 
-        console.log(agentId, { applicationSid: process.env.TWILIO_TWIML_APP_SID, clientName: agentId });
-        
         capability.addScope(new ClientCapability.IncomingClientScope(agentId));
         capability.addScope(new ClientCapability.OutgoingClientScope({ applicationSid: process.env.TWILIO_TWIML_APP_SID, clientName: agentId }));
 
