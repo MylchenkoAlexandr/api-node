@@ -173,7 +173,7 @@ module.exports = server => {
                 } else {
                     exist = await LeadService.foundExistLead(formatedLead);
                 }
-
+                console.log(exist);
                 // Additional check for live transfer leads
                 if (bwf) {
                     if (!exist.email && !exist.fullname) {
