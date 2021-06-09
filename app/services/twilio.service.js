@@ -1,10 +1,6 @@
-const models = require('../../database/models');
 const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-const url = require('url');
-const UserService = require('../services/user.service');
 const ClientCapability = require('twilio').jwt.ClientCapability;
 const twilio = require('twilio');
-const VoiceResponse = twilio.twiml.VoiceResponse;
 
 class TwilioService {
     redirectCall(callSid, toPhone) {
@@ -50,9 +46,12 @@ class TwilioService {
             authToken: process.env.TWILIO_AUTH_TOKEN,
             ttl: 43200
         });
+
         capability.addScope(new ClientCapability.IncomingClientScope(agentId));
         capability.addScope(new ClientCapability.OutgoingClientScope({ applicationSid: process.env.TWILIO_TWIML_APP_SID, clientName: agentId }));
+
         const token = capability.toJwt();
+
         return token;
     }
 }

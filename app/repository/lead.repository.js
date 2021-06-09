@@ -3,17 +3,6 @@ const TransformationHelper = require('../helpers/transformation.helper');
 const moment = require('moment-timezone');
 
 const LeadRepository = {
-    async getGuideLeads() {
-        try {
-            let data = await db.sequelize.query(`SELECT *, sources.title as source, leads.id as id, status.title as status, states.title as state, leads.updatedAt AS updated FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (1, 2, 4, 5) AND leads.status_id IN (1, 2, 3, 4, 5, 11) AND leads.phone IS NOT NULL ORDER BY leads.id DESC;`, {
-                type: db.sequelize.QueryTypes.SELECT,
-            });
-            return data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
     async getAll(type, states) {
         try {
             let statesQuery = '';
@@ -74,7 +63,7 @@ const LeadRepository = {
 
             if (lead.weight && lead.height) lead.bmi = TransformationHelper.calculateBMI(lead.weight, lead.height);
 
-            const updatedAt = moment(lead.updatedAt);
+            const updatedAt = moment(lead.updatedAt, "MM-DD-YYYY");
             lead.updated = `${updatedAt.tz('America/Los_Angeles').format('L')} ${updatedAt.tz('America/Los_Angeles').format('LTS')}`;
             lead.source_title = lead.source_title.charAt(0).toUpperCase() + lead.source_title.slice(1);
             return lead;

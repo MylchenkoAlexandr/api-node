@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const models = require('../../database/models');
-
+ 
 class CustomScriptsService {
     constructor() {
         this._path_url = path.normalize(process.env.CUSTOM_SCRIPTS_PATH);
@@ -73,9 +73,11 @@ class CustomScriptsService {
     parseScript(filename) {
         try {
             let script_path = path.join(this._path_url, filename);
-            const data = fs.readFileSync(script_path, "utf8");
-
-            return data;
+            let file = false;
+            if (fs.existsSync(path)) {
+                file = fs.readFileSync(script_path, "utf8");
+            }
+            return file;
         } catch (error) {
             throw error;
         }

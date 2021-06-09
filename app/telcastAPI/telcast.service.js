@@ -57,8 +57,6 @@ class TelcastService {
             lead.birth_date ? params.date_of_birth = lead.birth_date : false;
             lead.email ? params.email = lead.email : false;
 
-            console.log(params);
-
             request({ url: url, qs: params }, function (err, response, body) {
                 if (err) {
                     logger.log({ level: "error", id: lead.id, message: body });

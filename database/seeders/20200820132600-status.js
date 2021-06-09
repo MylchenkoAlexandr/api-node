@@ -35,7 +35,7 @@ module.exports = {
       },
       {
         name: "notInterested",
-        title: "Not interested",
+        title: "Did not want quote",
         createdAt: new Date(),
         updatedAt: new Date()
       },

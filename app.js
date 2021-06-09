@@ -34,9 +34,7 @@ app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/agents', require('./routes/agent.routes'));
 app.use('/api/notes', require('./routes/notes.routes'));
 app.use('/api/beneficiaries', require('./routes/beneficiary.routes'));
-app.use('/api/twilio', require('./routes/twilio.routes'));
 app.use('/api/user', require('./routes/user.routes'));
-app.use('/api/autodialler', require('./routes/autodialler.routes'));
 app.use('/api/settings', require('./routes/settings.routes'));
 app.use('/api/state', require('./routes/state.routes'));
 app.use('/api/phone', require('./routes/phone.routes'));
@@ -44,13 +42,11 @@ app.use('/api/status', require('./routes/status.routes'));
 app.use('/api/source', require('./routes/source.routes'));
 app.use('/api/message', require('./routes/messages.routes'));
 app.use('/api/voicemail', require('./routes/voicemails.routes'));
-app.use('/api/conference', require('./routes/conference.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
 app.use('/api/templates', require('./routes/templates.routes'));
 app.use('/api/followup', require('./routes/followup.routes'));
 app.use('/api/statistic', require('./routes/statistic.routes'));
 app.use('/api/telcast', require('./routes/telcast.routes'));
-app.use('/api/deals', require('./routes/deals.routes'));
 
 app.use('*', (req, res) => {
     res.sendStatus(404);

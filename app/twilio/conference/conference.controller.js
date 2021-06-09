@@ -10,7 +10,7 @@ class ConferenceController {
                     .create({
                         from: process.env.TWILIO_NUMBER,
                         to: req.body.number,
-                        statusCallback: `${process.env.CALLBACK_TWILIO}/api/conference/participiant-status-callback/${req.body.user_id}`,
+                        statusCallback: `${process.env.CALLBACK_TWILIO}/api/call/conference/participiant-status-callback/${req.body.user_id}`,
                     }).then(res => {
                         client.emit("send-second-part-params", { callSid: res.callSid, conferenceSid: res.conferenceSid }, req.body.user_id);
                     }).catch((err) => {

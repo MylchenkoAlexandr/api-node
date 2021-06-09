@@ -158,14 +158,19 @@ class FormatService {
 
             if (!formatedLead.user_id && lead.bwf) {
                 let agent;
+                let leadType = { type_id: formatedLead.type_id, subrole_id: 1 };
+
+                if (formatedLead.type_id == 4) {
+                    leadType.subrole_id = 2;
+                }
 
                 if (formatedLead.state_id) {
-                    agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(formatedLead.state_id);
+                    agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(formatedLead.state_id, leadType);
                 } else if (formatedLead.phone) {
                     let formatedPhone = TransformationHelper.formatPhoneForCall(formatedLead.phone);
                     let state_id = await StateService.getStateIdFromPhone(formatedPhone);
                     if (state_id) {
-                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
+                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
                     }
                 }
 
@@ -293,6 +298,10 @@ class FormatService {
             }
             if ("type_id" in lead) {
                 delete lead.type_id;
+            }
+
+            if ("doNotUpdate" in lead) {
+                delete lead.doNotUpdate;
             }
 
 

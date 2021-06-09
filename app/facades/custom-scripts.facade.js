@@ -22,12 +22,15 @@ class CustomScriptsFacade {
             let scripts = [];
 
             custom_scripts.forEach(script => {
-                let script_obj = {
-                    id: script.id,
-                    html: CustomScriptsService.parseScript(script.filename)
-                };
+                let parsedScript = CustomScriptsService.parseScript(script.filename)
+                if (parsedScript) {
+                    let script_obj = {
+                        id: script.id,
+                        html: parsedScript
+                    };
 
-                scripts.push(script_obj);
+                    scripts.push(script_obj);
+                }
             });
 
             return { code: 200, status: 'success', scripts };

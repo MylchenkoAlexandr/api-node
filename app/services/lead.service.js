@@ -139,29 +139,6 @@ class LeadService {
         }
     }
 
-    /**
-     * Get all leads for guide user
-     */
-    async getGuideLeads() {
-        try {
-            return await LeadRepository.getGuideLeads();
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
-     * Get all leads skipping any params
-     */
-    async all() {
-        try {
-            const leads = await LeadRepository.All();
-            return leads;
-        } catch (error) {
-            throw error;
-        }
-    }
-
     /** 
      * Function for get all leads
      * @param {string} type
@@ -188,10 +165,10 @@ class LeadService {
             const location = zipcodes.lookup(lead.zipcode);
             if (location) lead.city = location.city;
 
-            const updatedAt = moment(lead.updatedAt);
+            const updatedAt = moment(lead.updatedAt, "MM-DD-YYYY");
             lead.updatedAt = `${updatedAt.tz('America/Los_Angeles').format('L')} ${updatedAt.tz('America/Los_Angeles').format('LTS')}`;
 
-            const createdAt = moment(lead.createdAt);
+            const createdAt = moment(lead.createdAt, "MM-DD-YYYY");
             lead.createdAt = `${createdAt.tz('America/Los_Angeles').format('L')} ${createdAt.tz('America/Los_Angeles').format('LTS')}`;
             return lead;
         } catch (error) {
@@ -204,8 +181,8 @@ class LeadService {
     */
     async getRawLeads() {
         try {
-            const row_leads = await LeadRepository.getEmptyAll();
-            return row_leads;
+            const raw_leads = await LeadRepository.getEmptyAll();
+            return raw_leads;
         } catch (error) {
             throw error;
         }
@@ -441,6 +418,19 @@ class LeadService {
                 }
             });
 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getCompaniesList(rawLead) {
+        try {
+            const formatedLeadForQuote = FormatService.formatLeadForQuote(rawLead);
+            const ninjaQuoterService = new NinjaQuoterService(formatedLeadForQuote);
+            const companies = await ninjaQuoterService.fetchCompanyListFromNinjaQuoter();
+            const companiesInfo = ninjaQuoterService.getCompaniesInfo(companies);
+
+            return companiesInfo;
         } catch (error) {
             throw error;
         }

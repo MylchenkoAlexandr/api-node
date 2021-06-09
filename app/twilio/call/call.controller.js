@@ -3,62 +3,64 @@ const ClientCapability = twilio.jwt.ClientCapability;
 const VoiceResponse = twilio.twiml.VoiceResponse;
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
 const axios = require('axios');
-const RecordService = require('../services/records.service');
-const models = require('../../database/models');
-const TransformationHelper = require('../helpers/transformation.helper');
-const StateService = require('../services/state.service');
-const UserRepository = require('../repository/user.repository');
-const MessageService = require('../twilio/message/message.service');
-const SettingsService = require('../services/settings.service');
-const twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const RecordService = require('../../services/records.service');
+const models = require('../../../database/models');
+const TransformationHelper = require('../../helpers/transformation.helper');
+const StateService = require('../../services/state.service');
+const UserRepository = require('../../repository/user.repository');
+const MessageService = require('../message/message.service');
+const SettingsService = require('../../services/settings.service');
+const TwilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const TwilioService = require('../../services/twilio.service');
 
 class CallController {
     token(req, res) {
-        const capability = new ClientCapability({
-            accountSid: process.env.TWILIO_ACCOUNT_SID,
-            authToken: process.env.TWILIO_AUTH_TOKEN,
-            ttl: 43200
-        });
-
-        capability.addScope(
-            new ClientCapability.OutgoingClientScope({
-                applicationSid: process.env.TWILIO_TWIML_APP_SID
-            })
-        );
-
-        const token = capability.toJwt();
-
-        return res.status(200).json({ token });
+        const token = TwilioService.genereteCapabilityToken(req.params.agent_id);
+        return res.status(200).json({ token: token });
     }
 
-    voice(req, res) {
+    async voice(req, res) {
         let voiceResponse;
+        const leadId = req.body.lead_id;
+        let from = process.env.TWILIO_NUMBER;
+
+        const lead = await models.Leads.findOne({
+            where: {
+                id: leadId
+            },
+            attributes: ['type_id']
+        });
+
+        if (lead.type_id == 4) {
+            from = process.env.TWILIO_HEALTH_NUMBER;
+        }
+
         if (req.body.callType == 'single') {
             voiceResponse = new VoiceResponse();
 
             voiceResponse.dial({
                 record: 'record-from-answer-dual',
                 recordingStatusCallbackEvent: "completed",
-                recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
-                callerId: process.env.TWILIO_NUMBER,
+                recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${leadId}/${req.body.user_id}`,
+                callerId: from,
             }, req.body.number);
         } else if (req.body.callType == 'conf') {
             const twiml = new VoiceResponse();
 
             voiceResponse = twiml.dial();
-            const confName = req.body.lead_id + (+new Date());
+            const confName = leadId + (+new Date());
             voiceResponse.conference(confName, {
                 endConferenceOnExit: true,
                 record: 'true',
                 recordingStatusCallbackEvent: "completed",
-                recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${req.body.lead_id}/${req.body.user_id}`,
+                recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${leadId}/${req.body.user_id}`,
             });
 
             // Connect participiant to the conference 
-            twilioClient.conferences(confName)
+            TwilioClient.conferences(confName)
                 .participants
                 .create({
-                    from: process.env.TWILIO_NUMBER,
+                    from: from,
                     to: req.body.number,
                     statusCallback: `${process.env.CALLBACK_TWILIO}/api/call/customer-status-callback/${req.body.user_id}`,
                     statusCallbackEvent: ["completed"],
@@ -115,22 +117,25 @@ class CallController {
     async inboundCall(req, res) {
         try {
             const data = req.body;
-
             if ("CallSid" in data && "From" in data) {
                 let agent, state_id;
-                let recordCall = false;
-
+                let leadType = { type_id: 2, subrole_id: 1 };
                 const settings = await SettingsService.get();
                 const defaultPhone = TransformationHelper.formatPhoneForCall(settings.default_phone);
+
+                if (data.To === process.env.TWILIO_HEALTH_NUMBER) {
+                    leadType = { type_id: 4, subrole_id: 2 }
+                }
 
                 let callbackVoiseMailUrl = settings.default_voice_mail;
                 let callbackTextMessage = settings.default_text_message;
 
                 const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
-                // where phone or second phone
+
                 let lead = await models.Leads.findOne({
                     where: {
-                        phone: formatedPhone
+                        phone: formatedPhone,
+                        type_id: leadType.type_id
                     }
                 });
 
@@ -141,7 +146,6 @@ class CallController {
                 }, 'Please wait connection with agent!');
 
                 if (lead) {
-                    recordCall = true;
                     if (lead.user_id) {
                         const user = await models.Users.findOne({
                             where: { id: lead.user_id }
@@ -157,12 +161,12 @@ class CallController {
                         }
                     } else {
                         if (lead.state_id) {
-                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id);
+                            agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id, leadType);
                         } else {
                             let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                             if (state_id) {
-                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
+                                agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
                             }
                         }
                     }
@@ -170,14 +174,14 @@ class CallController {
                     state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                     if (state_id) {
-                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id);
+                        agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
                     }
 
                     lead = await models.Leads.create({
                         state_id: state_id ? state_id : null,
                         source_id: 1,
                         status_id: 1,
-                        type_id: 2,
+                        type_id: leadType.type_id,
                         phone: TransformationHelper.phoneNumberForSearch(data.From)
                     });
 
@@ -211,7 +215,7 @@ class CallController {
                     });
 
                     // Connect participiant to the conference 
-                    twilioClient.conferences(confName)
+                    TwilioClient.conferences(confName)
                         .participants
                         .create({
                             from: process.env.TWILIO_NUMBER,
@@ -246,6 +250,8 @@ class CallController {
         }
     }
 
+    // Add new function for the health inbout call
+
     async recieveVoiceMail(req, res) {
         try {
             const data = req.body;
@@ -256,43 +262,6 @@ class CallController {
             return res.status(400).send({ status: "error", message: "Bad request!" });
         } catch (error) {
             res.status(500).send({ status: "error", message: "Server error!" });
-            throw error;
-        }
-    }
-
-    async playPreRecordedVM(req, res) {
-        try {
-            // twilioClient.calls.create({
-            //     url: 'https://api.twilio.com/cowbell.mp3'
-            // });
-
-            twilioClient.calls(req.body.callSid)
-                .update({
-                    // from: "+380632796212",
-                    // to: "+18339282583",
-                    // url: 'http://demo.twilio.com/docs/classic.mp3'
-                    method: "POST",
-                    url: `${process.env.CALLBACK_TWILIO}/api/call/voicemail-response`,
-                });
-
-            // const response = new VoiceResponse();
-            // response.enqueue({
-            //     waitUrl: 'https://api.twilio.com/cowbell.mp3'
-            // }, 'support');
-
-            // const response = new VoiceResponse();
-            // response.play('https://api.twilio.com/cowbell.mp3');
-
-
-            // response.play({
-            //     loop: 10
-            // }, '');
-
-
-            // res.type('text/xml');
-
-            return res.status(200).send({});
-        } catch (error) {
             throw error;
         }
     }
