@@ -173,9 +173,9 @@ module.exports = server => {
                 } else {
                     exist = await LeadService.foundExistLead(formatedLead);
                 }
-                console.log(exist);
+                
                 // Additional check for live transfer leads
-                if (bwf) {
+                if (bwf && exist) {
                     if (!exist.email && !exist.fullname) {
                         if (exist.user_id) {
                             formatedLead.user_id = exist.user_id;
@@ -192,7 +192,7 @@ module.exports = server => {
                         if (exist.empty == 0 && formatedLead.empty == 1) {
                             console.error("Skipped by checking if exist with filled data already in system!", formatedLead.email);
                         } else {
-                            uploadedLead = await LeadFacade.updateLead(exist, formatedLead, quoter);                            
+                            uploadedLead = await LeadFacade.updateLead(exist, formatedLead, quoter);
 
                             if (uploadedLead) {
                                 for (user in users) {
@@ -231,7 +231,7 @@ module.exports = server => {
                         }
                     }
                 } else {
-                    uploadedLead = await LeadFacade.createLead(formatedLead, quoter);                            
+                    uploadedLead = await LeadFacade.createLead(formatedLead, quoter);
 
                     if (uploadedLead) {
                         if (uploadedLead.empty == 0) {
@@ -294,7 +294,7 @@ module.exports = server => {
                 const updatedLead = await LeadService.updateStatus(lead_id, status);
 
                 io.sockets.to(updatedLead.id).emit("UPDATE_LEAD", updatedLead);
-                io.sockets.to(updatedLead.user_id).emit("UPDATE_LEADS", updatedLead);                    
+                io.sockets.to(updatedLead.user_id).emit("UPDATE_LEADS", updatedLead);
 
                 for (user in users) {
                     if (users[user].id != updatedLead.user_id) {
@@ -562,7 +562,7 @@ module.exports = server => {
         socket.on("send_lead", async (lead_id) => {
             try {
                 const lead = await LeadRepository.getOne(lead_id);
-                
+
                 io.sockets.to(lead.source + "_leads" + lead.type_id).emit("CREATE_LEAD", lead);
             } catch (error) {
                 throw error;
