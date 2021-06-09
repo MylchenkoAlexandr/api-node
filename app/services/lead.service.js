@@ -3,6 +3,8 @@ const zipcodes = require('zipcodes');
 const LeadRepository = require('../repository/lead.repository');
 const AgentRepository = require('../repository/agent.repository');
 const moment = require('moment-timezone');
+const FormatService = require('../services/format.service');
+const NinjaQuoterService = require('../services/ninja-quoter.service');
 
 class LeadService {
     /**
