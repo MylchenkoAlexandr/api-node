@@ -63,7 +63,7 @@ const LeadRepository = {
 
             if (lead.weight && lead.height) lead.bmi = TransformationHelper.calculateBMI(lead.weight, lead.height);
 
-            const updatedAt = moment(lead.updatedAt, "MM-DD-YYYY");
+            const updatedAt = moment(lead.updatedAt);
             lead.updated = `${updatedAt.tz('America/Los_Angeles').format('L')} ${updatedAt.tz('America/Los_Angeles').format('LTS')}`;
             lead.source_title = lead.source_title.charAt(0).toUpperCase() + lead.source_title.slice(1);
             return lead;
