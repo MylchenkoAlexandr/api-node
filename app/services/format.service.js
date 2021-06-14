@@ -11,6 +11,7 @@ class FormatService {
      * @param {object} lead
      */
     async formatLead(lead) {
+
         if (lead.length <= 0) {
             throw new Error('Lead object is empty!');
         }
@@ -303,7 +304,6 @@ class FormatService {
             if ("doNotUpdate" in lead) {
                 delete lead.doNotUpdate;
             }
-
 
             formatedLead.property = {
                 ...lead

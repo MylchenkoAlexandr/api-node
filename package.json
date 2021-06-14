@@ -6,7 +6,7 @@
   "scripts": {
     "prod": "node app.js",
     "dev": "nodemon app.js",
-    "test": "cross-env NODE_ENV=test PORT=3001 mocha --exit"
+    "test": "jest --detectOpenHandles"
   },
   "author": "Dmytro <dmytro@fluidweb.io>",
   "license": "ISC",
