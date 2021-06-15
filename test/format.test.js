@@ -1,12 +1,11 @@
 const db = require('../database/models');
 const FormatService = require("../app/services/format.service");
-const priceService = require('../app/services/price.service');
+
 const oldEnv = process.env;
 
 beforeAll(async () => {
     jest.resetModules();
     await db.sequelize.authenticate();
-    // process.env = { ...oldEnv };
     process.env.NODE_ENV = "test";
 });
 
