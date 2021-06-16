@@ -61,6 +61,7 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     email_sended: DataTypes.BOOLEAN,
     phone: DataTypes.STRING,
+    second_phone: DataTypes.STRING,
     fullname: DataTypes.STRING,
     busy: DataTypes.BOOLEAN,
     busy_agent_id: DataTypes.BIGINT.UNSIGNED,
