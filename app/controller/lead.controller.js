@@ -169,11 +169,10 @@ class LeadController {
     }
 
     async getLeadsByFilters(req, res) {
-        try {
-            const response = await LeadService.getLeadsByFilters(req.body);
-
+        try {        
+            const response = await LeadService.getLeadsByFilters(req.body.params, req.body.limit, req.body.page);
             if (response) {
-                return res.status(200).json({ status: "success", message: "Success Uploaded!", leads: response });
+                return res.status(200).json({ status: "success", message: "Success Uploaded!", leads: response.leads, totalCount: response.totalCount });
             }
 
             return res.status(400).json({ status: "error", message: "Bad request!" });

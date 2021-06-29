@@ -348,9 +348,9 @@ class LeadService {
         }
     }
 
-    async getLeadsByFilters(params) {
+    async getLeadsByFilters(params, limit, page) {
         try {
-            const leads = await LeadRepository.getLeadsByFilters(params);
+            const leads = await LeadRepository.getLeadsByFilters(params, limit, page);
             return leads;
         } catch (error) {
             throw error;
