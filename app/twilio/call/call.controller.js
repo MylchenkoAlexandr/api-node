@@ -139,6 +139,15 @@ class CallController {
                     }
                 });
 
+                if (!lead) {
+                    lead = await models.Leads.findOne({
+                        where: {
+                            second_phone: formatedPhone,
+                            type_id: leadType.type_id
+                        }
+                    });
+                }
+
                 const twiml = new VoiceResponse();
 
                 twiml.say({

@@ -23,6 +23,7 @@ class LeadService {
                 email: lead.email || null,
                 phone: lead.phone || null,
                 fullname: lead.fullname || null,
+                second_phone: lead.second_phone || null,
                 property: JSON.stringify(lead.property)
             });
 
@@ -48,6 +49,7 @@ class LeadService {
                 empty: lead.empty || 0,
                 email: lead.email || null,
                 phone: lead.phone || null,
+                second_phone: lead.second_phone || null,
                 fullname: lead.fullname || null,
                 property: JSON.stringify(lead.property),
                 draft_date: lead.draft_date,
@@ -346,9 +348,9 @@ class LeadService {
         }
     }
 
-    async getLeadsByFilters(params) {
+    async getLeadsByFilters(params, limit, page) {
         try {
-            const leads = await LeadRepository.getLeadsByFilters(params);
+            const leads = await LeadRepository.getLeadsByFilters(params, limit, page);
             return leads;
         } catch (error) {
             throw error;
