@@ -195,43 +195,6 @@ const LeadRepository = {
         }
     },
 
-    /**
-     * 
-     * @param {integer} limit count of leads neede
-     */
-    async getSuitableLeadsForCall(limit = null) {
-        try {
-            let limitLeads = ';';
-
-            if (limit) {
-                limitLeads = " LIMIT " + limit;
-            }
-
-            let data = await db.sequelize.query(`SELECT *, sources.title as source_title, leads.id as id, status.title as status_title, states.title as state_title FROM leads INNER JOIN status ON status.id = leads.status_id LEFT JOIN sources ON sources.id = leads.source_id LEFT JOIN states ON states.id = leads.state_id WHERE leads.source_id IN (1, 2, 4, 5) AND leads.status_id IN (1, 11) AND leads.AD_status NOT IN(1, 2, 4) AND leads.phone IS NOT NULL ORDER BY leads.id DESC` + limitLeads, {
-                type: db.sequelize.QueryTypes.SELECT,
-            });
-
-            if (limit) {
-                return data[0];
-            }
-
-            return data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
-    async updateADstatusFields(lead_id, field, status) {
-        try {
-            let data = await db.sequelize.query(`UPDATE leads SET leads.${field} = ${status} WHERE leads.id = ${lead_id};`, {
-                type: db.sequelize.QueryTypes.UPDATE,
-            });
-
-            return data;
-        } catch (error) {
-            throw error;
-        }
-    },
 
     async updatePostSale(lead_id, post_sale = 0) {
         try {

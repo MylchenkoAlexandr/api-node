@@ -11,7 +11,7 @@ const UserRepository = require('../../repository/user.repository');
 const MessageService = require('../message/message.service');
 const SettingsService = require('../../services/settings.service');
 const TwilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-const TwilioService = require('../../services/twilio.service');
+const TwilioService = require('../twilio.service');
 
 class CallController {
     token(req, res) {

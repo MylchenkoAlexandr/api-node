@@ -15,7 +15,6 @@ class AuthController {
       res.status(500).json({ status: 'error', message: "Server Error" });
       throw error;
     }
-
   };
 
   async verify(req, res) {

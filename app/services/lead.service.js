@@ -55,7 +55,7 @@ class LeadService {
                 draft_date: lead.draft_date,
                 app_date: lead.app_date
             });
-
+            
             return updatedLead;
         } catch (err) {
             throw err;
@@ -325,24 +325,6 @@ class LeadService {
     async updatePrice(lead_id, price) {
         try {
             return await LeadRepository.updatePrice(lead_id, price);
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getSuitableLeadsForCall(limit) {
-        try {
-            const leads = await LeadRepository.getSuitableLeadsForCall(limit);
-            return leads;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async updateADstatusFields(lead_id, field, status) {
-        try {
-            const lead = await LeadRepository.updateADstatusFields(lead_id, field, status);
-            return lead;
         } catch (error) {
             throw error;
         }

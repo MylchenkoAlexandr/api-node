@@ -1,6 +1,7 @@
 const UserFacade = require("../facades/user.facade");
 const UserRepository = require("../repository/user.repository");
 const UserService = require("../services/user.service");
+
 class UserController {
     async getStatus(req, res) {
         try {

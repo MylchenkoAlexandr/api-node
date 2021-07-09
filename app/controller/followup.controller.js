@@ -136,8 +136,6 @@ class FollowUpController {
     async filter(req, res) {
         try {
             if ("params" in req.body) {
-
-
                 const followups = await FollowUpsRepository.filter(req.body.params);
 
                 return res.status(200).send({ status: "success", message: "Success", followups: followups });
