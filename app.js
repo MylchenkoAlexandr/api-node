@@ -53,7 +53,7 @@ app.use('*', (req, res) => {
 });
 
 cron.schedule("* * * * *", async () => {
-    await CronService.followUpsNotification();
+    // await CronService.followUpsNotification();
 });
 
 cron.schedule("0 */2 * * *", async () => {
