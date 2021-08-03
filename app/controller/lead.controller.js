@@ -1,22 +1,8 @@
 const client = require('socket.io-client')(process.env.WEBSOCKET_URL);
-const FormatService = require('../services/format.service');
-const LeadFacade = require('../facades/lead.facade');
 const LeadService = require('../services/lead.service');
 const models = require('../../database/models');
-const leadService = require('../services/lead.service');
-const LeadRepository = require('../repository/user.repository');
 
 class LeadController {
-    async getAllLeadsForGuide(req, res) {
-        try {
-            const response = await LeadService.getSuitableLeadsForCall();
-            return res.status(200).json({ status: "Success", leads: response });
-        } catch (err) {
-            res.status(500).json({ status: 'error', message: "Server Error!" });
-            throw err;
-        }
-    }
-
     async getLeads(req, res) {
         try {
             const response = await LeadService.getAllLeads(req.params.type, req.params.user_id);
@@ -182,7 +168,7 @@ class LeadController {
         }
     }
 
-    async deteleLead(req, res) {
+    async detele(req, res) {
         try {
             if ("lead_id" in req.body) {
                 const lead_id = req.body.lead_id;
@@ -196,6 +182,7 @@ class LeadController {
             throw error;
         }
     }
+
     deleteSelectedLeads(req, res) {
         try {
             if (req.body.leads) {
@@ -241,11 +228,6 @@ class LeadController {
         }
     }
 
-    /**
-     * for unassign leads from the selected aggents 
-     * @param {*} req 
-     * @param {*} res 
-     */
     async assign(req, res) {
         try {
             if (req.body.leads) {

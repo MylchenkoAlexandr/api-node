@@ -126,7 +126,7 @@ class StatisticRepository {
 
                 if (lead.price) lead.price = JSON.parse(lead.price);
                 return lead
-            }))
+            }));
 
 
             let totalCoverage = 0;
