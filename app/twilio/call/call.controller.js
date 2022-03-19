@@ -12,6 +12,23 @@ const MessageService = require('../message/message.service');
 const SettingsService = require('../../services/settings.service');
 const TwilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const TwilioService = require('../twilio.service');
+const winston = require("winston");
+
+/**
+ * Logged with params
+ */
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'logs/call.log' })
+    ],
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.printf(info => {
+            return `${info.timestamp} (${info.row}): "${info.message.trimEnd()}"`;
+        })
+    ),
+});
 
 class CallController {
     token(req, res) {
@@ -56,7 +73,7 @@ class CallController {
                 recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${leadId}/${req.body.user_id}`,
             });
 
-            // Connect participiant to the conference 
+            // Connect participiant to the conference
             TwilioClient.conferences(confName)
                 .participants
                 .create({
@@ -67,10 +84,10 @@ class CallController {
                     startConferenceOnEnter: true,
                     endConferenceOnExit: true,
                 }).then(res => {
-                    client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid }, req.body.user_id);
-                }).catch((err) => {
-                    console.log(err);
-                });
+                client.emit("send-conf-params", { callSid: res.callSid, conferenceSid: res.conferenceSid }, req.body.user_id);
+            }).catch((err) => {
+                console.log(err);
+            });
         }
 
         return res.type('text/xml').send(voiceResponse.toString());
@@ -115,22 +132,32 @@ class CallController {
     }
 
     async inboundCall(req, res) {
+
+        logger.log({ level: "info", row: '136', message: "Inbound call..." });
+
         try {
             const data = req.body;
             if ("CallSid" in data && "From" in data) {
+
+                logger.log({ level: "info", row: '142', message: `request data: ${JSON.stringify(data)}` });
+
                 let agent, state_id;
                 let leadType = { type_id: 2, subrole_id: 1 };
                 const settings = await SettingsService.get();
                 const defaultPhone = TransformationHelper.formatPhoneForCall(settings.default_phone);
 
+                logger.log({ level: "info", row: '149', message: `default phone: ${defaultPhone}` });
+
                 if (data.To === process.env.TWILIO_HEALTH_NUMBER) {
                     leadType = { type_id: 4, subrole_id: 2 }
                 }
-
+                logger.log({ level: "info", row: '154', message: `lead type: ${JSON.stringify(leadType)}` });
                 let callbackVoiseMailUrl = settings.default_voice_mail;
                 let callbackTextMessage = settings.default_text_message;
 
                 const formatedPhone = TransformationHelper.phoneNumberForSearch(data.From);
+
+                logger.log({ level: "info", row: '160', message: `lead phone: ${formatedPhone}` });
 
                 let lead = await models.Leads.findOne({
                     where: {
@@ -155,27 +182,50 @@ class CallController {
                 }, 'Please wait connection with agent!');
 
                 if (lead) {
+
+                    logger.log({ level: "info", row: '186', message: `founded lead: ${JSON.stringify(lead)}` });
+
                     if (lead.user_id) {
                         const user = await models.Users.findOne({
                             where: { id: lead.user_id }
                         });
 
                         if (user) {
+
+                            logger.log({ level: "info", row: '195', message: `founded user: ${JSON.stringify(user)}` });
+
                             agent = await UserRepository.findSuitableAgent(lead.user_id);
 
                             if (!agent) {
+
+                                logger.log({ level: "info", row: '201', message: `agent not found` });
+
                                 callbackVoiseMailUrl = user.voice_mail;
                                 callbackTextMessage = user.text_message;
+                            } else {
+                                logger.log({ level: "info", row: '206', message: `founded agent: ${JSON.stringify(agent)}` });
                             }
                         }
                     } else {
                         if (lead.state_id) {
                             agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(lead.state_id, leadType);
+
+                            if (!agent) {
+                                logger.log({ level: "info", row: '214', message: `agent not found` });
+                            } else {
+                                logger.log({ level: "info", row: '216', message: `founded agent: ${JSON.stringify(agent)}` });
+                            }
                         } else {
                             let state_id = await StateService.getStateIdFromPhone(formatedPhone);
 
                             if (state_id) {
                                 agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
+
+                                if (!agent) {
+                                    logger.log({ level: "info", row: '225', message: `agent not found` });
+                                } else {
+                                    logger.log({ level: "info", row: '227', message: `founded agent: ${JSON.stringify(agent)}` });
+                                }
                             }
                         }
                     }
@@ -184,6 +234,12 @@ class CallController {
 
                     if (state_id) {
                         agent = await UserRepository.findSuitableAgentByCountOfBlueberryLeads(state_id, leadType);
+
+                        if (!agent) {
+                            logger.log({ level: "info", row: '239', message: `agent not found` });
+                        } else {
+                            logger.log({ level: "info", row: '241', message: `founded agent: ${JSON.stringify(agent)}` });
+                        }
                     }
 
                     lead = await models.Leads.create({
@@ -195,20 +251,27 @@ class CallController {
                     });
 
                     if (lead) {
+                        logger.log({ level: "info", row: '254', message: `created lead: ${JSON.stringify(lead)}` });
                         client.emit("send_lead", lead.id);
+                    } else {
+                        logger.log({ level: "info", row: '267', message: `lead not created` });
                     }
                 }
 
                 if (agent) {
                     if (lead) {
                         if (lead.user_id != agent.id) {
+                            logger.log({ level: "info", row: '264', message: `assign agent` });
                             client.emit("assign-agent", lead.id, agent.id);
                         }
 
                         if (lead.id) {
+                            logger.log({ level: "info", row: '269', message: `send lead id` });
                             client.emit("send-lead-id", lead.id, agent.id);
                         }
                     }
+
+                    logger.log({ level: "info", row: '274', message: `starting a dial...` });
 
                     const dial = twiml.dial();
 
@@ -223,7 +286,7 @@ class CallController {
                         recordingStatusCallback: `${process.env.CALLBACK_TWILIO}/api/call/record-callback/${lead.id}/${agent.id}`,
                     });
 
-                    // Connect participiant to the conference 
+                    // Connect participiant to the conference
                     TwilioClient.conferences(confName)
                         .participants
                         .create({
@@ -231,11 +294,15 @@ class CallController {
                             to: `client:${agent.id}`,
                             endConferenceOnExit: true,
                         }).then(res => {
-                            client.emit("send-conf-params", { callSid: lead.phone, conferenceSid: res.conferenceSid }, agent.id);
-                        }).catch((err) => {
-                            console.log(err);
-                        });
+                        logger.log({ level: "info", row: '297', message: `participant connected: ${res}` });
+                        client.emit("send-conf-params", { callSid: lead.phone, conferenceSid: res.conferenceSid }, agent.id);
+                    }).catch((err) => {
+                        logger.log({ level: "info", row: '300', message: `participant connection error: ${err.message}` });
+                        console.log(err);
+                    });
                 } else {
+                    logger.log({ level: "info", row: '304', message: `agent not found, voicemail start...` });
+
                     twiml.play(process.env.WEBSOCKET_URL + '/' + callbackVoiseMailUrl);
 
                     twiml.record({
@@ -249,11 +316,18 @@ class CallController {
                     MessageService.sendMessage(defaultPhone, data.From, callbackTextMessage);
                 }
 
+                logger.log({ level: "info", row: '319', message: `success` });
+
                 return res.status(200).send(twiml.toString());
             }
 
+            logger.log({ level: "info", row: '301', message: `Error...` });
+
             return res.status(400).json({ status: 'error', message: "Bad request!" });
         } catch (error) {
+
+            logger.log({ level: "error", row: '306', message: error.message });
+
             res.status(500).json({ status: 'error', message: "Server Error!" });
             throw error;
         }
